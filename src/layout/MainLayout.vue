@@ -1,6 +1,7 @@
 <template>
-  <router-view />
-  <van-tabbar v-model="active" route :border="false">
+  <nav-bar :title="title" class="navbar" />
+  <router-view class="content" />
+  <van-tabbar v-model="active" route :border="false" class="tabbar">
     <van-tabbar-item name="meet" to="/meet" :icon="active === 'meet' ? 'like' : 'like-o'" />
     <van-tabbar-item
       name="message"
@@ -14,19 +15,29 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import NavBar from '@/shared/components/NavBar.vue'
+import { computed } from 'vue'
 
 const route = useRoute()
-const active = ref(route.name?.toString() || 'meet')
+const routeName = route.name?.toString()
+const active = ref(routeName || 'meet')
+const title = computed(() => {
+  switch (active.value) {
+    case 'meet':
+      return '遇见'
+    case 'message':
+      return '消息'
+    case 'home':
+      return '我的'
+    default:
+      return '导航'
+  }
+})
 </script>
 
 <style scoped lang="scss">
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+.content {
+  min-height: calc(100vh - var(--height-navbar) - var(--height-tabbar));
+  background-color: gray;
 }
 </style>
