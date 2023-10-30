@@ -1,5 +1,6 @@
 <template>
-  <div class="home-TUIKit-main">
+  This is message view.
+  <!-- <div class="home-TUIKit-main">
     <div
       :class="env?.isH5 ? 'conversation-h5' : 'conversation'"
       v-show="!env?.isH5 || currentModel === 'conversation'"
@@ -11,9 +12,9 @@
       <TUIChat>
         <h1>欢迎使用腾讯云即时通信IM</h1>
       </TUIChat>
-    </div>
-    <!-- TUICallKit 组件：通话 UI 组件主体 -->
-    <TUICallKit
+    </div> -->
+  <!-- TUICallKit 组件：通话 UI 组件主体 -->
+  <!-- <TUICallKit
       :class="!showCallMini ? 'callkit-drag-container' : 'callkit-drag-container-mini'"
       :allowedMinimized="true"
       :allowedFullScreen="false"
@@ -22,63 +23,63 @@
       :onMinimized="onMinimized"
       :onMessageSentByMe="onMessageSentByMe"
     />
-  </div>
+  </div> -->
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from "vue";
-import { TUIEnv } from "../TUIKit/TUIPlugin";
-import { handleErrorPrompts } from "../TUIKit/TUIComponents/container/utils";
+<script setup lang="ts">
+// import { defineComponent, reactive, toRefs } from "vue";
+// import { TUIEnv } from "../TUIKit/TUIPlugin";
+// import { handleErrorPrompts } from "../TUIKit/TUIComponents/container/utils";
 
-export default defineComponent({
-  name: "App",
-  setup() {
-    const data = reactive({
-      env: TUIEnv(),
-      currentModel: "conversation",
-      showCall: false,
-      showCallMini: false,
-    });
-    const TUIServer = (window as any)?.TUIKitTUICore?.TUIServer;
-    const handleCurrentConversation = (value: string) => {
-      data.currentModel = value ? "message" : "conversation";
-    };
-    // beforeCalling：在拨打电话前与收到通话邀请前执行
-    const beforeCalling = (type: string, error: any) => {
-      if (error) {
-        handleErrorPrompts(error, type);
-        return;
-      }
-      data.showCall = true;
-    };
-    // afterCalling：结束通话后执行
-    const afterCalling = () => {
-      data.showCall = false;
-      data.showCallMini = false;
-    };
-    // onMinimized：组件切换最小化状态时执行
-    const onMinimized = (
-      oldMinimizedStatus: boolean,
-      newMinimizedStatus: boolean
-    ) => {
-      data.showCall = !newMinimizedStatus;
-      data.showCallMini = newMinimizedStatus;
-    };
-    // onMessageSentByMe：在整个通话过程内发送消息时执行
-    const onMessageSentByMe = async (message: any) => {
-      TUIServer?.TUIChat?.handleMessageSentByMeToView(message);
-      return;
-    };
-    return {
-      ...toRefs(data),
-      handleCurrentConversation,
-      beforeCalling,
-      afterCalling,
-      onMinimized,
-      onMessageSentByMe,
-    };
-  },
-});
+// export default defineComponent({
+//   name: "App",
+//   setup() {
+//     const data = reactive({
+//       env: TUIEnv(),
+//       currentModel: "conversation",
+//       showCall: false,
+//       showCallMini: false,
+//     });
+//     const TUIServer = (window as any)?.TUIKitTUICore?.TUIServer;
+//     const handleCurrentConversation = (value: string) => {
+//       data.currentModel = value ? "message" : "conversation";
+//     };
+//     // beforeCalling：在拨打电话前与收到通话邀请前执行
+//     const beforeCalling = (type: string, error: any) => {
+//       if (error) {
+//         handleErrorPrompts(error, type);
+//         return;
+//       }
+//       data.showCall = true;
+//     };
+//     // afterCalling：结束通话后执行
+//     const afterCalling = () => {
+//       data.showCall = false;
+//       data.showCallMini = false;
+//     };
+//     // onMinimized：组件切换最小化状态时执行
+//     const onMinimized = (
+//       oldMinimizedStatus: boolean,
+//       newMinimizedStatus: boolean
+//     ) => {
+//       data.showCall = !newMinimizedStatus;
+//       data.showCallMini = newMinimizedStatus;
+//     };
+//     // onMessageSentByMe：在整个通话过程内发送消息时执行
+//     const onMessageSentByMe = async (message: any) => {
+//       TUIServer?.TUIChat?.handleMessageSentByMeToView(message);
+//       return;
+//     };
+//     return {
+//       ...toRefs(data),
+//       handleCurrentConversation,
+//       beforeCalling,
+//       afterCalling,
+//       onMinimized,
+//       onMessageSentByMe,
+//     };
+//   },
+// });
 </script>
 <style scoped>
 .home-TUIKit-main {
@@ -110,7 +111,9 @@ export default defineComponent({
   width: 50rem;
   height: 36rem;
   border-radius: 16px;
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  box-shadow:
+    rgba(0, 0, 0, 0.16) 0px 3px 6px,
+    rgba(0, 0, 0, 0.23) 0px 3px 6px;
 }
 .callkit-drag-container-mini {
   position: fixed;

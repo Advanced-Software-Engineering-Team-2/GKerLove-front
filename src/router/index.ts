@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { getToken } from '@/utils/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,13 +37,47 @@ const router = createRouter({
     },
     {
       path: '/login',
-      component: () => import('@/layout/MainLayout.vue')
+      name: 'login',
+      component: () => import('@/views/LoginView.vue'),
+      meta: {
+        title: '登录'
+      }
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('@/views/RegisterView.vue'),
+      meta: {
+        title: '注册'
+      }
+    },
+    {
+      path: '/404',
+      name: '404',
+      component: () => import('@/views/404.vue'),
+      meta: {
+        title: '页面不存在'
+      }
+    },
+    {
+      path: '/:pathMatch(.*)',
+      redirect: '/404'
     }
   ]
 })
 
-router.beforeEach((to, _, next) => {
+const whiteList = ['/login', '/register', '/reset'] // no redirect whitelist
+
+router.beforeEach(async (to, _, next) => {
   document.title = to.meta.title as string
+  const hasToken = getToken()
+  if (!hasToken) {
+    if (whiteList.indexOf(to.path) !== -1) {
+      next()
+    } else {
+      next('/login')
+    }
+  }
   next()
 })
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="navbar">
+  <div class="navbar van-safe-area-top">
     <span class="title">{{ props.title }}</span>
   </div>
 </template>
@@ -20,6 +20,7 @@ const props = defineProps<{
 
   .title {
     font-weight: var(--font-weight-navbar);
+    font-size: var(--font-size-navbar);
   }
 }
 </style>
