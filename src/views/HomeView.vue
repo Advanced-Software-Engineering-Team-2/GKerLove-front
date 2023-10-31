@@ -8,7 +8,7 @@
 import { useUser } from '@/stores/user'
 
 const user = useUser()
-
+user.getInfo()
 </script>
 
 <style scoped lang="scss"></style>
