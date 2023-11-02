@@ -238,10 +238,12 @@ defineExpose({
   max-height: 100%;
   max-width: 100%;
   overflow: hidden;
+  color: black;
 }
 .message-input-h5 {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  color: black;
 }
 </style>

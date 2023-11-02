@@ -101,8 +101,9 @@ export default defineComponent({
 <style scoped>
 .home-TUIKit-main {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - var(--height-navbar) - var(--height-tabbar));
   overflow: hidden;
+  background-color: white;
 }
 .search {
   padding: 12px;

@@ -105,6 +105,7 @@ export default Forward;
 @import url('../../../../styles/common.scss');
 @import url('../../../../styles/icon.scss');
 .forward {
+  color: black;
   position: absolute;
   z-index: 5;
   box-sizing: border-box;
@@ -155,6 +156,7 @@ export default Forward;
   }
 }
 .forward-h5 {
+  color: black;
   position: fixed;
   top: 0;
   left: 0;
