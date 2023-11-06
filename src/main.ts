@@ -9,7 +9,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-import { TUIComponents, TUICore, genTestUserSig } from './TUIKit'
+import { TUIComponents, TUICore, genTestUserSig} from './TUIKit'
 import { TUICallKit } from '@tencentcloud/call-uikit-vue'
 
 const SDKAppID = 1600009914 // Your SDKAppID

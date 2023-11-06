@@ -117,6 +117,96 @@
               </li>
             </ul>
           </li>
+
+
+
+
+
+          <li class="TUI-contact-column-item">
+            <header @click="select('mylove')">
+              <i class="icon icon-right" :class="[columnName === 'mylove' && 'icon-down']"></i>
+              <main>
+                <label>{{ $t('TUIContact.我喜欢的人') }}</label>
+              </main>
+            </header>
+            <ul class="TUI-contact-list" v-show="columnName === 'mylove'">
+              <li
+                class="TUI-contact-list-item"
+                :class="[currentFriend?.userID === item?.userID && 'selected']"
+                v-for="(item, index) in myloveIDList"
+                :key="index"
+                @click="handleListItem(item)"
+              >
+                <aside class="left">
+                  <img
+                    class="avatar"
+                    :src="item?.profile?.avatar || 'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'"
+                    onerror="this.src='https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'"
+                  />
+                  <div
+                    class="online-status"
+                    :class="
+                      userStatusList.get(item?.userID)?.statusType === 1
+                        ? 'online-status-online'
+                        : 'online-status-offline'
+                    "
+                    v-if="displayOnlineStatus"
+                  ></div>
+                </aside>
+                <main class="content">
+                  <ul>
+                    <li class="name">{{ item?.profile?.nick || item?.userID }}</li>
+                  </ul>
+                </main>
+              </li>
+            </ul>
+          </li>
+
+          <li class="TUI-contact-column-item">
+            <header @click="select('loveme')">
+              <i class="icon icon-right" :class="[columnName === 'loveme' && 'icon-down']"></i>
+              <main>
+                <label>{{ $t('TUIContact.喜欢我的人') }}</label>
+              </main>
+            </header>
+            <ul class="TUI-contact-list" v-show="columnName === 'loveme'">
+              <li
+                class="TUI-contact-list-item"
+                :class="[currentFriend?.userID === item?.userID && 'selected']"
+                v-for="(item, index) in lovemeIDList"
+                :key="index"
+                @click="handleListItem(item)"
+              >
+                <aside class="left">
+                  <img
+                    class="avatar"
+                    :src="item?.profile?.avatar || 'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'"
+                    onerror="this.src='https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'"
+                  />
+                  <div
+                    class="online-status"
+                    :class="
+                      userStatusList.get(item?.userID)?.statusType === 1
+                        ? 'online-status-online'
+                        : 'online-status-offline'
+                    "
+                    v-if="displayOnlineStatus"
+                  ></div>
+                </aside>
+                <main class="content">
+                  <ul>
+                    <li class="name">{{ item?.profile?.nick || item?.userID }}</li>
+                  </ul>
+                </main>
+              </li>
+            </ul>
+          </li>
+
+
+
+
+
+
         </ul>
         <ul class="TUI-contact-list" v-else>
           <li
@@ -206,7 +296,7 @@
             </button>
           </footer>
         </div>
-        <div v-else-if="currentFriend?.userID && columnName === 'friend'" class="TUI-contact-main-info">
+        <div v-else-if="currentFriend?.userID && (columnName === 'friend'||columnName === 'mylove'||columnName === 'loveme')" class="TUI-contact-main-info">
           <header class="TUI-contact-main-info-header">
             <ul class="list">
               <h1>{{ currentFriend?.profile?.nick || currentFriend?.userID }}</h1>
@@ -283,7 +373,11 @@ const TUIContact = defineComponent({
       isSearch: false,
       env: TUIServer.TUICore.TUIEnv,
       friendList: [],
+      myloveList:[],
+      lovemeList:[],
       userIDList: [],
+      myloveIDList: [],
+      lovemeIDList: [],
       currentFriend: {},
       displayOnlineStatus: false,
       onlineStatus: false,
@@ -325,6 +419,12 @@ const TUIContact = defineComponent({
           data.currentGroup = item;
           break;
         case 'friend':
+          data.currentFriend = item;
+          break;
+        case 'mylove':
+          data.currentFriend = item;
+          break;
+        case 'loveme':
           data.currentFriend = item;
           break;
       }

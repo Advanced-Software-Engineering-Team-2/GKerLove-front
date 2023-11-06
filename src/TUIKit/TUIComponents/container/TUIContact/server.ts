@@ -82,6 +82,11 @@ export default class TUIContactServer extends IComponentServer {
   private handleFriendListUpdated(event: any) {
     this.currentStore.friendList = event.data;
     this.currentStore.userIDList = this.currentStore.friendList.map((item: any) => item.userID);
+    if(this.currentStore.friendList[this.currentStore.friendList.length-1].groupList.length>0){
+      this.currentStore.myloveIDList.push(this.currentStore.friendList[this.currentStore.friendList.length-1]);
+    }else{
+      this.currentStore.lovemeIDList.push(this.currentStore.friendList[this.currentStore.friendList.length-1]);
+    }
   }
 
   private handleUserStatusUpdated(event: any) {
@@ -398,6 +403,82 @@ export default class TUIContactServer extends IComponentServer {
         const imResponse = await this.TUICore.tim.getFriendList();
         this.currentStore.friendList = imResponse.data;
         this.currentStore.userIDList = this.currentStore.friendList.map((item: any) => item.userID) || [];
+        let userIDList=[];
+        for(var i=0;i<this.currentStore.friendList.length;i++){
+          if(this.currentStore.friendList[i].groupList.length == 0){
+            userIDList.push(this.currentStore.friendList[i].userID);
+          }
+        }
+        if(userIDList.length>0){
+          try{
+            const imResponse = await this.TUICore.tim.addToFriendGroup({name: '喜欢我的人',userIDList});
+          } catch (error) {
+            reject(error);
+          }
+        }
+        resolve(imResponse);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  /**
+   * 获取 SDK 缓存的“我喜欢的人”列表
+   * Get mylove list from SDK
+   *
+   * @param {Array<string>} userIDList 用户的账号列表/userID list
+   * @returns {Promise}
+   */
+  public async getmyloveList(): Promise<void> {
+    return this.handlePromiseCallback(async (resolve: any, reject: any) => {
+      try {
+        const imResponse = await this.TUICore.tim.getFriendGroupList();
+        this.currentStore.myloveList = imResponse.data[1];
+        if(this.currentStore.myloveList.userIDList.length>0){
+          this.currentStore.myloveIDList = this.currentStore.myloveList.userIDList.map((item: any) => item) || [];
+          let userIDList:string[] = new Array(this.currentStore.myloveIDList.length);
+          for(var i = 0; i<userIDList.length; i++) { 
+            userIDList[i] = this.currentStore.myloveIDList[i];
+          }
+          const imResponse1 = await this.TUICore.tim.getUserProfile({userIDList});
+          this.currentStore.myloveIDList = imResponse1.data;
+        }
+        else{
+          this.currentStore.myloveIDList = null;
+        }
+        resolve(imResponse);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+
+  /**
+   * 获取 SDK 缓存的“喜欢我的人”列表
+   * Get mylove list from SDK
+   *
+   * @param {Array<string>} userIDList 用户的账号列表/userID list
+   * @returns {Promise}
+   */
+  public async getlovemeList(): Promise<void> {
+    return this.handlePromiseCallback(async (resolve: any, reject: any) => {
+      try {
+        const imResponse = await this.TUICore.tim.getFriendGroupList();
+        this.currentStore.lovemeList = imResponse.data[0];
+        if(this.currentStore.lovemeList.userIDList.length>0){
+          this.currentStore.lovemeIDList = this.currentStore.lovemeList.userIDList.map((item: any) => item) || [];
+          let userIDList:string[] = new Array(this.currentStore.lovemeIDList.length);
+          for(var i = 0; i<userIDList.length; i++) { 
+            userIDList[i] = this.currentStore.lovemeIDList[i];
+          }
+          const imResponse1 = await this.TUICore.tim.getUserProfile({userIDList});
+          this.currentStore.lovemeIDList = imResponse1.data;
+        }
+        else{
+          this.currentStore.lovemeIDList = null;
+        }
         resolve(imResponse);
       } catch (error) {
         reject(error);
@@ -512,6 +593,8 @@ export default class TUIContactServer extends IComponentServer {
     await this.getGroupList();
     await this.getConversationList();
     await this.getFriendList();
+    await this.getmyloveList();
+    await this.getlovemeList();
     return this.currentStore;
   }
 }
