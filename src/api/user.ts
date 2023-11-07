@@ -22,7 +22,8 @@ function register(
     {
       username: username,
       password: password,
-      email: email
+      email: email,
+      hasaboutme: false
     },
     {
       params: {

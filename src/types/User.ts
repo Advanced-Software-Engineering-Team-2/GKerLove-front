@@ -1,6 +1,7 @@
 export interface User {
   username: string
   password: string
+  hasaboutme: boolean
 }
 
 export interface UserInfo {

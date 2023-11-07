@@ -81,11 +81,24 @@ export default class TUIContactServer extends IComponentServer {
 
   private handleFriendListUpdated(event: any) {
     this.currentStore.friendList = event.data;
+    const old_idlistlength = this.currentStore.userIDList.length;
+    const old_userIDList = this.currentStore.userIDList;
     this.currentStore.userIDList = this.currentStore.friendList.map((item: any) => item.userID);
-    if(this.currentStore.friendList[this.currentStore.friendList.length-1].groupList.length>0){
-      this.currentStore.myloveIDList.push(this.currentStore.friendList[this.currentStore.friendList.length-1]);
-    }else{
-      this.currentStore.lovemeIDList.push(this.currentStore.friendList[this.currentStore.friendList.length-1]);
+    const new_idlistlength = this.currentStore.userIDList.length;
+    if(new_idlistlength>old_idlistlength){
+      if(this.currentStore.friendList[this.currentStore.friendList.length-1].groupList.length>0){
+        this.currentStore.myloveIDList.push(this.currentStore.friendList[this.currentStore.friendList.length-1].profile);
+      }else{
+        this.currentStore.lovemeIDList.push(this.currentStore.friendList[this.currentStore.friendList.length-1].profile);
+      }
+    } else{ 
+            const uniqueObjects = old_userIDList.filter(obj1 => !this.currentStore.userIDList.find(obj2 => obj1 === obj2));
+            const index1 = this.currentStore.myloveIDList.findIndex(obj => { return obj.userID == uniqueObjects[0] });
+            if(index1 > -1)
+              this.currentStore.myloveIDList.splice(index1, 1);
+            const index2 = this.currentStore.lovemeIDList.findIndex(obj => { return obj.userID == uniqueObjects[0] });
+            if(index2 > -1)
+              this.currentStore.lovemeIDList.splice(index2, 1);
     }
   }
 
@@ -99,7 +112,6 @@ export default class TUIContactServer extends IComponentServer {
       );
     });
   }
-
   /**
    * /////////////////////////////////////////////////////////////////////////////////
    * //
@@ -116,7 +128,7 @@ export default class TUIContactServer extends IComponentServer {
    * @param {callback} callback 回调函数/callback
    * @returns {Promise} 返回异步函数/return callback
    */
-  public handlePromiseCallback(callback: any) {
+  public handlePromiseCallback(callback: any): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const config = {
         TUIName: 'TUIContact',
