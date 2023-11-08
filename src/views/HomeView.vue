@@ -21,21 +21,14 @@ import router from '@/router';
 import { useAboutme } from '@/stores/aboutme';
 import { useUser } from '@/stores/user'
 import { showSuccess } from '@/utils/show';
-import { ref } from 'vue'
 
 const user = useUser()
-const captcha = ref('')
-const baseUrl = import.meta.env.VITE_API_URL
-const captchaImgUrl = ref(baseUrl + '/common/captcha?timestamp=' + new Date().getTime())
-user.getInfo()
 
 
 const about = useAboutme()
 about.getabout(user.username)
 
-const refreshCaptcha = () => {
-  captchaImgUrl.value = baseUrl + '/common/captcha?timestamp=' + new Date().getTime()
-}
+
 
 const handleLogoutButtonClicked = async () => {
   try {
@@ -43,8 +36,6 @@ const handleLogoutButtonClicked = async () => {
     showSuccess('退出登录成功')
     router.push('/login')
   } catch (_) {
-    captcha.value = ''
-    refreshCaptcha()
   }
 }
 </script>

@@ -1,5 +1,9 @@
 <template>
-  <div class="about">This is meet page.</div>
+  <div class="meet">This is meet page.</div>
 </template>
 
-<style></style>
+<script setup lang="ts">
+</script>
+
+<style>
+</style>

@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getToken } from '@/utils/auth'
 
+import { useUser } from '@/stores/user'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -52,6 +54,14 @@ const router = createRouter({
       }
     },
     {
+      path: '/fillinfo',
+      name: 'fillinfo',
+      component: () => import('@/views/FillInfo.vue'),
+      meta: {
+        title: '填写详细信息'
+      }
+    },
+    {
       path: '/404',
       name: '404',
       component: () => import('@/views/404.vue'),
@@ -66,19 +76,30 @@ const router = createRouter({
   ]
 })
 
-const whiteList = ['/login', '/register', '/reset'] // no redirect whitelist
+const whiteList = ['/login', '/register', '/reset', '/fillinfo'] // no redirect whitelist
 
 router.beforeEach(async (to, _, next) => {
   document.title = to.meta.title as string
   const hasToken = getToken()
+
+  const indexuser = useUser()
+  await indexuser.getInfo()
   if (!hasToken) {
     if (whiteList.indexOf(to.path) !== -1) {
       next()
     } else {
       next('/login')
     }
+  } else{
+      if (!indexuser.hasaboutme) {
+        if(whiteList.indexOf(to.path) !== -1){
+          next()
+        } else{
+          next('/fillinfo')
+        }
+      }
+      next()
   }
-  next()
 })
 
 export default router

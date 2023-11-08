@@ -72,7 +72,7 @@ const handleLoginButtonClicked = async () => {
     const secretKey = 'd82b484df8d55fc6077400a56a4a42a5ef7ce2a53ee05777e7b416f6ee6d0c79'; //Your secretKey
     const userID = username.value; // User ID
     const TUIins = TUICore.instance;
-    TUIins.login({
+    await TUIins.login({
               userID: userID,
               userSig: genTestUserSig({
               SDKAppID,

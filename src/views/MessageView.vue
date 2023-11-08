@@ -1,33 +1,34 @@
 <template>
   <div class="home-TUIKit-main">
-    <div
-      :class="env?.isH5 ? 'conversation-h5' : 'conversation'"
-      v-show="!env?.isH5 || currentModel === 'conversation'"
-    >
-      <TUISearch class="search" />
-      <TUIConversation @current="handleCurrentConversation" />
-    </div>
-    <div>
-      <TUIContact display-type="selectFriend" />
-    </div>
+    <van-tabs class="tabs" v-model="active" v-show="currentModel === 'conversation'">
+      <van-tab  class="home-TUIKit-main" title="聊天">
+        <div
+        :class="env?.isH5 ? 'conversation-h5' : 'conversation'"
+        v-show="!env?.isH5 || currentModel === 'conversation'"
+        >
+          <TUISearch class="search" />
+          <TUIConversation @current="handleCurrentConversation" />
+        </div>
+      </van-tab>
+      <van-tab  class="home-TUIKit-main" title="通讯录">
+        <TUIContact display-type="selectFriend" />
+      </van-tab>
+    </van-tabs>
     <div class="chat" v-show="!env?.isH5 || currentModel === 'message'">
       <TUIChat>
-        <h1>欢迎使用腾讯云即时通信IM</h1>
       </TUIChat>
     </div>
     <!-- TUICallKit 组件：通话 UI 组件主体 -->
     <TUICallKit
-      :class="!showCallMini ? 'callkit-drag-container' : 'callkit-drag-container-mini'"
-      :allowedMinimized="true"
-      :allowedFullScreen="false"
-      :beforeCalling="beforeCalling"
-      :afterCalling="afterCalling"
-      :onMinimized="onMinimized"
-      :onMessageSentByMe="onMessageSentByMe"
+    :class="!showCallMini ? 'callkit-drag-container' : 'callkit-drag-container-mini'"
+    :allowedMinimized="true"
+    :allowedFullScreen="false"
+    :beforeCalling="beforeCalling"
+    :afterCalling="afterCalling"
+    :onMinimized="onMinimized"
+    :onMessageSentByMe="onMessageSentByMe"
     />
-
   </div>
-
 </template>
 
 <script lang="ts">
@@ -38,7 +39,6 @@ import { defineComponent, reactive, toRefs } from "vue";
 import { TUIEnv } from "../TUIKit/TUIPlugin";
 import { handleErrorPrompts } from "../TUIKit/TUIComponents/container/utils";
 import { TUIContact } from '../TUIKit/TUIComponents';
-import { TUICore, genTestUserSig } from '../TUIKit';
 
 export default defineComponent({
     name: "App",
@@ -83,10 +83,12 @@ export default defineComponent({
             beforeCalling,
             afterCalling,
             onMinimized,
-            onMessageSentByMe
+            onMessageSentByMe,
+            active: 1
         };
     }
 });
+
 </script>
 <style scoped>
 .home-TUIKit-main {
@@ -107,11 +109,17 @@ export default defineComponent({
   flex: 1;
   border-right: 1px solid #f4f5f9;
 }
+.tabs {
+  flex: 1;
+  height: 100%;
+  position: relative;
+}
 .chat {
   flex: 1;
   height: 100%;
   position: relative;
 }
+
 .callkit-drag-container {
   position: fixed;
   left: calc(50% - 25rem);

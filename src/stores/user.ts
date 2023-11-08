@@ -8,7 +8,8 @@ export const useUser = defineStore('user', {
       token: getToken(),
       id: '',
       username: '',
-      email: ''
+      email: '',
+      hasaboutme: false
     }
   },
   actions: {
@@ -31,6 +32,7 @@ export const useUser = defineStore('user', {
       this.id = userInfo.id
       this.username = userInfo.username
       this.email = userInfo.email
+      this.hasaboutme = userInfo.hasaboutme
     },
 
     async resetToken() {

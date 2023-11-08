@@ -17,12 +17,6 @@
       </aside>
     </header>
     <div class="TUIChat-main">
-      <div class="TUIChat-safe-tips">
-        <span>
-          {{ $t('TUIChat.安全提示') }}
-        </span>
-        <a @click="openLink(Link.complaint)">{{ $t('TUIChat.点此投诉') }}</a>
-      </div>
       <ul class="TUI-message-list" @click="dialogID = ''" ref="messageEle" id="messageEle">
         <p class="message-more" @click="getHistoryMessageList" v-if="!isCompleted">
           {{ $t('TUIChat.查看更多') }}
