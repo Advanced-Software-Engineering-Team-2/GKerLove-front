@@ -2,7 +2,10 @@
 
 <template>
   <van-config-provider theme="dark" />
-  <RouterView />
+  <suspense>
+    <router-view />
+    <template #fallback>正在加载...</template>
+  </suspense>
 </template>
 
 <style scoped></style>

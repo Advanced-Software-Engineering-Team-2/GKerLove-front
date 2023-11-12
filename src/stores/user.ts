@@ -1,15 +1,20 @@
 import { defineStore } from 'pinia'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import userApi from '@/api/user'
+import { User, UserInfo } from '@/types/User'
+import { showSuccess, showError } from '@/utils/show'
+
+interface State extends User {
+  token: string
+}
 
 export const useUser = defineStore('user', {
-  state: () => {
+  state: (): State => {
     return {
-      token: getToken(),
-      id: '',
+      token: getToken() || '',
       username: '',
       email: '',
-      hasaboutme: false
+      info: {}
     }
   },
   actions: {
@@ -18,21 +23,37 @@ export const useUser = defineStore('user', {
         const res = await userApi.login(username, password, captcha)
         this.token = res.data.data.token
         setToken(this.token)
-        await this.getInfo()
-        return Promise.resolve()
+        showSuccess(res.data.message)
       } catch (_) {
+        // 登录失败
         return Promise.reject()
       }
+      await this.getUser()
     },
 
-    async getInfo() {
+    async updateInfo(userInfo: UserInfo) {
+      try {
+        const res = await userApi.updateInfo(userInfo)
+        showSuccess(res.data.message)
+      } catch (_) {
+        // 更新信息失败
+        return Promise.reject()
+      }
+      await this.getUser()
+    },
+
+    async getUser() {
       if (!this.token) return null
-      const res = await userApi.getInfo()
-      const userInfo = res.data.data.user
-      this.id = userInfo.id
-      this.username = userInfo.username
-      this.email = userInfo.email
-      this.hasaboutme = userInfo.hasaboutme
+      try {
+        const res = await userApi.getUser()
+        const user = res.data.data.user
+        this.username = user.username
+        this.email = user.email
+        this.info = user.info
+      } catch (_) {
+        // 获取用户信息失败
+        showError('获取用户信息失败')
+      }
     },
 
     async resetToken() {

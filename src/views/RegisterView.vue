@@ -103,22 +103,37 @@ const handleCodeSendButtonClicked = async () => {
 }
 
 const handleRegisterButtonClicked = async () => {
-  if (!username.value || !password.value || !email.value || !code.value) {
+  // 检查字段是否都填写
+  if (!username.value || !password.value || !email.value || !code.value || !captcha.value) {
     showError('请检查输入是否完整')
     return
   }
-  if (password.value.length < 6) {
-    showError('密码至少为6位')
+  // 用户名长度校验
+  if (username.value.length < 4 || username.value.length > 20) {
+    showError('用户名长度必须在4-20之间')
     return
   }
+  // 密码长度校验
+  if (password.value.length < 6 || password.value.length > 20) {
+    showError('密码长度必须在6-20之间')
+    return
+  }
+  // 邮箱长度校验
+  if (email.value.length > 50) {
+    showError('邮箱长度不能超过50')
+    return
+  }
+  // 邮箱格式校验
   if (!checkEmail(email.value)) {
     showError('邮箱格式错误')
     return
   }
-  if (!captcha.value) {
-    showError('请输入验证码')
+  // 邮箱验证码长度校验
+  if (code.value.length !== 6) {
+    showError('邮箱验证码错误')
     return
   }
+  // 图片验证码长度校验
   if (captcha.value.length !== 4) {
     showError('验证码错误')
     return
@@ -137,7 +152,7 @@ const handleRegisterButtonClicked = async () => {
 <style scoped>
 .register-view {
   width: 100%;
-  margin-top: 3rem;
+  padding-top: 3rem;
 }
 
 .form-title {

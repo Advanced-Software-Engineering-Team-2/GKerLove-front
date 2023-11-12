@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
-import NavBar from '@/shared/components/Navbar.vue'
+import NavBar from '@/shared/components/NavBar.vue'
 import { computed } from 'vue'
 
 const route = useRoute()

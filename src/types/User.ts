@@ -1,11 +1,14 @@
-export interface User {
-  username: string
-  password: string
+export interface UserInfo {
+  avatar?: string
+  gender?: '男' | '女'
+  age?: number
+  city?: string
+  institute?: string
+  introduction?: string
 }
 
-export interface UserInfo {
-  id: string
+export interface User {
   username: string
   email: string
-  hasaboutme: boolean
+  info: UserInfo
 }

@@ -54,11 +54,11 @@ const router = createRouter({
       }
     },
     {
-      path: '/fillinfo',
-      name: 'fillinfo',
-      component: () => import('@/views/FillInfo.vue'),
+      path: '/updateInfo',
+      name: 'updateInfo',
+      component: () => import('@/views/UpdateInfoView.vue'),
       meta: {
-        title: '填写详细信息'
+        title: '完善详细信息'
       }
     },
     {
@@ -76,30 +76,22 @@ const router = createRouter({
   ]
 })
 
-const whiteList = ['/login', '/register', '/reset', '/fillinfo'] // no redirect whitelist
+const whiteList = ['/login', '/register'] // no redirect whitelist
 
 router.beforeEach(async (to, _, next) => {
   document.title = to.meta.title as string
   const hasToken = getToken()
 
   const indexuser = useUser()
-  await indexuser.getInfo()
+  await indexuser.getUser()
   if (!hasToken) {
     if (whiteList.indexOf(to.path) !== -1) {
       next()
     } else {
       next('/login')
     }
-  } else{
-      if (!indexuser.hasaboutme) {
-        if(whiteList.indexOf(to.path) !== -1){
-          next()
-        } else{
-          next('/fillinfo')
-        }
-      }
-      next()
   }
+  next()
 })
 
 export default router
