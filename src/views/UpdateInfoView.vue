@@ -1,7 +1,13 @@
 <!-- 完善信息页面，允许用户不填任何信息 -->
 <template>
-  <div class="fillinfo">
-    <h2 class="form-title">详细信息</h2>
+  <div class="update-info">
+    <van-nav-bar
+      title="完善信息"
+      left-arrow
+      @click-left="onClickBack"
+      :border="false"
+      safe-area-inset-top
+    />
     <van-form>
       <van-cell-group inset>
         <van-field label="头像" placeholder="头像" center>
@@ -17,6 +23,8 @@
                 :after-read="afterReadAvatar"
                 :max-count="1"
                 :max-size="10 * 1024 * 1024"
+                reupload
+                :deletable="false"
               />
             </van-config-provider>
           </template>
@@ -141,7 +149,7 @@ const OSSUtil = await useOSSUtil()
 
 const avatar = ref<UploaderFileListItem[]>([
   {
-    url: OSSUtil.signatureUrl(user.info.avatar ? user.info.avatar : 'default-avatar'),
+    url: OSSUtil.signatureUrl(user.info.avatar),
     isImage: true
   }
 ])
@@ -150,7 +158,6 @@ const age = ref(user.info.age)
 const city = ref(user.info.city)
 const institute = ref(user.info.institute)
 const introduction = ref(user.info.introduction)
-
 
 const afterReadAvatar = async (file: UploaderFileListItem | UploaderFileListItem[]) => {
   if (Array.isArray(file)) {
@@ -172,13 +179,12 @@ const afterReadAvatar = async (file: UploaderFileListItem | UploaderFileListItem
   }
   file.status = 'done'
   file.message = '上传成功'
-  console.log(avatar.value)
 }
 
 const handleSubmitButtonClicked = async () => {
   try {
     await user.updateInfo({
-      avatar: avatar.value[0].status === 'done' ? user.username + '/avatar' : 'default-avatar',
+      avatar: avatar.value[0].status === 'done' ? user.username + '/avatar' : user.info.avatar,
       gender: gender.value,
       age: age.value,
       city: city.value,
@@ -190,12 +196,15 @@ const handleSubmitButtonClicked = async () => {
     /* empty */
   }
 }
+
+const onClickBack = () => {
+  router.back()
+}
 </script>
 
 <style scoped>
-.fillinfo {
+.update-info {
   width: 100%;
-  padding-top: 3rem;
 }
 
 .form-title {

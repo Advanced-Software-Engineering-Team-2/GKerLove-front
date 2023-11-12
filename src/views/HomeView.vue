@@ -1,11 +1,7 @@
 <template>
   <div class="home">
-    <p>用户名: {{ user.username }}</p>
-    <p>性别: {{ user.info.gender ? user.info.gender : '未填写' }}</p>
-    <p>年龄: {{ user.info.age ? user.info.age : '未填写' }}</p>
-    <p>所在城市: {{ user.info.city ? user.info.city : '未填写' }}</p>
-    <p>培养单位: {{ user.info.institute ? user.info.institute : '未填写' }}</p>
-    <p>自我介绍: {{ user.info.introduction ? user.info.introduction : '未填写' }}</p>
+    <user-card class="user-card"/>
+    
     <div style="margin: 16px">
       <van-button color="red" round block type="primary" @click="handleLogoutButtonClicked">
         退出登录
@@ -15,6 +11,8 @@
 </template>
 
 <script setup lang="ts">
+import UserCard from '@/components/UserCard.vue'
+
 import router from '@/router'
 import { useUser } from '@/stores/user'
 import { showSuccess } from '@/utils/show'
@@ -32,4 +30,5 @@ const handleLogoutButtonClicked = async () => {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+</style>

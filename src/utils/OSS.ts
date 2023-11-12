@@ -1,11 +1,11 @@
-import OSSApi from '@/api/OSS'
+import STSApi from '@/api/STS'
 import OSS from 'ali-oss'
 
 let OSSUtil: OSS | undefined = undefined
 
 async function useOSSUtil() {
   if (OSSUtil) return OSSUtil
-  const res = await OSSApi.getSTSResponse()
+  const res = await STSApi.getSTSResponse()
   OSSUtil = new OSS({
     region: 'oss-cn-beijing',
     accessKeyId: res.data.data.stsResponse.credentials.accessKeyId,
@@ -13,7 +13,7 @@ async function useOSSUtil() {
     stsToken: res.data.data.stsResponse.credentials.securityToken,
     bucket: 'gker-love',
     refreshSTSToken: async () => {
-      const stsResponse = await OSSApi.getSTSResponse()
+      const stsResponse = await STSApi.getSTSResponse()
       return {
         accessKeyId: stsResponse.data.data.stsResponse.credentials.accessKeyId,
         accessKeySecret: stsResponse.data.data.stsResponse.credentials.accessKeySecret,

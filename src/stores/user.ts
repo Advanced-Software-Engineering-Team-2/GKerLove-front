@@ -14,7 +14,11 @@ export const useUser = defineStore('user', {
       token: getToken() || '',
       username: '',
       email: '',
-      info: {}
+      info: {
+        avatar: 'default-avatar'
+      },
+      likedBy: 0,
+      likes: 0
     }
   },
   actions: {
@@ -50,6 +54,8 @@ export const useUser = defineStore('user', {
         this.username = user.username
         this.email = user.email
         this.info = user.info
+        this.likedBy = user.likedBy
+        this.likes = user.likes
       } catch (_) {
         // 获取用户信息失败
         showError('获取用户信息失败')

@@ -4,7 +4,7 @@ import type { R } from '@/types/R'
 import type { STSResponse } from '@/types/STSResponse'
 
 function getSTSResponse() {
-  return request.get<R<{ stsResponse: STSResponse }>>('/OSS/token')
+  return request.get<R<{ stsResponse: STSResponse }>>('/sts/token')
 }
 
 export default {
