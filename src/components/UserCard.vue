@@ -7,10 +7,10 @@
       <div class="info">
         <h3 class="username">{{ user.username }}</h3>
         <div class="detail">
-          <p>性别: {{ user.info.gender ? user.info.gender : '未填写' }}</p>
-          <p>年龄: {{ user.info.age ? user.info.age : '未填写' }}</p>
-          <p>所在城市: {{ user.info.city ? user.info.city : '未填写' }}</p>
-          <p>培养单位: {{ user.info.institute ? user.info.institute : '未填写' }}</p>
+          <p>性别： {{ user.info.gender ? user.info.gender : '未填写' }}</p>
+          <p>年龄： {{ user.info.age ? user.info.age : '未填写' }}</p>
+          <p>所在城市： {{ user.info.city ? user.info.city : '未填写' }}</p>
+          <p>培养单位： {{ user.info.institute ? user.info.institute : '未填写' }}</p>
         </div>
       </div>
     </div>
@@ -20,8 +20,8 @@
     </div>
     <van-divider />
     <div class="row-3">
-      <span>人气: {{ user.likedBy }}</span>
-      <span>喜欢: {{ user.likes }}</span>
+      <span>人气： {{ user.likedBy }}</span>
+      <span>喜欢： {{ user.likes }}</span>
       <van-button type="primary" size="small" round @click="router.push('/updateInfo')">
         完善资料
       </van-button>
@@ -35,6 +35,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const user = useUser()
+user.getUser()
 </script>
 
 <style scoped lang="scss">

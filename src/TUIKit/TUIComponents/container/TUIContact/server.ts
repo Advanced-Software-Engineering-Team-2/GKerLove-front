@@ -1,5 +1,4 @@
 import IComponentServer from '../IComponentServer';
-
 const store: any = {};
 
 /**
