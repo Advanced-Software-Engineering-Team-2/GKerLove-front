@@ -78,18 +78,19 @@ const router = createRouter({
 
 const whiteList = ['/login', '/register'] // no redirect whitelist
 
-router.beforeEach(async (to, _, next) => {
+router.beforeEach((to, _, next) => {
   document.title = to.meta.title as string
   const hasToken = getToken()
-
-  const indexuser = useUser()
-  await indexuser.getUser()
   if (!hasToken) {
     if (whiteList.indexOf(to.path) !== -1) {
       next()
     } else {
       next('/login')
     }
+  }
+  const userStore = useUser()
+  if (!userStore.username) {
+    userStore.getUser()
   }
   next()
 })

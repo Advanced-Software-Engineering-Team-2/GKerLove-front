@@ -114,7 +114,7 @@
 import { ref } from 'vue'
 import { useUser } from '@/stores/user'
 import { useRouter } from 'vue-router'
-import useOSSUtil from '@/utils/OSS'
+import OSSUtil from '@/utils/OSS'
 import cityList from '@/constants/city'
 import instituteList from '@/constants/institute'
 
@@ -145,11 +145,10 @@ const showInstitutePicker = ref(false)
 
 const router = useRouter()
 const user = useUser()
-const OSSUtil = await useOSSUtil()
 
 const avatar = ref<UploaderFileListItem[]>([
   {
-    url: OSSUtil.signatureUrl(user.info.avatar),
+    url: user.avatarUrl,
     isImage: true
   }
 ])
@@ -168,7 +167,7 @@ const afterReadAvatar = async (file: UploaderFileListItem | UploaderFileListItem
   try {
     await OSSUtil.put(user.username + '/avatar', file.file, {
       headers: {
-        'Cache-Control': 'no-cache'
+        'Cache-Control': 'max-age=86400'
       },
       timeout: 5000
     })

@@ -2,13 +2,7 @@
   <div class="user-card">
     <div class="row-1">
       <div class="avatar">
-        <van-image
-          :src="OSSUtil.signatureUrl(user.info.avatar)"
-          round
-          :show-loading="false"
-          width="100px"
-          height="100px"
-        />
+        <van-image :src="user.avatarUrl" round :show-loading="false" width="100px" height="100px" />
       </div>
       <div class="info">
         <h3 class="username">{{ user.username }}</h3>
@@ -37,12 +31,10 @@
 
 <script setup lang="ts">
 import { useUser } from '@/stores/user'
-import useOSSUtil from '@/utils/OSS'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const user = useUser()
-const OSSUtil = await useOSSUtil()
 </script>
 
 <style scoped lang="scss">

@@ -3,6 +3,7 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 import userApi from '@/api/user'
 import { User, UserInfo } from '@/types/User'
 import { showSuccess, showError } from '@/utils/show'
+import OSSUtil from '@/utils/OSS'
 
 interface State extends User {
   token: string
@@ -19,6 +20,11 @@ export const useUser = defineStore('user', {
       },
       likedBy: 0,
       likes: 0
+    }
+  },
+  getters: {
+    avatarUrl: (state) => {
+      return OSSUtil.signatureUrl(state.info.avatar)
     }
   },
   actions: {
@@ -53,7 +59,7 @@ export const useUser = defineStore('user', {
         const user = res.data.data.user
         this.username = user.username
         this.email = user.email
-        this.info = user.info
+        this.info = { ...user.info }
         this.likedBy = user.likedBy
         this.likes = user.likes
       } catch (_) {
