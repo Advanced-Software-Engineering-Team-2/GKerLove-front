@@ -16,11 +16,13 @@ import UserCard from '@/components/UserCard.vue'
 import router from '@/router'
 import { useUser } from '@/stores/user'
 import { showSuccess } from '@/utils/show'
-
+import { TUICore } from '../TUIKit'
 const user = useUser()
 
 const handleLogoutButtonClicked = async () => {
   try {
+    const TUIins = TUICore.instance
+    await TUIins.logout()
     showSuccess('退出登录成功')
     router.push('/login')
     await user.resetToken()
