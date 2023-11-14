@@ -5,12 +5,22 @@ import type { User } from '@/types/User'
 function getmeetinglist(username: string) {
     return request.get<R<{ meetinglist: Array<User> }>>('/meeting/getlist',{
         params: {  
-            tousername: username
+            fromusername: username
+        }
+    })
+  }
+
+function addlove(fromusername: string,tousername: string) {
+    return request.post<R>('/meeting/addlove',null,{
+        params: {  
+            fromusername: fromusername,
+            tousername : tousername
         }
     })
   }
 
 
 export default {
-    getmeetinglist
+    getmeetinglist,
+    addlove
 }

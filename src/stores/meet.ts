@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import meetApi from '@/api/meet'
 import { User} from '@/types/User'
-import { showError } from '@/utils/show'
+import { showError, showSuccess} from '@/utils/show'
 import OSSUtil from '@/utils/OSS'
 export const useMeet = defineStore('meetlist', {
   state: () => {
@@ -30,6 +30,15 @@ export const useMeet = defineStore('meetlist', {
         else{
           this.curavatar = OSSUtil.signatureUrl("default-avatar")
         } 
+    },
+    async addLove(fromusername: string, tousername: string) {
+      try {
+        const res = await meetApi.addlove(fromusername, tousername)
+        const message = res.data.message
+        showSuccess(message)
+      } catch (_) {
+        showError('发送喜欢失败')
+      }
     }
   }
 })

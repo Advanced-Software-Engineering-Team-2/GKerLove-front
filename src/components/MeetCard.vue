@@ -21,9 +21,13 @@
     <van-divider />
   </div>
   <div style="margin: 16px; display: flex; justify-content: space-between">
-        <van-button round block type="primary" @click="handlePreClicked"> 上一位 </van-button>
-        <van-button round block type="primary" @click="handleNextClicked"> 下一位 </van-button>
-      </div>
+    <van-button round block type="primary" @click="handlePreClicked"> 上一位 </van-button>
+    <van-button round block type="primary" @click="handleNextClicked" style="margin-left: 2rem"> 下一位 </van-button>
+  </div>
+  <div style="margin: 16px; display: flex; justify-content: space-between">
+    <van-button color="green" round block type="primary" @click="handleLikeClicked"> 喜欢 </van-button>
+    <van-button color="red" round block type="primary" @click="handleHateClicked" style="margin-left: 2rem"> 不喜欢 </van-button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -51,6 +55,13 @@ const handleNextClicked =  () => {
   } else {
     alert('已经是最后一位了');
   }
+}
+
+const handleLikeClicked =  () => {
+  meet.addLove(user.username, meet.list[index.value].username)
+}
+
+const handleHateClicked = async () => {
 }
 </script>
 
