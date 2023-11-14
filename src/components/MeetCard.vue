@@ -21,6 +21,11 @@
     <van-divider />
   </div>
   <div style="margin: 16px; display: flex; justify-content: space-between">
+    <van-button type="primary" round @click="router.push('/selectMeet')" style="margin-left:6.5rem;">
+        设置筛选条件
+      </van-button>
+  </div>
+  <div style="margin: 16px; display: flex; justify-content: space-between">
     <van-button round block type="primary" @click="handlePreClicked"> 上一位 </van-button>
     <van-button round block type="primary" @click="handleNextClicked" style="margin-left: 2rem"> 下一位 </van-button>
   </div>
@@ -34,10 +39,11 @@
 import { ref } from 'vue'
 import { useUser } from '@/stores/user'
 import { useMeet } from '@/stores/meet'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const user = useUser()
 user.getUser()
 const meet = useMeet()
-meet.getList(user.username)
 const index = ref(0)
 const handlePreClicked = async () => {
   if (index.value > 0) {
