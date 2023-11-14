@@ -50,6 +50,7 @@ export default class TUIContactServer extends IComponentServer {
    */
 
   private bindTIMEvent() {
+    this.TUICore.tim.on(this.TUICore.TIM.EVENT.FRIEND_APPLICATION_LIST_UPDATED, this.handleFriendApplicationListUpdated, this);
     this.TUICore.tim.on(this.TUICore.TIM.EVENT.GROUP_LIST_UPDATED, this.handleGroupListUpdated, this);
     this.TUICore.tim.on(this.TUICore.TIM.EVENT.GROUP_ATTRIBUTES_UPDATED, this.handleGroupAttributesUpdated, this);
     this.TUICore.tim.on(this.TUICore.TIM.EVENT.CONVERSATION_LIST_UPDATED, this.handleConversationListUpdate, this);
@@ -58,11 +59,17 @@ export default class TUIContactServer extends IComponentServer {
   }
 
   private unbindTIMEvent() {
+    this.TUICore.tim.off(this.TUICore.TIM.EVENT.FRIEND_APPLICATION_LIST_UPDATED, this.handleFriendApplicationListUpdated, this);
     this.TUICore.tim.off(this.TUICore.TIM.EVENT.GROUP_LIST_UPDATED, this.handleGroupListUpdated);
     this.TUICore.tim.off(this.TUICore.TIM.EVENT.GROUP_ATTRIBUTES_UPDATED, this.handleGroupAttributesUpdated);
     this.TUICore.tim.off(this.TUICore.TIM.EVENT.CONVERSATION_LIST_UPDATED, this.handleConversationListUpdate);
     this.TUICore.tim.off(this.TUICore.TIM.EVENT.FRIEND_LIST_UPDATED, this.handleFriendListUpdated);
     this.TUICore.tim.off(this.TUICore.TIM.EVENT.USER_STATUS_UPDATED, this.handleUserStatusUpdated);
+  }
+
+  private handleFriendApplicationListUpdated(event: any){
+    this.currentStore.friendApplicationList = event.data.friendApplicationList;
+    this.currentStore.friendApplicationUnReadCount = event.data.unreadCount;
   }
 
   private handleGroupListUpdated(event: any) {
@@ -401,6 +408,29 @@ export default class TUIContactServer extends IComponentServer {
     });
   }
 
+
+  /**
+   * 获取 SDK 缓存的好友申请列表
+   * Get friend application list from SDK
+   *
+   * @param {Array<string>} userIDList 用户的账号列表/userID list
+   * @returns {Promise}
+   */
+  public async getFriendApplicationList(): Promise<void> {
+    return this.handlePromiseCallback(async (resolve: any, reject: any) => {
+      try {
+        const imResponse = await this.TUICore.tim.getFriendApplicationList();
+        this.currentStore.friendApplicationList = imResponse.data.friendApplicationList;
+        this.currentStore.friendApplicationUnReadCount = imResponse.data.unreadCount;
+        console.log(this.currentStore.friendApplicationList);
+        resolve(imResponse);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+
   /**
    * 获取 SDK 缓存的好友列表
    * Get friend list from SDK
@@ -603,6 +633,7 @@ export default class TUIContactServer extends IComponentServer {
     this.currentStore = params;
     await this.getGroupList();
     await this.getConversationList();
+    await this.getFriendApplicationList();
     await this.getFriendList();
     await this.getmyloveList();
     await this.getlovemeList();

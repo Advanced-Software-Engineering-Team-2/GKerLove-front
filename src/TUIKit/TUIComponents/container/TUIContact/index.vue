@@ -78,6 +78,62 @@
               </li>
             </ul>
           </li>
+
+
+          <li class="TUI-contact-column-item">
+            <header @click="select('friendapplication')">
+              <i class="icon icon-right" :class="[columnName === 'friendapplication' && 'icon-down']"></i>
+              <main>
+                <label>{{ $t('TUIContact.好友请求') }}</label>
+                <span class="num" v-if="friendApplicationList.length > 0 && friendApplicationUnReadCount > 0">{{
+                  friendApplicationUnReadCount
+                }}</span>
+              </main>
+            </header>
+            <ul class="TUI-contact-list" v-show="columnName === 'friendapplication'">
+              <li
+                class="TUI-contact-list-item"
+                v-for="(item, index) in friendApplicationList"
+                :key="index"
+              >
+                <aside class="left">
+                  <img
+                    class="avatar"
+                    :src="item?.avatar || 'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'"
+                    onerror="this.src='https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'"
+                  />
+                </aside>
+                <main class="content">
+                  <ul>
+                    <li class="name">{{ item?.userID }}</li>
+                  </ul>
+                  <div
+                    class="TUI-contact-list-card-right-application"
+                  >
+                    <div
+                      v-if="item?.type === 'Pendency_Type_SendOut'"
+                      class="TUI-contact-list-card-right-application-text"
+                      style="color: gray;"
+                    >
+                      {{ $t('TUIContact.等待验证') }}
+                    </div>
+                    <van-button 
+                    v-else-if="item?.type === 'Pendency_Type_ComeIn'"
+                    @click="handleAcceptClicked(item?.userID)"
+                    color="green"
+                    type="primary"
+                    size="small"
+                    >
+                    {{ $t('TUIContact.同意') }}
+                    </van-button>
+                  </div>
+                </main>
+              </li>
+            </ul>
+          </li>
+
+
+
           <li class="TUI-contact-column-item">
             <header @click="select('friend')">
               <i class="icon icon-right" :class="[columnName === 'friend' && 'icon-down']"></i>
@@ -372,6 +428,8 @@ const TUIContact = defineComponent({
       types: TUIServer.TUICore.TIM.TYPES,
       isSearch: false,
       env: TUIServer.TUICore.TUIEnv,
+      friendApplicationList: [],
+      friendApplicationUnReadCount: 0,
       friendList: [],
       myloveList:[],
       lovemeList:[],
@@ -519,6 +577,16 @@ const TUIContact = defineComponent({
       TUIServer.TUICore.getUserStatusList(userList);
     };
 
+    const handleAcceptClicked = async (username: string) => {
+      const options: any = {
+        userID: username,
+        remark: '',
+        type: 'TencentCloudChat.TYPES.SNS_APPLICATION_AGREE_AND_ADD'
+      };
+      await TUIServer.TUICore.tim.acceptFriendApplication(options);
+    };
+
+
     return {
       ...toRefs(data),
       handleListItem,
@@ -534,6 +602,7 @@ const TUIContact = defineComponent({
       back,
       enter,
       getUserStatusList,
+      handleAcceptClicked,
     };
   },
 });
