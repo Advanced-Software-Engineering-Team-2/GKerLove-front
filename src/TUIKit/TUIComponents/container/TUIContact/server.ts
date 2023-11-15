@@ -86,11 +86,12 @@ export default class TUIContactServer extends IComponentServer {
   }
 
   private handleFriendListUpdated(event: any) {
+    console.log("触发好友列表更新操作！！！");
     this.currentStore.friendList = event.data;
-    const old_idlistlength = this.currentStore.userIDList.length;
-    const old_userIDList = this.currentStore.userIDList;
+    var old_idlistlength = this.currentStore.userIDList.length;
+    var old_userIDList = this.currentStore.userIDList;
     this.currentStore.userIDList = this.currentStore.friendList.map((item: any) => item.userID);
-    const new_idlistlength = this.currentStore.userIDList.length;
+    var new_idlistlength = this.currentStore.userIDList.length;
     if(new_idlistlength>old_idlistlength){
       if(this.currentStore.friendList[this.currentStore.friendList.length-1].groupList.length>0){
         this.currentStore.myloveIDList.push(this.currentStore.friendList[this.currentStore.friendList.length-1].profile);
@@ -98,11 +99,11 @@ export default class TUIContactServer extends IComponentServer {
         this.currentStore.lovemeIDList.push(this.currentStore.friendList[this.currentStore.friendList.length-1].profile);
       }
     } else{ 
-            const uniqueObjects = old_userIDList.filter(obj1 => !this.currentStore.userIDList.find(obj2 => obj1 === obj2));
-            const index1 = this.currentStore.myloveIDList.findIndex(obj => { return obj.userID == uniqueObjects[0] });
+            var uniqueObjects = old_userIDList.filter(obj1 => !this.currentStore.userIDList.find(obj2 => obj1 === obj2));
+            var index1 = this.currentStore.myloveIDList.findIndex(obj => { return obj.userID == uniqueObjects[0] });
             if(index1 > -1)
               this.currentStore.myloveIDList.splice(index1, 1);
-            const index2 = this.currentStore.lovemeIDList.findIndex(obj => { return obj.userID == uniqueObjects[0] });
+            var index2 = this.currentStore.lovemeIDList.findIndex(obj => { return obj.userID == uniqueObjects[0] });
             if(index2 > -1)
               this.currentStore.lovemeIDList.splice(index2, 1);
     }
@@ -439,20 +440,22 @@ export default class TUIContactServer extends IComponentServer {
    * @returns {Promise}
    */
   public async getFriendList(): Promise<void> {
+    console.log("触发获取好友列表操作！！！");
     return this.handlePromiseCallback(async (resolve: any, reject: any) => {
       try {
         const imResponse = await this.TUICore.tim.getFriendList();
         this.currentStore.friendList = imResponse.data;
         this.currentStore.userIDList = this.currentStore.friendList.map((item: any) => item.userID) || [];
-        let userIDList=[];
+        let lovemeIDList=[];
         for(var i=0;i<this.currentStore.friendList.length;i++){
           if(this.currentStore.friendList[i].groupList.length == 0){
-            userIDList.push(this.currentStore.friendList[i].userID);
+            lovemeIDList.push(this.currentStore.friendList[i].userID);
           }
         }
-        if(userIDList.length>0){
+        if(lovemeIDList.length>0){
           try{
-            const imResponse = await this.TUICore.tim.addToFriendGroup({name: '喜欢我的人',userIDList});
+            const imResponse1 = await this.TUICore.tim.addToFriendGroup({name: '喜欢我的人',userIDList: lovemeIDList});
+            resolve(imResponse1);
           } catch (error) {
             reject(error);
           }
@@ -472,6 +475,7 @@ export default class TUIContactServer extends IComponentServer {
    * @returns {Promise}
    */
   public async getmyloveList(): Promise<void> {
+    console.log("触发获取我喜欢的人列表操作！！！");
     return this.handlePromiseCallback(async (resolve: any, reject: any) => {
       try {
         const imResponse = await this.TUICore.tim.getFriendGroupList();
@@ -486,7 +490,7 @@ export default class TUIContactServer extends IComponentServer {
           this.currentStore.myloveIDList = imResponse1.data;
         }
         else{
-          this.currentStore.myloveIDList = null;
+          this.currentStore.myloveIDList = [];
         }
         resolve(imResponse);
       } catch (error) {
@@ -504,6 +508,7 @@ export default class TUIContactServer extends IComponentServer {
    * @returns {Promise}
    */
   public async getlovemeList(): Promise<void> {
+    console.log("触发获取喜欢我的人列表操作！！！");
     return this.handlePromiseCallback(async (resolve: any, reject: any) => {
       try {
         const imResponse = await this.TUICore.tim.getFriendGroupList();
@@ -518,7 +523,7 @@ export default class TUIContactServer extends IComponentServer {
           this.currentStore.lovemeIDList = imResponse1.data;
         }
         else{
-          this.currentStore.lovemeIDList = null;
+          this.currentStore.lovemeIDList = [];
         }
         resolve(imResponse);
       } catch (error) {
