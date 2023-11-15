@@ -22,19 +22,17 @@
     <div class="row-3">
       <span>人气： {{ user.likedBy }}</span>
       <span>喜欢： {{ user.likes }}</span>
-      <van-button type="primary" size="small" round @click="router.push('/updateInfo')">
-        完善资料
-      </van-button>
+
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useUser } from '@/stores/user'
+import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const user = useUser()
+const user = useUserStore()
 user.getUser()
 </script>
 

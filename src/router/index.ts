@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getToken } from '@/utils/auth'
 
-import { useUser } from '@/stores/user'
+import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -86,7 +86,7 @@ const router = createRouter({
 
 const whiteList = ['/login', '/register'] // no redirect whitelist
 
-router.beforeEach((to, _, next) => {
+router.beforeEach(async (to, _, next) => {
   document.title = to.meta.title as string
   const hasToken = getToken()
   if (!hasToken) {
@@ -96,9 +96,9 @@ router.beforeEach((to, _, next) => {
       next('/login')
     }
   }
-  const userStore = useUser()
-  if (!userStore.username) {
-    userStore.getUser()
+  const user = useUserStore()
+  if (!user.username) {
+    await user.getUser()
   }
   next()
 })

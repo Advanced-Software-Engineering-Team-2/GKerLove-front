@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUser } from '@/stores/user'
+import { useUserStore } from '@/stores/user'
 import { showError } from '@/utils/show'
 import { useMeet } from '@/stores/meet'
 import { TUICore, genTestUserSig } from '../TUIKit'
@@ -43,11 +43,11 @@ import { TUICore, genTestUserSig } from '../TUIKit'
 const baseUrl = import.meta.env.VITE_API_URL
 
 const router = useRouter()
-const userStore = useUser()
+const user = useUserStore()
 const username = ref('')
 const password = ref('')
 const captcha = ref('')
-const meet =useMeet()
+const meet = useMeet()
 const captchaImgUrl = ref(baseUrl + '/common/captcha?timestamp=' + new Date().getTime())
 
 const refreshCaptcha = () => {
@@ -75,8 +75,8 @@ const handleLoginButtonClicked = async () => {
     return
   }
   try {
-    await userStore.login(username.value, password.value, captcha.value)
-    await meet.getList(username.value,'',0,0,'','')
+    await user.login(username.value, password.value, captcha.value)
+    await meet.getList(username.value, '', 0, 0, '', '')
     const SDKAppID = 1600009914 // Your SDKAppID
     const secretKey = 'd82b484df8d55fc6077400a56a4a42a5ef7ce2a53ee05777e7b416f6ee6d0c79' //Your secretKey
     const userID = username.value // User ID

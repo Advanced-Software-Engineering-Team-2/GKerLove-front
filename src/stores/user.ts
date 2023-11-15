@@ -3,13 +3,15 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 import userApi from '@/api/user'
 import { User, UserInfo } from '@/types/User'
 import { showSuccess, showError } from '@/utils/show'
-import OSSUtil from '@/utils/OSS'
+import { createOSSUtil } from '@/utils/OSS'
+import OSS from 'ali-oss'
 
 interface State extends User {
   token: string
+  OSSUtil: null | OSS
 }
 
-export const useUser = defineStore('user', {
+export const useUserStore = defineStore('user', {
   state: (): State => {
     return {
       token: getToken() || '',
@@ -19,12 +21,13 @@ export const useUser = defineStore('user', {
         avatar: 'default-avatar'
       },
       likedBy: 0,
-      likes: 0
+      likes: 0,
+      OSSUtil: null
     }
   },
   getters: {
     avatarUrl: (state) => {
-      return OSSUtil.signatureUrl(state.info.avatar)
+      return state.OSSUtil?.signatureUrl(state.info.avatar)
     }
   },
   actions: {
@@ -62,6 +65,9 @@ export const useUser = defineStore('user', {
         this.info = { ...user.info }
         this.likedBy = user.likedBy
         this.likes = user.likes
+        if (this.OSSUtil === null) {
+          this.OSSUtil = await createOSSUtil()
+        }
       } catch (_) {
         // 获取用户信息失败
         showError('获取用户信息失败')

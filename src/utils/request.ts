@@ -2,7 +2,7 @@ import axios, { type AxiosResponse } from 'axios'
 import { showConfirmDialog } from 'vant'
 import { showError } from './show'
 import { getToken } from '@/utils/auth'
-import { useUser } from '@/stores/user'
+import { useUserStore } from '@/stores/user'
 import type { R } from '@/types/R'
 
 const request = axios.create({
@@ -12,8 +12,8 @@ const request = axios.create({
 
 request.interceptors.request.use(
   (config) => {
-    const userStore = useUser()
-    if (userStore.token) {
+    const user = useUserStore()
+    if (user.token) {
       config.headers['token'] = getToken()
     }
     return config
@@ -36,7 +36,7 @@ request.interceptors.response.use(
           confirmButtonText: '重新登录',
           cancelButtonText: '取消'
         }).then(() => {
-          const userStore = useUser()
+          const userStore = useUserStore()
           userStore.resetToken()
           location.assign('/login')
         })

@@ -112,9 +112,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useUser } from '@/stores/user'
+import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
-import OSSUtil from '@/utils/OSS'
 import cityList from '@/constants/city'
 import instituteList from '@/constants/institute'
 
@@ -144,7 +143,7 @@ const showCityPicker = ref(false)
 const showInstitutePicker = ref(false)
 
 const router = useRouter()
-const user = useUser()
+const user = useUserStore()
 
 const avatar = ref<UploaderFileListItem[]>([
   {
@@ -165,10 +164,10 @@ const afterReadAvatar = async (file: UploaderFileListItem | UploaderFileListItem
   file.status = 'uploading'
   file.message = '上传中'
   try {
-    await OSSUtil.put(user.username + '/avatar', file.file, {
-      headers: {
-        'Cache-Control': 'max-age=86400'
-      },
+    await user.OSSUtil?.put(user.username + '/avatar', file.file, {
+      // headers: {
+      //   'Cache-Control': 'max-age=86400'
+      // },
       timeout: 5000
     })
   } catch (_) {

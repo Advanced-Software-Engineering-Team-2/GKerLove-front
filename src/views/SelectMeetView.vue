@@ -24,7 +24,10 @@
           placeholder="最小年龄"
           type="digit"
           :rules="[
-            { validator: (min_age: number) => min_age >= 0 && min_age <= 200, message: '请输入正确的年龄' }
+            {
+              validator: (min_age: number) => min_age >= 0 && min_age <= 200,
+              message: '请输入正确的年龄'
+            }
           ]"
           center
         />
@@ -34,7 +37,10 @@
           placeholder="最大年龄"
           type="digit"
           :rules="[
-            { validator: (max_age: number) => max_age >= 0 && max_age <= 200, message: '请输入正确的年龄' }
+            {
+              validator: (max_age: number) => max_age >= 0 && max_age <= 200,
+              message: '请输入正确的年龄'
+            }
           ]"
           center
         />
@@ -92,12 +98,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useUser } from '@/stores/user'
-import { useMeet} from '@/stores/meet'
+import { useUserStore } from '@/stores/user'
+import { useMeet } from '@/stores/meet'
 import { useRouter } from 'vue-router'
 import cityList from '@/constants/city'
 import instituteList from '@/constants/institute'
-
 
 const cityPickerColumns = Object.keys(cityList).map((province) => {
   return {
@@ -123,7 +128,7 @@ const showCityPicker = ref(false)
 const showInstitutePicker = ref(false)
 
 const router = useRouter()
-const user = useUser()
+const user = useUserStore()
 const meet = useMeet()
 
 const gender = ref('')
@@ -132,22 +137,22 @@ const max_age = ref()
 const city = ref('')
 const institute = ref('')
 
-
-
 const handleSubmitButtonClicked = async () => {
-  if(!min_age.value){
+  if (!min_age.value) {
     min_age.value = 0
   }
-  if(!max_age.value){
+  if (!max_age.value) {
     max_age.value = 0
   }
   try {
-    await meet.getList(user.username, 
-                       gender.value, 
-                       min_age.value, 
-                       max_age.value, 
-                       city.value, 
-                       institute.value)
+    await meet.getList(
+      user.username,
+      gender.value,
+      min_age.value,
+      max_age.value,
+      city.value,
+      institute.value
+    )
     router.push('/meet')
   } catch (_) {
     /* empty */

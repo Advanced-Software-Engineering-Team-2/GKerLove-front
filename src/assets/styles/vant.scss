@@ -1,4 +1,6 @@
 :root:root {
+  --van-line-height-lg: var(--line-height);
+
   --van-tabbar-background: var(--color-background);
   --van-tabbar-item-text-color: var(--color-text);
   --van-tabbar-item-active-color: var(--color-text);
@@ -12,9 +14,10 @@
   --van-field-label-color: var(--color-text);
 
   --van-nav-bar-background: var(--color-background);
-  --van-nav-bar-arrow-size: 20px;
+  --van-nav-bar-arrow-size: var(--font-size-navbar);
   --van-nav-bar-icon-color: var(--color-text);
   --van-nav-bar-text-color: var(--color-text);
-  --van-nav-bar-title-font-size: 20px;
-  --van-nav-bar-height: 50px;
+  --van-nav-bar-title-font-size: var(--font-size-navbar);
+  --van-nav-bar-height: var(--height-navbar);
+  --van-nav-bar-line-height: var(--height-navbar);
 }

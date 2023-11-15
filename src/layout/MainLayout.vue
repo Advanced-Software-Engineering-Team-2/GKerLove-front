@@ -40,6 +40,6 @@ const title = computed(() => {
 <style scoped lang="scss">
 .content {
   min-height: calc(100vh - var(--height-navbar) - var(--height-tabbar));
-  background-color: gray;
+  // background-color: gray;
 }
 </style>
