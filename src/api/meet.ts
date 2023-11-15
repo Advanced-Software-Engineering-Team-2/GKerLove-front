@@ -23,9 +23,17 @@ function addlove(fromusername: string,tousername: string) {
         }
     })
   }
-
+  function notlove(fromusername: string,tousername: string) {
+    return request.post<R>('/meeting/notlove',null,{
+        params: {  
+            fromusername: fromusername,
+            tousername : tousername
+        }
+    })
+  }
 
 export default {
     getmeetinglist,
-    addlove
+    addlove,
+    notlove
 }
