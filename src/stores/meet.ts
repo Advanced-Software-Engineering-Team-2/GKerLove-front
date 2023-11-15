@@ -59,6 +59,15 @@ export const useMeet = defineStore('meetlist', {
       } catch (_) {
         showError('发送喜欢失败')
       }
+    },
+    async notLove(fromusername: string, tousername: string) {
+      try {
+        const res = await meetApi.notlove(fromusername, tousername)
+        const message = res.data.message
+        showSuccess(message)
+      } catch (_) {
+        showError('发送不喜欢失败')
+      }
     }
   }
 })

@@ -7,7 +7,6 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    FloatButton: typeof import('./src/components/FloatButton.vue')['default']
     MeetCard: typeof import('./src/components/MeetCard.vue')['default']
     Post: typeof import('./src/components/Post.vue')['default']
     PostCard: typeof import('./src/components/PostCard.vue')['default']

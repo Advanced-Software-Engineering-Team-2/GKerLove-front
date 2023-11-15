@@ -83,9 +83,35 @@ const handleNextClicked = () => {
 
 const handleLikeClicked = () => {
   meet.addLove(user.username, meet.list[index.value].username)
+  if(meet.list.length == 1){
+    alert('向该用户发送喜欢请求后已没有其余人选，请重新设置筛选条件');
+  }
+  else if(index.value < meet.list.length - 1){
+    meet.list.splice(index.value,1)
+    meet.getavatar(index.value)
+  }
+  else{
+    meet.list.splice(index.value,1)
+    index.value--;
+    meet.getavatar(index.value)
+  }
 }
 
-const handleHateClicked = async () => {}
+const handleHateClicked = async () => {
+  meet.notLove(user.username, meet.list[index.value].username)
+  if(meet.list.length == 1){
+    alert('将该用户设置为不喜欢后已没有其余人选，请重新设置筛选条件');
+  }
+  else if(index.value < meet.list.length - 1){
+    meet.list.splice(index.value,1)
+    meet.getavatar(index.value)
+  }
+  else{
+    meet.list.splice(index.value,1)
+    index.value--;
+    meet.getavatar(index.value)
+  }
+}
 </script>
 
 <style scoped lang="scss">
