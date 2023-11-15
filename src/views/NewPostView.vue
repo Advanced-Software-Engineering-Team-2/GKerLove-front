@@ -85,11 +85,7 @@ const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem
 }
 
 const handleSubmitButtonClicked = async () => {
-  const res = await postApi.addPost({
-    id: '',
-    content: content.value,
-    imageList: imageIds
-  })
+  const res = await postApi.addPost(content.value, imageIds)
   showSuccess(res.data.message)
   router.push('/home')
 }

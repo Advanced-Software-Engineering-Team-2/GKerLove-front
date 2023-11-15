@@ -39,7 +39,8 @@ const title = computed(() => {
 
 <style scoped lang="scss">
 .content {
-  min-height: calc(100vh - var(--height-navbar) - var(--height-tabbar));
+  height: calc(100vh - var(--height-navbar) - var(--height-tabbar));
+  overflow: auto;
   // background-color: gray;
 }
 </style>
