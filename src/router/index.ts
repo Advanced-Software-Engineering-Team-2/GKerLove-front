@@ -58,7 +58,15 @@ const router = createRouter({
       name: 'updateInfo',
       component: () => import('@/views/UpdateInfoView.vue'),
       meta: {
-        title: '完善详细信息'
+        title: '完善信息'
+      }
+    },
+    {
+      path: '/newPost',
+      name: 'newPost',
+      component: () => import('@/views/NewPostView.vue'),
+      meta: {
+        title: '发布动态'
       }
     },
     {
