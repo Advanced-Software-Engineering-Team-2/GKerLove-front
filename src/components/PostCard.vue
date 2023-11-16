@@ -24,30 +24,17 @@
 
 <script setup lang="ts">
 import { Post } from '@/types/Post'
-import { useUserStore } from '@/stores/user'
 import moment from 'moment'
 import { computed } from 'vue'
-import { User } from '@/types/User'
 
-const my = useUserStore()
-
-const { post, user } = defineProps<{
+const { post, username, avatarUrl } = defineProps<{
   post: Post
-  user?: User
+  username: string
+  avatarUrl: string
 }>()
 
 const formattedTime = computed(() => {
   return moment(post.time).format('MM月DD日 HH:mm')
-})
-
-const avatarUrl = computed(() => {
-  if (user) return my.avatarUrl
-  return my.OSSUtil?.signatureUrl(post.user.info.avatar)
-})
-
-const username = computed(() => {
-  if (my) return my.username
-  return post.user.username
 })
 </script>
 

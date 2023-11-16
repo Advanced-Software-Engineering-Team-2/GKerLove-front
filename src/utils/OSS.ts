@@ -1,17 +1,5 @@
-// import STSApi from '@/api/STS'
 import OSS from 'ali-oss'
 import STSApi from '@/api/STS'
-
-// let OSSUtil: OSS | null = undefined
-
-// const OSSUtil = new OSS({
-//   region: 'oss-cn-beijing',
-//   accessKeyId: 'LTAI5tMLQA6BXqazQi7KSZ4f',
-//   accessKeySecret: 'T6Mwtmk1mX6dP81iUifae4GVP9iOoR',
-//   bucket: 'gker-love'
-// })
-
-// export default OSSUtil
 
 export async function createOSSUtil() {
   const res = await STSApi.getSTSResponse()

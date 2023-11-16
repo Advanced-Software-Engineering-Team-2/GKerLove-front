@@ -9,7 +9,7 @@ const router = createRouter({
     {
       path: '/',
       component: () => import('@/layout/MainLayout.vue'),
-      redirect: '/meet',
+      redirect: '/home',
       children: [
         {
           path: 'meet',
@@ -106,7 +106,9 @@ router.beforeEach(async (to, _, next) => {
   }
   const user = useUserStore()
   if (!user.username) {
-    await user.initUser()
+    if (whiteList.indexOf(to.path) === -1) {
+      await user.initUser()
+    }
   }
   next()
 })

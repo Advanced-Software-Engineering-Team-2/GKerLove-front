@@ -32,8 +32,8 @@ export const useMeet = defineStore('meetlist', {
         const meetinglist = res.data.data.meetinglist
         this.list = meetinglist
         const user = useUserStore()
-        this.curavatar = user.OSSUtil?.signatureUrl(this.list[0].info.avatar)
-          ? user.OSSUtil.signatureUrl(this.list[0].info.avatar)
+        this.curavatar = user.OSSUtil?.signatureUrl(this.list[0].avatar)
+          ? user.OSSUtil.signatureUrl(this.list[0].avatar)
           : ''
       } catch (_) {
         showError('没有满足条件的对象，请更换筛选信息并重新提交！')
@@ -42,8 +42,8 @@ export const useMeet = defineStore('meetlist', {
     async getavatar(index: number) {
       const user = useUserStore()
       if (this.list.length > 0) {
-        this.curavatar = user.OSSUtil?.signatureUrl(this.list[0].info.avatar)
-          ? user.OSSUtil?.signatureUrl(this.list[0].info.avatar)
+        this.curavatar = user.OSSUtil?.signatureUrl(this.list[0].avatar)
+          ? user.OSSUtil?.signatureUrl(this.list[0].avatar)
           : ''
       } else {
         this.curavatar = user.OSSUtil?.signatureUrl('default-avatar')

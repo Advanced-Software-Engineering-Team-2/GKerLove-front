@@ -5,7 +5,7 @@ import type { Post } from '@/types/Post'
 import type { Page } from '@/types/Page'
 
 function addPost(content: string, imageList: string[]) {
-  return request.post<R>('/post', {
+  return request.post<R<{post: Post}>>('/post', {
     content,
     imageList
   })

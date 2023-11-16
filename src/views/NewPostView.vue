@@ -48,15 +48,13 @@ import { UploaderFileListItem } from 'vant'
 import { v4 as uuidv4 } from 'uuid'
 
 import { useUserStore } from '@/stores/user'
-import postApi from '@/api/post'
-import { showSuccess } from '@/utils/show'
 
 const router = useRouter()
 const user = useUserStore()
 
 const content = ref('')
 const imageList = ref([])
-const imageIds: string[] = []
+let imageIds: string[] = []
 
 const onClickBack = () => {
   router.back()
@@ -85,9 +83,15 @@ const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem
 }
 
 const handleSubmitButtonClicked = async () => {
-  const res = await postApi.addPost(content.value, imageIds)
-  showSuccess(res.data.message)
-  router.push('/home')
+  try {
+    await user.addPost(content.value, imageIds)
+    content.value = ''
+    imageList.value = []
+    imageIds = []
+    router.push('/home')
+  } catch (_) {
+    /* empty */
+  }
 }
 </script>
 

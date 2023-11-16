@@ -3,7 +3,7 @@
     <div class="row-1">
       <div class="avatar">
         <van-image
-          :src="my.OSSUtil?.signatureUrl(user.info.avatar)"
+          :src="me.OSSUtil?.signatureUrl(user.avatar)"
           round
           :show-loading="false"
           width="100px"
@@ -13,16 +13,16 @@
       <div class="info">
         <h3 class="username">{{ user.username }}</h3>
         <div class="detail">
-          <p>性别： {{ user.info.gender ? user.info.gender : '未填写' }}</p>
-          <p>年龄： {{ user.info.age ? user.info.age : '未填写' }}</p>
-          <p>所在城市： {{ user.info.city ? user.info.city : '未填写' }}</p>
-          <p>培养单位： {{ user.info.institute ? user.info.institute : '未填写' }}</p>
+          <p>性别： {{ user.gender ? user.gender : '未填写' }}</p>
+          <p>年龄： {{ user.age ? user.age : '未填写' }}</p>
+          <p>所在城市： {{ user.city }}</p>
+          <p>培养单位： {{ user.institute ? user.institute : '未填写' }}</p>
         </div>
       </div>
     </div>
     <van-divider />
     <div class="row-2">
-      <p>自我介绍：{{ user.info.introduction }}</p>
+      <p>自我介绍：{{ user.introduction }}</p>
     </div>
     <van-divider />
     <div class="row-3">
@@ -32,7 +32,7 @@
     </div>
     <van-divider />
     <div class="post-card-list">
-      <post-card class="post-card" v-for="post in posts" :key="post.id" :post="post" />
+      <post-card class="post-card" v-for="post in posts" :key="post.id" :post="post" :user="user" />
       <van-back-top right="10vw" bottom="10vh" />
     </div>
   </div>
@@ -52,9 +52,9 @@ import { toRefs } from '@vueuse/core'
 const props = defineProps<{
   user: User
 }>()
-const { user } = toRefs(props)
 
-const my = useUserStore()
+const { user } = toRefs(props)
+const me = useUserStore()
 
 const posts = ref<Post[]>()
 

@@ -116,6 +116,7 @@ import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import cityList from '@/constants/city'
 import instituteList from '@/constants/institute'
+import { v4 as uuidv4 } from 'uuid'
 
 import type { UploaderFileListItem } from 'vant'
 
@@ -151,11 +152,12 @@ const avatar = ref<UploaderFileListItem[]>([
     isImage: true
   }
 ])
-const gender = ref(user.info.gender)
-const age = ref(user.info.age)
-const city = ref(user.info.city)
-const institute = ref(user.info.institute)
-const introduction = ref(user.info.introduction)
+let imageId: string | undefined = undefined
+const gender = ref(user.gender)
+const age = ref(user.age)
+const city = ref(user.city)
+const institute = ref(user.institute)
+const introduction = ref(user.introduction)
 
 const afterReadAvatar = async (file: UploaderFileListItem | UploaderFileListItem[]) => {
   if (Array.isArray(file)) {
@@ -163,8 +165,10 @@ const afterReadAvatar = async (file: UploaderFileListItem | UploaderFileListItem
   }
   file.status = 'uploading'
   file.message = '上传中'
+  const uuid = uuidv4()
+  imageId = `${user.username}/${uuid}`
   try {
-    await user.OSSUtil?.put(user.username + '/avatar', file.file, {
+    await user.OSSUtil?.put(imageId, file.file, {
       // headers: {
       //   'Cache-Control': 'max-age=86400'
       // },
@@ -182,7 +186,7 @@ const afterReadAvatar = async (file: UploaderFileListItem | UploaderFileListItem
 const handleSubmitButtonClicked = async () => {
   try {
     await user.updateInfo({
-      avatar: avatar.value[0].status === 'done' ? user.username + '/avatar' : user.info.avatar,
+      avatar: imageId ? imageId : user.avatar,
       gender: gender.value,
       age: age.value,
       city: city.value,

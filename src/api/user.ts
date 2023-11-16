@@ -27,7 +27,7 @@ function getUser() {
 }
 
 function updateInfo(userInfo: UserInfo) {
-  return request.put<R<{ info: UserInfo }>>('/user/info', userInfo)
+  return request.put<R>('/user/info', userInfo)
 }
 
 export default {
