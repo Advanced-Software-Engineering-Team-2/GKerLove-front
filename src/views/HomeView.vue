@@ -55,7 +55,16 @@
         </div>
       </div>
       <van-divider />
-      <post-card class="post-card" v-for="post in myPosts" :key="post.id" :post="post" />
+      <div class="post-card-list">
+        <post-card
+          class="post-card"
+          v-for="post in myPosts"
+          :me="true"
+          :key="post.id"
+          :post="post"
+        />
+        <van-back-top right="10vw" bottom="10vh" />
+      </div>
     </van-config-provider>
   </div>
 </template>
@@ -79,11 +88,10 @@ const user = useUserStore()
 const themeVars: ConfigProviderThemeVars = {
   buttonIconSize: '2rem'
 }
-const pageNumber = ref(1)
 
 const myPosts = ref<Post[]>()
 
-const res = await postApi.getMyPosts(pageNumber.value)
+const res = await postApi.getMyPosts()
 
 myPosts.value = res.data.data.postList.content
 

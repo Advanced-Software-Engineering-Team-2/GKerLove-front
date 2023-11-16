@@ -3,7 +3,11 @@
 <template>
   <van-config-provider theme="dark" />
   <suspense>
-    <router-view />
+    <router-view v-slot="{ Component }">
+      <keep-alive>
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
     <template #fallback>正在加载...</template>
   </suspense>
 </template>

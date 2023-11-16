@@ -22,7 +22,6 @@
     <div class="row-3">
       <span>人气： {{ user.likedBy }}</span>
       <span>喜欢： {{ user.likes }}</span>
-
     </div>
   </div>
 </template>
@@ -33,7 +32,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const user = useUserStore()
-user.getUser()
+user.initUser()
 </script>
 
 <style scoped lang="scss">

@@ -7,17 +7,11 @@
     >
       <div class="header">
         <div class="avatar">
-          <van-image
-            :src="user.OSSUtil?.signatureUrl(post.user.info.avatar)"
-            round
-            :show-loading="false"
-            width="3rem"
-            height="3rem"
-          />
+          <van-image :src="avatarUrl" round :show-loading="false" width="3rem" height="3rem" />
         </div>
         <div class="wrapper">
-          <div class="username">{{ post.user.username }}</div>
-          <div class="time">{{ post.time }}</div>
+          <div class="username">{{ username }}</div>
+          <div class="time">{{ formattedTime }}</div>
         </div>
       </div>
       <van-divider />
@@ -31,12 +25,34 @@
 <script setup lang="ts">
 import { Post } from '@/types/Post'
 import { useUserStore } from '@/stores/user'
+import moment from 'moment'
+import { computed } from 'vue'
 
 const user = useUserStore()
 
-const { post } = defineProps<{
-  post: Post
-}>()
+const { post, me } = withDefaults(
+  defineProps<{
+    post: Post
+    me?: boolean
+  }>(),
+  {
+    me: false
+  }
+)
+
+const formattedTime = computed(() => {
+  return moment(post.time).format('MM月DD日 HH:mm')
+})
+
+const avatarUrl = computed(() => {
+  if (me) return user.avatarUrl
+  return user.OSSUtil?.signatureUrl(post.user.info.avatar)
+})
+
+const username = computed(() => {
+  if (me) return user.username
+  return post.user.username
+})
 </script>
 
 <style scoped lang="scss">

@@ -106,7 +106,7 @@ router.beforeEach(async (to, _, next) => {
   }
   const user = useUserStore()
   if (!user.username) {
-    await user.getUser()
+    await user.initUser()
   }
   next()
 })
