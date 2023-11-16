@@ -2,7 +2,13 @@
   <div class="user-card">
     <div class="row-1">
       <div class="avatar">
-        <van-image :src="user.avatarUrl" round :show-loading="false" width="100px" height="100px" />
+        <van-image
+          :src="my.OSSUtil?.signatureUrl(user.info.avatar)"
+          round
+          :show-loading="false"
+          width="100px"
+          height="100px"
+        />
       </div>
       <div class="info">
         <h3 class="username">{{ user.username }}</h3>
@@ -20,45 +26,84 @@
     </div>
     <van-divider />
     <div class="row-3">
-      <span>人气： {{ user.likedBy }}</span>
-      <span>喜欢： {{ user.likes }}</span>
+      <span>人气: {{ user.likedBy }}</span>
+      <span>喜欢: {{ user.likes }}</span>
+      <slot></slot>
+    </div>
+    <van-divider />
+    <div class="post-card-list">
+      <post-card class="post-card" v-for="post in posts" :key="post.id" :post="post" />
+      <van-back-top right="10vw" bottom="10vh" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from '@/stores/user'
-import { useRouter } from 'vue-router'
+import PostCard from '@/components/PostCard.vue'
 
-const router = useRouter()
-const user = useUserStore()
-user.initUser()
+import { useUserStore } from '@/stores/user'
+import postApi from '@/api/post'
+
+import type { Post } from '@/types/Post'
+import { ref } from 'vue'
+import { User } from '@/types/User'
+import { toRefs } from '@vueuse/core'
+
+const props = defineProps<{
+  user: User
+}>()
+const { user } = toRefs(props)
+
+const my = useUserStore()
+
+const posts = ref<Post[]>()
+
+const res = await postApi.getUserPosts(user.value.id)
+
+posts.value = res.data.data.posts.content
 </script>
 
 <style scoped lang="scss">
-.user-card {
-  .row-1 {
+.row-1 {
+  display: flex;
+  .avatar {
+    flex: 1;
     display: flex;
-    .avatar {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-right: 5px;
-    }
-    .info {
-      flex: 3;
-      margin-left: 5px;
-      .username {
-        font-size: 1.5rem;
-      }
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+  }
+  .info {
+    flex: 3;
+    margin-left: 5px;
+    .username {
+      font-size: 1.5rem;
     }
   }
+}
 
-  .row-3 {
+.row-3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .button-box {
     display: flex;
-    justify-content: space-between;
     align-items: center;
   }
 }
+
+.post-card {
+  margin: 10px 0;
+}
+
+// .new-post-button {
+//   display: block;
+//   margin: 10px auto;
+//   border: 0;
+//   background: var(--red-gradient);
+//   width: 4rem;
+//   height: 4rem;
+//   border-radius: 50%;
+// }
 </style>

@@ -5,19 +5,17 @@ import { User, UserInfo } from '@/types/User'
 import { showSuccess, showError } from '@/utils/show'
 import { createOSSUtil } from '@/utils/OSS'
 import OSS from 'ali-oss'
-import type { Post } from '@/types/Post'
-import postApi from '@/api/post'
 
 interface State extends User {
   token: string
   OSSUtil: null | OSS
-  posts: Post[]
 }
 
 export const useUserStore = defineStore('user', {
   state: (): State => {
     return {
       token: getToken() || '',
+      id: '',
       username: '',
       email: '',
       info: {
@@ -25,7 +23,6 @@ export const useUserStore = defineStore('user', {
       },
       likedBy: 0,
       likes: 0,
-      posts: [],
       OSSUtil: null
     }
   },
@@ -59,17 +56,6 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    async addPost(content: string, imageList: string[]) {
-      try {
-        const res = await postApi.addPost(content, imageList)
-        showSuccess(res.data.message)
-        this.posts.unshift(res.data.data.post)
-      } catch (_) {
-        // 发布失败
-        return Promise.reject()
-      }
-    },
-
     /**
      * 初始化用户，在以下两种情况下调用：
      * 1. 用户登录
@@ -80,6 +66,7 @@ export const useUserStore = defineStore('user', {
       try {
         const res = await userApi.getUser()
         const user = res.data.data.user
+        this.id = user.id
         this.username = user.username
         this.email = user.email
         this.info = { ...user.info }

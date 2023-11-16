@@ -5,17 +5,17 @@ import type { Post } from '@/types/Post'
 import type { Page } from '@/types/Page'
 
 function addPost(content: string, imageList: string[]) {
-  return request.post<R<{ post: Post }>>('/post', {
+  return request.post<R>('/post', {
     content,
     imageList
   })
 }
 
-function getMyPosts() {
-  return request.get<R<{ postList: Page<Post> }>>('/post/my')
+function getUserPosts(userId: string) {
+  return request.get<R<{ posts: Page<Post> }>>(`/post/${userId}`)
 }
 
 export default {
   addPost,
-  getMyPosts
+  getUserPosts
 }
