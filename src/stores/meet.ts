@@ -41,15 +41,9 @@ export const useMeet = defineStore('meetlist', {
     },
     async getavatar(index: number) {
       const user = useUserStore()
-      if (this.list.length > 0) {
-        this.curavatar = user.OSSUtil?.signatureUrl(this.list[0].avatar)
-          ? user.OSSUtil?.signatureUrl(this.list[0].avatar)
-          : ''
-      } else {
-        this.curavatar = user.OSSUtil?.signatureUrl('default-avatar')
-          ? user.OSSUtil?.signatureUrl('default-avatar')
-          : ''
-      }
+      this.curavatar = user.OSSUtil?.signatureUrl(this.list[index].avatar)
+      ? user.OSSUtil?.signatureUrl(this.list[index].avatar)
+      : ''
     },
     async addLove(fromusername: string, tousername: string) {
       try {

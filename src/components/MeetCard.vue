@@ -60,7 +60,6 @@ import { useMeet } from '@/stores/meet'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const user = useUserStore()
-user.initUser()
 const meet = useMeet()
 const index = ref(0)
 const handlePreClicked = async () => {

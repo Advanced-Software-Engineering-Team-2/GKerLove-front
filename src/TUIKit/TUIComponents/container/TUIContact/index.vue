@@ -191,7 +191,7 @@
                 :class="[currentFriend?.userID === item?.userID && 'selected']"
                 v-for="(item, index) in myloveIDList"
                 :key="index"
-                @click="handleListItem(item)"
+                @click="handleListItem(friendList.find((friend) => friend?.userID === item?.userID))"
               >
                 <aside class="left">
                   <img
@@ -231,7 +231,7 @@
                 :class="[currentFriend?.userID === item?.userID && 'selected']"
                 v-for="(item, index) in lovemeIDList"
                 :key="index"
-                @click="handleListItem(item)"
+                @click="handleListItem(friendList.find((friend) => friend?.userID === item?.userID))"
               >
                 <aside class="left">
                   <img
@@ -297,7 +297,7 @@
       >
         <header class="TUI-contact-main-h5-title" v-if="env.isH5">
           <i class="icon icon-back" @click="back"></i>
-          <h1>{{ currentGroup?.name || $t('TUIContact.系统通知') }}</h1>
+          <h1>{{ currentGroup?.name || $t('TUIContact.详细信息') }}</h1>
         </header>
         <div v-if="!!currentGroup?.groupID" class="TUI-contact-main-info">
           <header class="TUI-contact-main-info-header">
@@ -352,7 +352,7 @@
             </button>
           </footer>
         </div>
-        <div v-else-if="currentFriend?.userID && (columnName === 'friend'||columnName === 'mylove'||columnName === 'loveme')" class="TUI-contact-main-info">
+        <div v-else-if="currentFriend?.userID && (columnName === 'friend' || columnName === 'mylove' || columnName === 'loveme')" class="TUI-contact-main-info">
           <header class="TUI-contact-main-info-header">
             <ul class="list">
               <h1>{{ currentFriend?.profile?.nick || currentFriend?.userID }}</h1>
@@ -361,8 +361,7 @@
                 <span>{{ currentFriend?.profile?.userID }}</span>
               </li>
               <li>
-                <label>{{ $t('TUIContact.个性签名') }}：</label>
-                <span>{{ currentFriend?.profile?.selfSignature }}</span>
+                <span>{{ currentFriend?.profile?.selfSignature || "该用户未完善个人信息"}}</span>
               </li>
             </ul>
             <img
