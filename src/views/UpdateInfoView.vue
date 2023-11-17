@@ -19,7 +19,7 @@
               }"
             >
               <van-uploader
-                v-model="avatar"
+                v-model="avatarFiles"
                 :after-read="afterReadAvatar"
                 :max-count="1"
                 :max-size="10 * 1024 * 1024"
@@ -146,13 +146,13 @@ const showInstitutePicker = ref(false)
 const router = useRouter()
 const user = useUserStore()
 
-const avatar = ref<UploaderFileListItem[]>([
+const avatarFiles = ref<UploaderFileListItem[]>([
   {
-    url: user.avatarUrl,
+    url: user.avatar,
     isImage: true
   }
 ])
-let imageId: string | undefined = undefined
+let avatar = user.avatar
 const gender = ref(user.gender)
 const age = ref(user.age)
 const city = ref(user.city)
@@ -166,14 +166,15 @@ const afterReadAvatar = async (file: UploaderFileListItem | UploaderFileListItem
   file.status = 'uploading'
   file.message = '上传中'
   const uuid = uuidv4()
-  imageId = `${user.username}/${uuid}`
   try {
-    await user.OSSUtil?.put(imageId, file.file, {
+    const res = await user.OSSUtil?.put(`${user.username}/${uuid}`, file.file, {
+      // 对于用户头像，可能会修改，因此设置缓存策略为no-cache（默认），每次先去服务器判断是否修改过（304）
       // headers: {
       //   'Cache-Control': 'max-age=86400'
       // },
       timeout: 5000
     })
+    avatar = res!.url
   } catch (_) {
     file.status = 'failed'
     file.message = '上传失败'
@@ -186,7 +187,7 @@ const afterReadAvatar = async (file: UploaderFileListItem | UploaderFileListItem
 const handleSubmitButtonClicked = async () => {
   try {
     await user.updateInfo({
-      avatar: imageId ? imageId : user.avatar,
+      avatar,
       gender: gender.value,
       age: age.value,
       city: city.value,

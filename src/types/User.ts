@@ -1,5 +1,5 @@
 export interface UserInfo {
-  avatar: string
+  avatar?: string
   gender?: '男' | '女'
   age?: number
   city?: string

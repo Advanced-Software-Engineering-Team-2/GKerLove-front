@@ -14,7 +14,7 @@ export const useUserStore = defineStore('user', () => {
   const id = ref<string>()
   const username = ref<string>()
   const email = ref<string>()
-  const avatar = ref('default-avatar')
+  const avatar = ref<string>()
   const gender = ref<'男' | '女'>()
   const age = ref<number>()
   const city = ref<string>()
@@ -24,9 +24,6 @@ export const useUserStore = defineStore('user', () => {
   const likes = ref(0)
   const posts = ref<Post[]>([])
   const OSSUtil = ref<OSS | null>(null)
-  const avatarUrl = computed(() => {
-    return OSSUtil.value?.signatureUrl(avatar.value)
-  })
 
   async function initUser() {
     if (!token.value) return null
@@ -95,6 +92,16 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  async function deletePost(id: string) {
+    try {
+      const res = await postApi.deletePost(id)
+      posts.value = posts.value.filter((post) => post.id !== id)
+      showSuccess(res.data.message)
+    } catch (_) {
+      return Promise.reject()
+    }
+  }
+
   function $reset() {
     token.value = undefined
     id.value = undefined
@@ -118,7 +125,6 @@ export const useUserStore = defineStore('user', () => {
     username,
     email,
     avatar,
-    avatarUrl,
     gender,
     age,
     city,
@@ -132,6 +138,7 @@ export const useUserStore = defineStore('user', () => {
     login,
     updateInfo,
     addPost,
+    deletePost,
     fetchPosts,
     $reset
   }

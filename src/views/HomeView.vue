@@ -3,13 +3,7 @@
     <div class="user-card">
       <div class="row-1">
         <div class="avatar">
-          <van-image
-            :src="user.avatarUrl"
-            round
-            :show-loading="false"
-            width="100px"
-            height="100px"
-          />
+          <van-image :src="user.avatar" round :show-loading="false" width="100px" height="100px" />
         </div>
         <div class="info">
           <h3 class="username">{{ user.username }}</h3>
@@ -61,7 +55,9 @@
           :key="post.id"
           :post="post"
           :username="user.username!"
-          :avatar-url="user.avatarUrl!"
+          :avatar="user.avatar!"
+          :show-delete-button="true"
+          @delete-button-clicked="user.deletePost(post.id)"
         />
         <van-back-top right="10vw" bottom="10vh" />
       </div>

@@ -54,7 +54,7 @@ const user = useUserStore()
 
 const content = ref('')
 const imageList = ref([])
-let imageIds: string[] = []
+let imageUrls: string[] = []
 
 const onClickBack = () => {
   router.back()
@@ -69,12 +69,16 @@ const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem
     file.message = '上传中'
     try {
       const uuid = uuidv4()
-      await user.OSSUtil?.put(`${user.username}/posts/${uuid}`, file.file, {
-        timeout: 5000
+      const res = await user.OSSUtil?.put(`${user.username}/posts/${uuid}`, file.file, {
+        timeout: 5000,
+        // 对于动态图片，不会被修改，因此缓存时间可以设置的很长
+        headers: {
+          'Cache-Control': 'max-age=8640000'
+        }
       })
       file.status = 'done'
       file.message = '上传成功'
-      imageIds.push(uuid)
+      imageUrls.push(res!.url)
     } catch (_) {
       file.status = 'failed'
       file.message = '上传失败'
@@ -84,10 +88,10 @@ const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem
 
 const handleSubmitButtonClicked = async () => {
   try {
-    await user.addPost(content.value, imageIds)
+    await user.addPost(content.value, imageUrls)
     content.value = ''
     imageList.value = []
-    imageIds = []
+    imageUrls = []
     router.push('/home')
   } catch (_) {
     /* empty */
