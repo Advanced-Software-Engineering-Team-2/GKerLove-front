@@ -7,16 +7,16 @@
       <div class="info">
         <h3 class="username">{{ meet.list.length > 0 ? meet.list[index].username : '' }}</h3>
         <div class="detail">
-          <p>性别： {{ meet.list.length > 0 ? meet.list[index].info.gender : '' }}</p>
-          <p>年龄： {{ meet.list.length > 0 ? meet.list[index].info.age : '' }}</p>
-          <p>所在城市： {{ meet.list.length > 0 ? meet.list[index].info.city : '' }}</p>
-          <p>培养单位： {{ meet.list.length > 0 ? meet.list[index].info.institute : '' }}</p>
+          <p>性别： {{ meet.list.length > 0 ? meet.list[index].gender : '' }}</p>
+          <p>年龄： {{ meet.list.length > 0 ? meet.list[index].age : '' }}</p>
+          <p>所在城市： {{ meet.list.length > 0 ? meet.list[index].city : '' }}</p>
+          <p>培养单位： {{ meet.list.length > 0 ? meet.list[index].institute : '' }}</p>
         </div>
       </div>
     </div>
     <van-divider />
     <div class="row-2">
-      <p>自我介绍：{{ meet.list.length > 0 ? meet.list[index].info.introduction : '' }}</p>
+      <p>自我介绍：{{ meet.list.length > 0 ? meet.list[index].introduction : '' }}</p>
     </div>
     <van-divider />
   </div>
