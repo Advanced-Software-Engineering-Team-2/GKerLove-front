@@ -6,7 +6,6 @@ import { useUserStore } from './user'
 export const useMeet = defineStore('meetlist', {
   state: () => {
     return {
-      curavatar: '',
       list: [] as User[]
     }
   },
@@ -32,18 +31,9 @@ export const useMeet = defineStore('meetlist', {
         const meetinglist = res.data.data.meetinglist
         this.list = meetinglist
         const user = useUserStore()
-        this.curavatar = user.OSSUtil?.signatureUrl(this.list[0].avatar)
-          ? user.OSSUtil.signatureUrl(this.list[0].avatar)
-          : ''
       } catch (_) {
         showError('没有满足条件的对象，请更换筛选信息并重新提交！')
       }
-    },
-    async getavatar(index: number) {
-      const user = useUserStore()
-      this.curavatar = user.OSSUtil?.signatureUrl(this.list[index].avatar)
-      ? user.OSSUtil?.signatureUrl(this.list[index].avatar)
-      : ''
     },
     async addLove(fromusername: string, tousername: string) {
       try {

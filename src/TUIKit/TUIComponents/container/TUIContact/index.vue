@@ -196,7 +196,7 @@
                 <aside class="left">
                   <img
                     class="avatar"
-                    :src="item?.profile?.avatar || 'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'"
+                    :src="friendList.find((friend) => friend?.userID === item?.userID)?.profile?.avatar"
                     onerror="this.src='https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'"
                   />
                   <div
@@ -236,7 +236,7 @@
                 <aside class="left">
                   <img
                     class="avatar"
-                    :src="item?.profile?.avatar || 'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'"
+                    :src="friendList.find((friend) => friend?.userID === item?.userID)?.profile?.avatar"
                     onerror="this.src='https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'"
                   />
                   <div
