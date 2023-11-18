@@ -32,7 +32,11 @@ const router = createRouter({
           name: 'home',
           component: () => import('@/views/HomeView.vue'),
           meta: {
-            title: '我的'
+            title: '我的',
+            scrollPos: {
+              top: 0,
+              left: 0
+            }
           }
         }
       ]
@@ -67,6 +71,14 @@ const router = createRouter({
       component: () => import('@/views/NewPostView.vue'),
       meta: {
         title: '发布动态'
+      }
+    },
+    {
+      path: '/post/:id',
+      name: 'postDetail',
+      component: () => import('@/views/PostDetailView.vue'),
+      meta: {
+        title: '动态详情'
       }
     },
     {

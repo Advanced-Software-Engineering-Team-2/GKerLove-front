@@ -6,7 +6,7 @@ import { UserInfo } from '@/types/User'
 import { showSuccess, showError } from '@/utils/show'
 import { createOSSUtil } from '@/utils/OSS'
 import OSS from 'ali-oss'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { Post } from '@/types/Post'
 
 export const useUserStore = defineStore('user', () => {

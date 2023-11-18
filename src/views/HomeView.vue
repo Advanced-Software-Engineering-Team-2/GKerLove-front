@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home" ref="root">
     <div class="user-card">
       <div class="row-1">
         <div class="avatar">
@@ -48,17 +48,19 @@
         </div>
       </div>
       <van-divider />
-      <div class="post-card-list">
-        <post-card
-          class="post-card"
-          v-for="post in user.posts"
-          :key="post.id"
-          :post="post"
-          :username="user.username!"
-          :avatar="user.avatar!"
-          :show-delete-button="true"
-          @delete-button-clicked="user.deletePost(post.id)"
-        />
+      <div class="post-card-list" id="post-card-list">
+        <div class="post-card-container" v-for="post in user.posts" :key="post.id">
+          <post-card
+            class="post-card"
+            :post="post"
+            :username="user.username!"
+            :avatar="user.avatar!"
+            :show-delete-button="true"
+            @delete-button-clicked="user.deletePost(post.id)"
+            @body-clicked="router.push(`/post/${post.id}`)"
+          />
+          <van-divider />
+        </div>
         <van-back-top right="10vw" bottom="10vh" />
       </div>
     </div>
@@ -67,13 +69,33 @@
 
 <script setup lang="ts">
 import router from '@/router'
+import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { showSuccess } from '@/utils/show'
 import { TUICore } from '../TUIKit'
+import { onBeforeRouteLeave } from 'vue-router'
+import { onMounted, ref, watch } from 'vue'
+import { useScrollParent, useEventListener } from '@vant/use'
+import { Ref } from 'vue'
+import { nextTick } from 'vue'
 
 const user = useUserStore()
+const root = ref<HTMLElement | undefined>()
+const scrollParent = useScrollParent(root) as Ref<HTMLElement>
+
+let lastScrollTop = 0
 
 await user.fetchPosts()
+
+const route = useRoute()
+
+watch(
+  () => route.params,
+  async () => {
+    if (route.name !== 'home') return
+    nextTick(() => scrollParent.value.scrollTo(0, lastScrollTop))
+  }
+)
 
 const handleLogoutButtonClicked = async () => {
   try {
@@ -84,10 +106,14 @@ const handleLogoutButtonClicked = async () => {
     user.$reset()
   } catch (err) {
     console.log(err)
-
     /* empty */
   }
 }
+
+onBeforeRouteLeave((_to, _from, next) => {
+  lastScrollTop = scrollParent.value.scrollTop
+  next()
+})
 </script>
 
 <style scoped lang="scss">
@@ -120,17 +146,9 @@ const handleLogoutButtonClicked = async () => {
   }
 }
 
-.post-card {
-  margin: 10px 0;
+.post-card-container {
+  .post-card {
+    margin: 10px 0;
+  }
 }
-
-// .new-post-button {
-//   display: block;
-//   margin: 10px auto;
-//   border: 0;
-//   background: var(--red-gradient);
-//   width: 4rem;
-//   height: 4rem;
-//   border-radius: 50%;
-// }
 </style>
