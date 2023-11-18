@@ -6,11 +6,16 @@
       }"
     >
       <post-card-header :username="username" :avatar="avatar" :time="post.time">
+        <template v-slot:left v-if="fromMe">
+          <div class="time" style="display: flex; justify-content: center; align-items: center">
+            {{ formattedTime }}
+          </div>
+        </template>
         <template v-slot:right>
           <van-button
             size="small"
             type="danger"
-            v-if="showDeleteButton"
+            v-if="fromMe"
             @click="$emit('delete-button-clicked')"
           >
             删除
@@ -33,18 +38,24 @@
 
 <script setup lang="ts">
 import type { Post } from '@/types/Post'
+import moment from 'moment'
+import { computed } from 'vue'
 
 const { post, username, avatar } = withDefaults(
   defineProps<{
     post: Post
     username: string
     avatar: string
-    showDeleteButton?: boolean
+    fromMe?: boolean
   }>(),
   {
-    showDeleteButton: false
+    fromMe: false
   }
 )
+
+const formattedTime = computed(() => {
+  return moment(post.time).format('MM月DD日 HH:mm')
+})
 </script>
 
 <style scoped lang="scss">

@@ -48,14 +48,15 @@
         </div>
       </div>
       <van-divider />
-      <div class="post-card-list" id="post-card-list">
+      <van-loading v-if="loading" />
+      <div class="post-card-list" v-else>
         <div class="post-card-container" v-for="post in user.posts" :key="post.id">
           <post-card
             class="post-card"
             :post="post"
             :username="user.username!"
             :avatar="user.avatar!"
-            :show-delete-button="true"
+            :from-me="true"
             @delete-button-clicked="user.deletePost(post.id)"
             @body-clicked="router.push(`/post/${post.id}`)"
           />
@@ -77,8 +78,7 @@ import { usePreserveScroll } from '@/hooks/usePreserveScroll'
 
 const user = useUserStore()
 const root = ref<HTMLElement | undefined>()
-
-await user.fetchPosts()
+const loading = ref(true)
 
 usePreserveScroll(root, 'home')
 
@@ -93,6 +93,14 @@ const handleLogoutButtonClicked = async () => {
     console.log(err)
     /* empty */
   }
+}
+
+try {
+  await user.fetchPosts()
+} catch (_) {
+  /* empty */
+} finally {
+  loading.value = false
 }
 </script>
 

@@ -38,7 +38,6 @@
     <div class="footer">
       <van-field
         v-model="comment"
-        autosize
         label="评论"
         type="textarea"
         maxlength="50"
@@ -101,6 +100,8 @@ const handleSendButtonClicked = async () => {
     const res = await postApi.comment(comment.value, post.value.id)
     showSuccess(res.data.message)
     post.value.commentList.push(res.data.data.comment)
+    post.value.commentCnt++
+    comment.value = ''
   } catch (_) {
     /* empty */
   }
@@ -111,7 +112,7 @@ await fetchPostDetail()
 
 <style scoped lang="scss">
 .body {
-  height: calc(100vh - 88px);
+  height: calc(100vh - 100px);
   overflow: auto;
 
   .loading {
