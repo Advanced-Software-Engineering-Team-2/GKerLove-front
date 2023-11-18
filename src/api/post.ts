@@ -11,6 +11,14 @@ function addPost(content: string, imageList: string[]) {
   })
 }
 
+function retrievePosts(page: number) {
+  return request.get<R<{ posts: Page<Post> }>>('/post', {
+    params: {
+      page
+    }
+  })
+}
+
 function getUserPosts(userId: string) {
   return request.get<R<{ posts: Page<Post> }>>(`/post/user/${userId}`)
 }
@@ -31,6 +39,7 @@ function comment(content: string, postId: string) {
 
 export default {
   addPost,
+  retrievePosts,
   getUserPosts,
   deletePost,
   getPostById,

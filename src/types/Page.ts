@@ -1,4 +1,4 @@
 export interface Page<T> {
-  page: number
+  total: number
   content: T[]
 }

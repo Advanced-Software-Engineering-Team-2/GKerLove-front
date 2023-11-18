@@ -14,6 +14,7 @@
       to="/message"
       :icon="active === 'message' ? 'chat' : 'chat-o'"
     />
+    <van-tabbar-item name="post" to="/post" :icon="active === 'post' ? 'friends' : 'friends-o'" />
     <van-tabbar-item name="home" to="/home" :icon="active === 'home' ? 'user' : 'user-o'" />
   </van-tabbar>
 </template>
@@ -35,6 +36,8 @@ const title = computed(() => {
       return '消息'
     case 'home':
       return '我的'
+    case 'post':
+      return '动态'
     default:
       return '导航'
   }

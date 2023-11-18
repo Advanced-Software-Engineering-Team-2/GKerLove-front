@@ -11,27 +11,19 @@
       <van-loading class="loading" v-if="loading" size="2rem" />
 
       <div class="content" v-else>
-        <post-card
-          :post="post"
-          :username="post.user.username"
-          :avatar="post.user.avatar"
-          :key="post.id"
-        />
+        <post-card :post="post" />
 
         <van-divider />
 
-        <div class="comment-list">
+        <div class="comment-list" ref="root">
           <div class="comment-container" v-for="comment in post.commentList" :key="comment.id">
-            <post-card-header
-              class="comment-header"
-              :username="comment.user.username"
-              :avatar="comment.user.avatar"
-              :time="comment.time"
-            />
+            <post-card-header class="comment-header" :post="post" />
             <div class="comment-body">{{ comment.content }}</div>
             <van-divider />
           </div>
         </div>
+
+        <van-back-top right="8vw" bottom="15vh" />
       </div>
     </div>
 
@@ -56,11 +48,15 @@
 import type { Ref } from 'vue'
 import type { Post } from '@/types/Post'
 
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useScrollParent } from '@vant/use'
 
 import postApi from '@/api/post'
-import { showSuccess } from '@/utils/show'
+import { showError, showSuccess } from '@/utils/show'
+
+const root = ref<HTMLElement | undefined>()
+const scrollParent = useScrollParent(root) as Ref<HTMLElement>
 
 const router = useRouter()
 const route = useRoute()
@@ -77,6 +73,10 @@ const fetchPostDetail = async () => {
     try {
       loading.value = true
       const res = await postApi.getPostById(postId)
+      if (res.data.data.post === null) {
+        router.push('/404')
+        return
+      }
       post.value = res.data.data.post
     } catch (_) {
       router.push('/404')
@@ -96,12 +96,19 @@ watch(
 )
 
 const handleSendButtonClicked = async () => {
+  if (comment.value.trim() === '') {
+    showError('评论不能为空')
+    return
+  }
   try {
     const res = await postApi.comment(comment.value, post.value.id)
     showSuccess(res.data.message)
     post.value.commentList.push(res.data.data.comment)
     post.value.commentCnt++
     comment.value = ''
+    nextTick(() => {
+      scrollParent.value?.scrollTo({ top: scrollParent.value?.scrollHeight, behavior: 'smooth' })
+    })
   } catch (_) {
     /* empty */
   }

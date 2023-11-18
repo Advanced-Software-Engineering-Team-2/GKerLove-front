@@ -3,10 +3,16 @@
     <div class="left">
       <slot name="left">
         <div class="avatar">
-          <van-image :src="props.avatar" round :show-loading="false" width="3rem" height="3rem" />
+          <van-image
+            :src="post.user.avatar"
+            :show-loading="false"
+            round
+            width="3rem"
+            height="3rem"
+          />
         </div>
         <div>
-          <div class="username">{{ props.username }}</div>
+          <div class="username">{{ post.user.username }}</div>
           <div class="time">{{ formattedTime }}</div>
         </div>
       </slot>
@@ -18,17 +24,20 @@
 </template>
 
 <script setup lang="ts">
+import { Post } from '@/types/Post'
+
 import { computed } from 'vue'
 import moment from 'moment'
+import { toRefs } from 'vue'
 
 const props = defineProps<{
-  username: string
-  avatar: string
-  time: string
+  post: Post
 }>()
 
+const { post } = toRefs(props)
+
 const formattedTime = computed(() => {
-  return moment(props.time).format('MM月DD日 HH:mm')
+  return moment(post.value.time).format('MM月DD日 HH:mm')
 })
 </script>
 

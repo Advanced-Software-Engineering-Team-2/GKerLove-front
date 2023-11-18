@@ -32,11 +32,15 @@ const router = createRouter({
           name: 'home',
           component: () => import('@/views/HomeView.vue'),
           meta: {
-            title: '我的',
-            scrollPos: {
-              top: 0,
-              left: 0
-            }
+            title: '我的'
+          }
+        },
+        {
+          path: 'post',
+          name: 'post',
+          component: () => import('@/views/PostView.vue'),
+          meta: {
+            title: '动态'
           }
         }
       ]
