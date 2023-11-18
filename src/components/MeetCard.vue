@@ -2,7 +2,7 @@
   <div class="user-card">
     <div class="row-1">
       <div class="avatar" v-show="meet.list.length > 0">
-        <van-image :src="meet.curavatar" round :show-loading="false" width="100px" height="100px" />
+        <van-image :src="meet.list[index].avatar" round :show-loading="false" width="100px" height="100px" />
       </div>
       <div class="info">
         <h3 class="username">{{ meet.list.length > 0 ? meet.list[index].username : '' }}</h3>
@@ -65,7 +65,6 @@ const index = ref(0)
 const handlePreClicked = async () => {
   if (index.value > 0) {
     index.value--
-    meet.getavatar(index.value)
   } else {
     alert('已经是第一位了')
   }
@@ -74,7 +73,6 @@ const handlePreClicked = async () => {
 const handleNextClicked = () => {
   if (index.value < meet.list.length - 1) {
     index.value++
-    meet.getavatar(index.value)
   } else {
     alert('已经是最后一位了')
   }
@@ -86,11 +84,9 @@ const handleLikeClicked = () => {
     alert('向该用户发送喜欢请求后已没有其余人选，请重新设置筛选条件')
   } else if (index.value < meet.list.length - 1) {
     meet.list.splice(index.value, 1)
-    meet.getavatar(index.value)
   } else {
     meet.list.splice(index.value, 1)
     index.value--
-    meet.getavatar(index.value)
   }
 }
 
@@ -100,11 +96,9 @@ const handleHateClicked = async () => {
     alert('将该用户设置为不喜欢后已没有其余人选，请重新设置筛选条件')
   } else if (index.value < meet.list.length - 1) {
     meet.list.splice(index.value, 1)
-    meet.getavatar(index.value)
   } else {
     meet.list.splice(index.value, 1)
     index.value--
-    meet.getavatar(index.value)
   }
 }
 </script>
