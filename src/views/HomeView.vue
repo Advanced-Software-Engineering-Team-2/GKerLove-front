@@ -69,33 +69,18 @@
 
 <script setup lang="ts">
 import router from '@/router'
-import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { showSuccess } from '@/utils/show'
 import { TUICore } from '../TUIKit'
-import { onBeforeRouteLeave } from 'vue-router'
-import { onMounted, ref, watch } from 'vue'
-import { useScrollParent, useEventListener } from '@vant/use'
-import { Ref } from 'vue'
-import { nextTick } from 'vue'
+import { ref } from 'vue'
+import { usePreserveScroll } from '@/hooks/usePreserveScroll'
 
 const user = useUserStore()
 const root = ref<HTMLElement | undefined>()
-const scrollParent = useScrollParent(root) as Ref<HTMLElement>
-
-let lastScrollTop = 0
 
 await user.fetchPosts()
 
-const route = useRoute()
-
-watch(
-  () => route.params,
-  async () => {
-    if (route.name !== 'home') return
-    nextTick(() => scrollParent.value.scrollTo(0, lastScrollTop))
-  }
-)
+usePreserveScroll(root, 'home')
 
 const handleLogoutButtonClicked = async () => {
   try {
@@ -109,11 +94,6 @@ const handleLogoutButtonClicked = async () => {
     /* empty */
   }
 }
-
-onBeforeRouteLeave((_to, _from, next) => {
-  lastScrollTop = scrollParent.value.scrollTop
-  next()
-})
 </script>
 
 <style scoped lang="scss">
