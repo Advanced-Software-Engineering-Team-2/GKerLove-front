@@ -45,7 +45,7 @@ export const usePostStore = defineStore('post', () => {
 
   async function commentOnPost(post: Post, content: string) {
     try {
-      const res = await postApi.comment(post.id, content)
+      const res = await postApi.commentOnPost(post.id, content)
       showSuccess(res.data.message)
     } catch (_) {
       return Promise.reject()
@@ -61,7 +61,7 @@ export const usePostStore = defineStore('post', () => {
     const user = useUserStore()
     try {
       const res = await postApi.getUserPosts(user.id!)
-      posts.value = res.data.data.posts.content
+      myPosts.value = res.data.data.posts.content
     } catch (_) {
       return Promise.reject()
     }

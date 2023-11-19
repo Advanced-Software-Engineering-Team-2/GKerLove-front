@@ -31,7 +31,7 @@ function getPostById(postId: string) {
   return request.get<R<{ post: Post }>>(`/post/${postId}`)
 }
 
-function comment(postId: string, content: string) {
+function commentOnPost(postId: string, content: string) {
   return request.post<R>(`/post/comment/${postId}`, {
     content
   })
@@ -43,5 +43,5 @@ export default {
   getUserPosts,
   deletePost,
   getPostById,
-  comment
+  commentOnPost
 }

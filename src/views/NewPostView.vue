@@ -48,9 +48,11 @@ import { UploaderFileListItem } from 'vant'
 import { v4 as uuidv4 } from 'uuid'
 
 import { useUserStore } from '@/stores/user'
+import { usePostStore } from '@/stores/post'
 
 const router = useRouter()
 const user = useUserStore()
+const postStore = usePostStore()
 
 const content = ref('')
 const imageList = ref([])
@@ -88,7 +90,7 @@ const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem
 
 const handleSubmitButtonClicked = async () => {
   try {
-    await user.addPost(content.value, imageUrls)
+    await postStore.addPost(content.value, imageUrls)
     content.value = ''
     imageList.value = []
     imageUrls = []

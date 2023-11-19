@@ -50,14 +50,14 @@
       <van-divider />
       <van-loading v-if="loading" />
       <div class="post-card-list" v-else>
-        <div class="post-card-container" v-for="post in user.posts" :key="post.id">
+        <div class="post-card-container" v-for="post in postStore.myPosts" :key="post.id">
           <post-card
             class="post-card"
             :post="post"
             :username="user.username!"
             :avatar="user.avatar!"
             :from-me="true"
-            @delete-button-clicked="user.deletePost(post.id)"
+            @delete-button-clicked="postStore.deletePost(post.id)"
             @body-clicked="router.push(`/post/${post.id}`)"
           />
           <van-divider />
@@ -75,8 +75,10 @@ import { showSuccess } from '@/utils/show'
 import { TUICore } from '../TUIKit'
 import { ref } from 'vue'
 import { usePreserveScroll } from '@/hooks/usePreserveScroll'
+import { usePostStore } from '@/stores/post'
 
 const user = useUserStore()
+const postStore = usePostStore()
 const root = ref<HTMLElement | undefined>()
 const loading = ref(true)
 
@@ -96,7 +98,8 @@ const handleLogoutButtonClicked = async () => {
 }
 
 try {
-  await user.fetchPosts()
+  loading.value = true
+  await postStore.fetchMyPosts()
 } catch (_) {
   /* empty */
 } finally {
