@@ -33,20 +33,17 @@
 <script setup lang="ts">
 import type { Post } from '@/types/Post'
 import moment from 'moment'
-import { computed } from 'vue'
+import { computed, toRefs } from 'vue'
 
-const { post } = withDefaults(
-  defineProps<{
-    post: Post
-    fromMe?: boolean
-  }>(),
-  {
-    fromMe: false
-  }
-)
+const props = defineProps<{
+  post: Post
+  fromMe?: boolean
+}>()
+
+const { post, fromMe } = toRefs(props)
 
 const formattedTime = computed(() => {
-  return moment(post.time).format('MM月DD日 HH:mm')
+  return moment(post.value.time).format('MM月DD日 HH:mm')
 })
 </script>
 

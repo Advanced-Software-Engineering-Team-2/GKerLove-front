@@ -8,20 +8,19 @@
         :border="false"
         safe-area-inset-top
       />
-      <van-loading class="loading" v-if="loading" size="2rem" />
 
-      <div class="content" v-else>
+      <div class="content">
         <post-card :post="post" />
-
         <van-divider />
-
         <div class="comment-list" ref="root">
           <div class="comment-container" v-for="comment in post.commentList" :key="comment.id">
-            <post-card-header class="comment-header" :post="post" />
+            <post-card-header class="comment-header" :post="comment" />
             <div class="comment-body">{{ comment.content }}</div>
             <van-divider />
           </div>
         </div>
+
+        <van-loading class="loading" v-if="loading" size="2rem" />
 
         <van-back-top right="8vw" bottom="15vh" />
       </div>
@@ -46,51 +45,47 @@
 
 <script setup lang="ts">
 import type { Ref } from 'vue'
-import type { Post } from '@/types/Post'
 
 import { ref, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useScrollParent } from '@vant/use'
 
-import postApi from '@/api/post'
-import { showError, showSuccess } from '@/utils/show'
+import { showError } from '@/utils/show'
+import { usePostStore } from '@/stores/post'
+import { Post } from '@/types/Post'
+import { computed } from 'vue'
 
 const root = ref<HTMLElement | undefined>()
 const scrollParent = useScrollParent(root) as Ref<HTMLElement>
 
 const router = useRouter()
 const route = useRoute()
+const postStore = usePostStore()
+let postId = ref(route.params.id as string)
+const post = computed(() => {
+  return postStore.getPostById(postId.value) as Post // 已经在路由守卫中判断过，此时id一定在postStore中，告诉ts类型为Post
+})
 
-const post = ref<Post>() as Ref<Post>
+const loading = ref(false)
 const comment = ref('')
-const loading = ref(true)
 
 const fetchPostDetail = async () => {
-  const postId = route.params.id
-  if (!postId || Array.isArray(postId)) {
-    router.push('/404')
-  } else {
-    try {
-      loading.value = true
-      const res = await postApi.getPostById(postId)
-      if (res.data.data.post === null) {
-        router.push('/404')
-        return
-      }
-      post.value = res.data.data.post
-    } catch (_) {
-      router.push('/404')
-    } finally {
-      loading.value = false
-    }
+  try {
+    loading.value = true
+    await postStore.fetchPostById(postId.value)
+  } catch (_) {
+    /* empty */
+  } finally {
+    loading.value = false
   }
 }
 
 watch(
   () => route.params,
-  async () => {
+  () => {
     if (route.name === 'postDetail') {
-      await fetchPostDetail()
+      postId.value = route.params.id as string
+      fetchPostDetail()
     }
   }
 )
@@ -101,11 +96,11 @@ const handleSendButtonClicked = async () => {
     return
   }
   try {
-    const res = await postApi.comment(comment.value, post.value.id)
-    showSuccess(res.data.message)
-    post.value.commentList.push(res.data.data.comment)
-    post.value.commentCnt++
+    loading.value = true
+    await postStore.commentOnPost(post.value, comment.value)
     comment.value = ''
+    await postStore.fetchPostById(post.value.id)
+    loading.value = false
     nextTick(() => {
       scrollParent.value?.scrollTo({ top: scrollParent.value?.scrollHeight, behavior: 'smooth' })
     })

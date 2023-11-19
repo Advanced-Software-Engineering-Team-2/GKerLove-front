@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { getToken } from '@/utils/auth'
 
 import { useUserStore } from '@/stores/user'
+import { usePostStore } from '@/stores/post'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,6 +54,14 @@ const router = createRouter({
         title: '登录'
       }
     },
+    // {
+    //   path: '/test',
+    //   name: 'test',
+    //   component: () => import('@/views/test.vue'),
+    //   meta: {
+    //     title: '测试'
+    //   }
+    // },
     {
       path: '/register',
       name: 'register',
@@ -83,6 +92,16 @@ const router = createRouter({
       component: () => import('@/views/PostDetailView.vue'),
       meta: {
         title: '动态详情'
+      },
+      beforeEnter: (to, _, next) => {
+        const postId = to.params.id
+        const postStore = usePostStore()
+        const post = postStore.posts.find((post) => post.id === postId)
+        if (post) {
+          next()
+        } else {
+          next('/404')
+        }
       }
     },
     {

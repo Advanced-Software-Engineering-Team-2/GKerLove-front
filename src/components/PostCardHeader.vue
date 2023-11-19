@@ -24,14 +24,14 @@
 </template>
 
 <script setup lang="ts">
-import { Post } from '@/types/Post'
+import { Post, Comment } from '@/types/Post'
 
 import { computed } from 'vue'
 import moment from 'moment'
 import { toRefs } from 'vue'
 
 const props = defineProps<{
-  post: Post
+  post: Post | Comment
 }>()
 
 const { post } = toRefs(props)
