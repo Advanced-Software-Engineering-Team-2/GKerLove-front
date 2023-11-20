@@ -93,10 +93,12 @@ const router = createRouter({
       meta: {
         title: '动态详情'
       },
-      beforeEnter: (to, _, next) => {
+      beforeEnter: (to, from, next) => {
         const postId = to.params.id
         const postStore = usePostStore()
-        const post = postStore.posts.find((post) => post.id === postId)
+        let post = undefined
+        if (from.name === 'post') post = postStore.posts.find((post) => post.id === postId)
+        else if (from.name === 'home') post = postStore.myPosts.find((post) => post.id === postId)
         if (post) {
           next()
         } else {

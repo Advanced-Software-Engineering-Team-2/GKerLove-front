@@ -60,10 +60,17 @@ const scrollParent = useScrollParent(root) as Ref<HTMLElement>
 
 const router = useRouter()
 const route = useRoute()
+
 const postStore = usePostStore()
 let postId = ref(route.params.id as string)
+let from = ref(route.query.from)
+
 const post = computed(() => {
-  return postStore.getPostById(postId.value) as Post // 已经在路由守卫中判断过，此时id一定在postStore中，告诉ts类型为Post
+  // 已经在路由守卫中判断过，此时id一定在postStore中
+  if (from.value && from.value === 'home') {
+    return postStore.myPosts.find((post) => post.id === postId.value) as Post
+  }
+  return postStore.posts.find((post) => post.id === postId.value) as Post
 })
 
 const loading = ref(false)
@@ -72,7 +79,7 @@ const comment = ref('')
 const fetchPostDetail = async () => {
   try {
     loading.value = true
-    await postStore.fetchPostById(postId.value)
+    await postStore.syncPost(post.value)
   } catch (_) {
     /* empty */
   } finally {
@@ -81,10 +88,11 @@ const fetchPostDetail = async () => {
 }
 
 watch(
-  () => route.params,
+  () => route.params.id,
   () => {
     if (route.name === 'postDetail') {
       postId.value = route.params.id as string
+      from.value = route.query.from
       fetchPostDetail()
     }
   }
@@ -99,7 +107,7 @@ const handleSendButtonClicked = async () => {
     loading.value = true
     await postStore.commentOnPost(post.value, comment.value)
     comment.value = ''
-    await postStore.fetchPostById(post.value.id)
+    await postStore.syncPost(post.value)
     loading.value = false
     nextTick(() => {
       scrollParent.value?.scrollTo({ top: scrollParent.value?.scrollHeight, behavior: 'smooth' })

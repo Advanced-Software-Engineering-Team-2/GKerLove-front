@@ -54,11 +54,10 @@
           <post-card
             class="post-card"
             :post="post"
-            :username="user.username!"
-            :avatar="user.avatar!"
-            :from-me="true"
+            :show-user="false"
+            :show-delete="true"
             @delete-button-clicked="postStore.deletePost(post.id)"
-            @body-clicked="router.push(`/post/${post.id}`)"
+            @body-clicked="router.push(`/post/${post.id}?from=home`)"
           />
           <van-divider />
         </div>
@@ -93,7 +92,6 @@ const handleLogoutButtonClicked = async () => {
     user.$reset()
   } catch (err) {
     console.log(err)
-    /* empty */
   }
 }
 

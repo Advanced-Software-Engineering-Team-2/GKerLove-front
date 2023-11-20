@@ -9,7 +9,7 @@ export const usePreserveScroll = (root: Ref<HTMLElement | undefined>, routeName:
 
   watch(
     () => route.params,
-    async () => {
+    () => {
       if (route.name !== routeName) return
       nextTick(() => scrollParent.value.scrollTo(0, lastScrollTop))
     }

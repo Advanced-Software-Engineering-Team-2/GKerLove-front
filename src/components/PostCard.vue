@@ -1,7 +1,7 @@
 <template>
   <div class="post-card">
     <post-card-header class="header" :post="post">
-      <template v-slot:left v-if="fromMe">
+      <template v-slot:left v-if="!showUser">
         <div class="time" style="display: flex; justify-content: center; align-items: center">
           {{ formattedTime }}
         </div>
@@ -10,7 +10,7 @@
         <van-button
           size="small"
           type="danger"
-          v-if="fromMe"
+          v-if="showDelete"
           @click="$emit('delete-button-clicked')"
         >
           删除
@@ -35,12 +35,16 @@ import type { Post } from '@/types/Post'
 import moment from 'moment'
 import { computed, toRefs } from 'vue'
 
-const props = defineProps<{
-  post: Post
-  fromMe?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    post: Post
+    showUser?: boolean
+    showDelete?: boolean
+  }>(),
+  { showUser: true, showDelete: false }
+)
 
-const { post, fromMe } = toRefs(props)
+const { post, showUser, showDelete } = toRefs(props)
 
 const formattedTime = computed(() => {
   return moment(post.value.time).format('MM月DD日 HH:mm')
