@@ -10,10 +10,10 @@
       />
 
       <div class="content">
-        <post-card :post="post" />
+        <post-card :post="post" v-if="post" />
         <van-divider />
         <div class="comment-list" ref="root">
-          <div class="comment-container" v-for="comment in post.commentList" :key="comment.id">
+          <div class="comment-container" v-for="comment in post?.commentList" :key="comment.id">
             <post-card-header class="comment-header" :post="comment" />
             <div class="comment-body">{{ comment.content }}</div>
             <van-divider />
@@ -52,7 +52,6 @@ import { useScrollParent } from '@vant/use'
 
 import { showError } from '@/utils/show'
 import { usePostStore } from '@/stores/post'
-import { Post } from '@/types/Post'
 import { computed } from 'vue'
 
 const root = ref<HTMLElement | undefined>()
@@ -66,22 +65,22 @@ let postId = ref(route.params.id as string)
 let from = ref(route.query.from)
 
 const post = computed(() => {
-  // 已经在路由守卫中判断过，此时id一定在postStore中
   if (from.value && from.value === 'home') {
-    return postStore.myPosts.find((post) => post.id === postId.value) as Post
+    return postStore.myPosts.find((post) => post.id === postId.value)
   }
-  return postStore.posts.find((post) => post.id === postId.value) as Post
+  return postStore.posts.find((post) => post.id === postId.value)
 })
 
 const loading = ref(false)
 const comment = ref('')
 
 const fetchPostDetail = async () => {
+  if (!post.value) return
   try {
     loading.value = true
     await postStore.syncPost(post.value)
   } catch (_) {
-    /* empty */
+    router.push('/404')
   } finally {
     loading.value = false
   }
@@ -103,6 +102,7 @@ const handleSendButtonClicked = async () => {
     showError('评论不能为空')
     return
   }
+  if (!post.value) return
   try {
     loading.value = true
     await postStore.commentOnPost(post.value, comment.value)

@@ -15,9 +15,17 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
 
 const router = useRouter()
+
+onBeforeRouteLeave((to, _, next) => {
+  if (to.name === 'postDetail') {
+    next('/post')
+  } else {
+    next()
+  }
+})
 </script>
 
 <style scoped lang="scss">

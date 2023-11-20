@@ -29,7 +29,12 @@ export const usePostStore = defineStore('post', () => {
 
   async function syncPost(post: Post) {
     try {
-      const res = await postApi.getPostById(post.id)
+      const id = post.id
+      const res = await postApi.getPostById(id)
+      if (res.data.data.post === null) {
+        posts.value = posts.value.filter((post) => post.id !== id)
+        return Promise.reject()
+      }
       // 更新帖子信息
       Object.assign(post, res.data.data.post)
     } catch (_) {
@@ -75,7 +80,7 @@ export const usePostStore = defineStore('post', () => {
   async function deletePost(id: string) {
     try {
       const res = await postApi.deletePost(id)
-      posts.value = posts.value.filter((post) => post.id !== id)
+      myPosts.value = myPosts.value.filter((post) => post.id !== id)
       showSuccess(res.data.message)
     } catch (_) {
       return Promise.reject()
