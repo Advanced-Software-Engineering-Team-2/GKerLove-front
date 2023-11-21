@@ -2,14 +2,27 @@
 
 <template>
   <van-config-provider theme="dark" />
-  <suspense>
-    <router-view v-slot="{ Component }">
+  <router-view v-slot="{ Component }">
+    <template v-if="Component">
       <keep-alive>
-        <component :is="Component" />
+        <suspense>
+          <component :is="Component"></component>
+          <template #fallback>
+            <div class="loading">
+              <van-loading type="spinner" size="30px" />
+            </div>
+          </template>
+        </suspense>
       </keep-alive>
-    </router-view>
-    <template #fallback>正在加载...</template>
-  </suspense>
+    </template>
+  </router-view>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.loading {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>

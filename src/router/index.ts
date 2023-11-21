@@ -97,13 +97,21 @@ const router = createRouter({
         const postId = to.params.id
         const postStore = usePostStore()
         let post = undefined
-        if (from.name === 'post') post = postStore.posts.find((post) => post.id === postId)
-        else if (from.name === 'home') post = postStore.myPosts.find((post) => post.id === postId)
+        if (from.name === 'home') post = postStore.myPosts.find((post) => post.id === postId)
+        else post = postStore.posts.find((post) => post.id === postId)
         if (post) {
           next()
         } else {
           next('/404')
         }
+      }
+    },
+    {
+      path: '/user/:id',
+      name: 'userDetail',
+      component: () => import('@/views/UserDetailView.vue'),
+      meta: {
+        title: '用户详情'
       }
     },
     {
@@ -120,7 +128,7 @@ const router = createRouter({
       component: () => import('@/views/404.vue'),
       meta: {
         title: '页面不存在'
-      },
+      }
     },
     {
       path: '/:pathMatch(.*)',

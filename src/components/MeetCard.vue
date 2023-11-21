@@ -2,7 +2,13 @@
   <div class="user-card">
     <div class="row-1">
       <div class="avatar" v-show="meet.list.length > 0">
-        <van-image :src="meet.list[index].avatar" round :show-loading="false" width="100px" height="100px" />
+        <van-image
+          :src="meet.list[index].avatar"
+          round
+          :show-loading="false"
+          width="100px"
+          height="100px"
+        />
       </div>
       <div class="info">
         <h3 class="username">{{ meet.list.length > 0 ? meet.list[index].username : '' }}</h3>
@@ -56,11 +62,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { useMeet } from '@/stores/meet'
+import { useMeetStore } from '@/stores/meet'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const user = useUserStore()
-const meet = useMeet()
+const meet = useMeetStore()
 const index = ref(0)
 const handlePreClicked = async () => {
   if (index.value > 0) {
@@ -71,7 +77,7 @@ const handlePreClicked = async () => {
 }
 
 const handleNextClicked = () => {
-  if (index.value < meet.list.length - 1) {
+  if (index.value < meet.userList.length - 1) {
     index.value++
   } else {
     alert('已经是最后一位了')
@@ -79,25 +85,25 @@ const handleNextClicked = () => {
 }
 
 const handleLikeClicked = () => {
-  meet.addLove(user.username, meet.list[index.value].username)
-  if (meet.list.length == 1) {
+  meet.addLove(user.username, meet.userList[index.value].username)
+  if (meet.userList.length == 1) {
     alert('向该用户发送喜欢请求后已没有其余人选，请重新设置筛选条件')
-  } else if (index.value < meet.list.length - 1) {
-    meet.list.splice(index.value, 1)
+  } else if (index.value < meet.userList.length - 1) {
+    meet.userList.splice(index.value, 1)
   } else {
-    meet.list.splice(index.value, 1)
+    meet.userList.splice(index.value, 1)
     index.value--
   }
 }
 
 const handleHateClicked = async () => {
-  meet.notLove(user.username, meet.list[index.value].username)
-  if (meet.list.length == 1) {
+  meet.notLove(user.username, meet.userList[index.value].username)
+  if (meet.userList.length == 1) {
     alert('将该用户设置为不喜欢后已没有其余人选，请重新设置筛选条件')
-  } else if (index.value < meet.list.length - 1) {
-    meet.list.splice(index.value, 1)
+  } else if (index.value < meet.userList.length - 1) {
+    meet.userList.splice(index.value, 1)
   } else {
-    meet.list.splice(index.value, 1)
+    meet.userList.splice(index.value, 1)
     index.value--
   }
 }

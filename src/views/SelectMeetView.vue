@@ -99,7 +99,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { useMeet } from '@/stores/meet'
+import { useMeetStore } from '@/stores/meet'
 import { useRouter } from 'vue-router'
 import cityList from '@/constants/city'
 import instituteList from '@/constants/institute'
@@ -129,7 +129,7 @@ const showInstitutePicker = ref(false)
 
 const router = useRouter()
 const user = useUserStore()
-const meet = useMeet()
+const meet = useMeetStore()
 
 const gender = ref('')
 const min_age = ref()
@@ -145,7 +145,7 @@ const handleSubmitButtonClicked = async () => {
     max_age.value = 0
   }
   try {
-    await meet.getList(
+    await meet.getUserList(
       user.username,
       gender.value,
       min_age.value,

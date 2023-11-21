@@ -1,6 +1,6 @@
 <template>
   <div class="post-card">
-    <post-card-header class="header" :post="post">
+    <post-card-header class="header" :post="post" @avatar-clicked="$emit('avatar-clicked')">
       <template v-slot:left v-if="!showUser">
         <div class="time" style="display: flex; justify-content: center; align-items: center">
           {{ formattedTime }}

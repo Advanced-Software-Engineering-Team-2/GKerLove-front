@@ -2,38 +2,48 @@ import request from '@/utils/request'
 import type { R } from '@/types/R'
 import type { User } from '@/types/User'
 
-function getmeetinglist(username: string, gender:string, min_age: number, max_age: number, city: string, institute:string) {
-    return request.get<R<{ meetinglist: Array<User> }>>('/meeting/getlist',{
-        params: {  
-            fromusername: username,
-            gender: gender,
-            min_age: min_age,
-            max_age: max_age,
-            city: city,
-            institute: institute
-        }
-    })
-  }
+function getUserList(
+  gender?: string,
+  minAge?: number,
+  maxAge?: number,
+  city?: string,
+  institute?: string
+) {
+  return request.get<R<{ userList: User[] }>>('/meet', {
+    params: {
+      gender: gender,
+      minAge: minAge,
+      maxAge: maxAge,
+      city: city,
+      institute: institute
+    }
+  })
+}
 
-function addlove(fromusername: string,tousername: string) {
-    return request.post<R>('/meeting/addlove',null,{
-        params: {  
-            fromusername: fromusername,
-            tousername : tousername
-        }
-    })
-  }
-  function notlove(fromusername: string,tousername: string) {
-    return request.post<R>('/meeting/notlove',null,{
-        params: {  
-            fromusername: fromusername,
-            tousername : tousername
-        }
-    })
-  }
+function addlove(fromusername: string, tousername: string) {
+  return request.post<R>('/meet/addlove', null, {
+    params: {
+      fromusername: fromusername,
+      tousername: tousername
+    }
+  })
+}
+function notlove(fromusername: string, tousername: string) {
+  return request.post<R>('/meet/notlove', null, {
+    params: {
+      fromusername: fromusername,
+      tousername: tousername
+    }
+  })
+}
+
+function getUserById(id: string) {
+  return request.get<R<{ user: User }>>(`/meet/${id}`)
+}
 
 export default {
-    getmeetinglist,
-    addlove,
-    notlove
+  getUserList,
+  addlove,
+  notlove,
+  getUserById
 }

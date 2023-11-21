@@ -3,18 +3,26 @@
     <div class="body">
       <van-nav-bar
         left-arrow
-        title="详情"
+        title="动态详情"
         @click-left="router.back()"
         :border="false"
         safe-area-inset-top
       />
 
       <div class="content">
-        <post-card :post="post" v-if="post" />
+        <post-card
+          :post="post"
+          v-if="post"
+          @avatar-clicked="router.push(`/user/${post.user.id}`)"
+        />
         <van-divider />
         <div class="comment-list" ref="root">
           <div class="comment-container" v-for="comment in post?.commentList" :key="comment.id">
-            <post-card-header class="comment-header" :post="comment" />
+            <post-card-header
+              class="comment-header"
+              :post="comment"
+              @avatar-clicked="router.push(`/user/${comment.user.id}`)"
+            />
             <div class="comment-body">{{ comment.content }}</div>
             <van-divider />
           </div>

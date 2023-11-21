@@ -9,6 +9,7 @@
             round
             width="3rem"
             height="3rem"
+            @click="$emit('avatar-clicked')"
           />
         </div>
         <div>

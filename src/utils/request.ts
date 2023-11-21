@@ -37,7 +37,7 @@ request.interceptors.response.use(
           cancelButtonText: '取消'
         }).then(() => {
           const userStore = useUserStore()
-          userStore.resetToken()
+          userStore.$reset()
           location.assign('/login')
         })
       }

@@ -2,9 +2,18 @@
   <nav-bar :title="title" class="navbar van-safe-area-top" />
   <div class="content">
     <router-view v-slot="{ Component }">
-      <keep-alive>
-        <component :is="Component" />
-      </keep-alive>
+      <template v-if="Component">
+        <keep-alive>
+          <suspense>
+            <component :is="Component"></component>
+            <template #fallback>
+              <div class="loading">
+                <van-loading type="spinner" size="30px" />
+              </div>
+            </template>
+          </suspense>
+        </keep-alive>
+      </template>
     </router-view>
   </div>
   <van-tabbar v-model="active" route :border="false" class="tabbar van-safe-area-bottom">
@@ -45,6 +54,13 @@ const title = computed(() => {
 </script>
 
 <style scoped lang="scss">
+.loading {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .content {
   height: calc(100vh - var(--height-navbar) - var(--height-tabbar));
   overflow: auto;

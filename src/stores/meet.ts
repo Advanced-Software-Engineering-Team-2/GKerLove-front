@@ -2,39 +2,31 @@ import { defineStore } from 'pinia'
 import meetApi from '@/api/meet'
 import { User } from '@/types/User'
 import { showError, showSuccess } from '@/utils/show'
-import { useUserStore } from './user'
-export const useMeet = defineStore('meetlist', {
+
+export const useMeetStore = defineStore('meetlist', {
   state: () => {
     return {
-      list: [] as User[]
+      userList: [] as User[]
     }
   },
   getters: {},
   actions: {
-    async getList(
-      username: string,
-      gender: string,
-      min_age: number,
-      max_age: number,
-      city: string,
-      institute: string
+    async getUserList(
+      gender?: string,
+      minAge?: number,
+      maxAge?: number,
+      city?: string,
+      institute?: string
     ) {
       try {
-        const res = await meetApi.getmeetinglist(
-          username,
-          gender,
-          min_age,
-          max_age,
-          city,
-          institute
-        )
-        const meetinglist = res.data.data.meetinglist
-        this.list = meetinglist
-        const user = useUserStore()
+        const res = await meetApi.getUserList(gender, minAge, maxAge, city, institute)
+        const meetinglist = res.data.data.userList
+        this.userList = meetinglist
       } catch (_) {
-        showError('没有满足条件的对象，请更换筛选信息并重新提交！')
+        return Promise.reject()
       }
     },
+
     async addLove(fromusername: string, tousername: string) {
       try {
         const res = await meetApi.addlove(fromusername, tousername)

@@ -10,7 +10,11 @@
         @load="onLoad"
       >
         <div class="post-card-container" v-for="post in postStore.posts" :key="post.id">
-          <post-card :post="post" @body-clicked="router.push(`/post/${post.id}`)" />
+          <post-card
+            :post="post"
+            @body-clicked="router.push(`/post/${post.id}`)"
+            @avatar-clicked="router.push(`/user/${post.user.id}`)"
+          />
           <van-divider />
         </div>
       </van-list>
