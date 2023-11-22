@@ -3,10 +3,16 @@ import { getToken } from '@/utils/auth'
 
 import { useUserStore } from '@/stores/user'
 import { usePostStore } from '@/stores/post'
-import { useMeetStore } from '@/stores/meet'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  // scrollBehavior(to, from, savedPosition) {
+  //   if (savedPosition) {
+  //     return savedPosition
+  //   } else {
+  //     return { top: 0 }
+  //   }
+  // },
   routes: [
     {
       path: '/',
@@ -120,16 +126,6 @@ const router = createRouter({
       meta: {
         title: '用户详情'
       }
-      // beforeEnter: (to, _, next) => {
-      //   const userId = to.params.id
-      //   const meetStore = useMeetStore()
-      //   const user = meetStore.userList.find((user) => user.id === userId)
-      //   if (user) {
-      //     next()
-      //   } else {
-      //     next('/404')
-      //   }
-      // }
     },
     {
       path: '/selectMeet',

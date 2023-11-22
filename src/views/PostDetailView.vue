@@ -57,9 +57,11 @@ import { useScrollParent } from '@vant/use'
 import { showError } from '@/utils/show'
 import { usePostStore } from '@/stores/post'
 import { Post } from '@/types/Post'
+import { usePreserveScroll } from '@/hooks/usePreserveScroll'
 
 const root = ref<HTMLElement | undefined>()
 const scrollParent = useScrollParent(root) as Ref<HTMLElement>
+usePreserveScroll(root, 'postDetail')
 
 const router = useRouter()
 const route = useRoute()
@@ -108,8 +110,7 @@ onActivated(() => {
   // 根据post存储位置获取post
   if (from === 'home') {
     post.value = postStore.myPosts.find((post) => post.id === postId)
-  }
-  if (from === 'user') {
+  } else if (from === 'user') {
     post.value = [...postStore.userPosts.values()].flat().find((post) => post.id === postId)
   } else {
     post.value = postStore.posts.find((post) => post.id === postId)
