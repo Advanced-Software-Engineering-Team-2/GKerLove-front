@@ -6,12 +6,13 @@
     :border="false"
     safe-area-inset-top
   />
-  <div class="user-detail-view">
+  <loading-card v-if="loading" />
+  <div class="user-detail-view" v-else>
     <user-card :user="user" v-if="user" />
     <van-divider />
-    <loading-card v-if="loading" />
-    <div v-else>
-      <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+    <div>
+      <loading-card v-if="postLoading" />
+      <van-pull-refresh @refresh="onRefresh" v-else>
         <div class="posts" v-if="posts.length">
           <div class="post-container" v-for="post in posts" :key="post.id">
             <post-card
@@ -54,16 +55,16 @@ const meetStore = useMeetStore()
 const user = ref<User>()
 const posts = ref<Post[]>([])
 const loading = ref(false)
-const refreshing = ref(false)
+const postLoading = ref(false)
 
-const fetchUserDetail = async () => {
+const fetchUserPosts = async () => {
   try {
-    loading.value = true
+    postLoading.value = true
     await postStore.fetchUserPosts(user.value!)
   } catch (_) {
     /* empty */
   } finally {
-    loading.value = false
+    postLoading.value = false
   }
 }
 
@@ -78,7 +79,7 @@ const handleChatClicked = () => {
 
 const onRefresh = async () => {
   try {
-    await fetchUserDetail()
+    await fetchUserPosts()
     posts.value = postStore.userPosts.get(user.value!.id) || []
   } catch (_) {
     /* empty */
@@ -93,9 +94,16 @@ onActivated(async () => {
   if (!user.value || user.value.id !== userId) {
     // 重用用户详情页组件
     // 如果用户详情页面的用户不是当前用户，需要重新获取用户信息
-    user.value = meetStore.userList.find((user) => user.id === userId) as User
-    await fetchUserDetail()
-    posts.value = postStore.userPosts.get(user.value.id) || []
+    try {
+      loading.value = true
+      user.value = await meetStore.getUserById(userId)
+    } catch (_) {
+      router.push('/404')
+    } finally {
+      loading.value = false
+    }
+    await fetchUserPosts()
+    posts.value = postStore.userPosts.get(user.value!.id) || []
   }
 })
 </script>

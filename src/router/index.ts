@@ -119,17 +119,17 @@ const router = createRouter({
       component: () => import('@/views/UserDetailView.vue'),
       meta: {
         title: '用户详情'
-      },
-      beforeEnter: (to, _, next) => {
-        const userId = to.params.id
-        const meetStore = useMeetStore()
-        const user = meetStore.userList.find((user) => user.id === userId)
-        if (user) {
-          next()
-        } else {
-          next('/404')
-        }
       }
+      // beforeEnter: (to, _, next) => {
+      //   const userId = to.params.id
+      //   const meetStore = useMeetStore()
+      //   const user = meetStore.userList.find((user) => user.id === userId)
+      //   if (user) {
+      //     next()
+      //   } else {
+      //     next('/404')
+      //   }
+      // }
     },
     {
       path: '/selectMeet',

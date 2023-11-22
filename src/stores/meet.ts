@@ -27,6 +27,25 @@ export const useMeetStore = defineStore('meetlist', {
       }
     },
 
+    async getUserById(id: string) {
+      try {
+        const res = await meetApi.getUserById(id)
+        const syncedUser = res.data.data.user
+        if (!syncedUser) {
+          return Promise.reject()
+        }
+        const index = this.userList.findIndex((user) => user.id == syncedUser.id)
+        if (index != -1) {
+          this.userList[index] = syncedUser
+          return this.userList.find((user) => user.id === id)
+        } else {
+          return syncedUser
+        }
+      } catch (_) {
+        return Promise.reject()
+      }
+    },
+
     async addLove(fromusername: string, tousername: string) {
       try {
         const res = await meetApi.addlove(fromusername, tousername)
