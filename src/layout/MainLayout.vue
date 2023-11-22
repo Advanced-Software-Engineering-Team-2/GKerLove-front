@@ -1,7 +1,12 @@
 <template>
   <nav-bar :title="title" class="navbar van-safe-area-top" />
   <div class="content">
-    <router-view v-slot="{ Component }">
+    <router-view v-slot="{ Component, route }">
+      <keep-alive>
+        <component :is="Component" :key="route.path"></component>
+      </keep-alive>
+    </router-view>
+    <!-- <router-view v-slot="{ Component }">
       <template v-if="Component">
         <keep-alive>
           <suspense>
@@ -14,7 +19,7 @@
           </suspense>
         </keep-alive>
       </template>
-    </router-view>
+    </router-view> -->
   </div>
   <van-tabbar v-model="active" route :border="false" class="tabbar van-safe-area-bottom">
     <van-tabbar-item name="meet" to="/meet" :icon="active === 'meet' ? 'like' : 'like-o'" />

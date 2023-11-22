@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import type { Ref } from 'vue'
 
-import { ref, watch, nextTick } from 'vue'
+import { ref, nextTick, onActivated } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useScrollParent } from '@vant/use'
 
@@ -64,8 +64,6 @@ import { computed } from 'vue'
 
 const root = ref<HTMLElement | undefined>()
 const scrollParent = useScrollParent(root) as Ref<HTMLElement>
-
-console.log('set up in post detail')
 
 const router = useRouter()
 const route = useRoute()
@@ -86,6 +84,10 @@ const post = computed(() => {
   return postStore.posts.find((post) => post.id === postId.value)
 })
 
+onActivated(() => {
+  fetchPostDetail()
+})
+
 const loading = ref(false)
 const comment = ref('')
 
@@ -100,17 +102,6 @@ const fetchPostDetail = async () => {
     loading.value = false
   }
 }
-
-watch(
-  () => route.params.id,
-  () => {
-    if (route.name === 'postDetail') {
-      postId.value = route.params.id as string
-      from.value = route.query.from
-      fetchPostDetail()
-    }
-  }
-)
 
 const handleSendButtonClicked = async () => {
   if (comment.value.trim() === '') {
@@ -131,8 +122,6 @@ const handleSendButtonClicked = async () => {
     /* empty */
   }
 }
-
-await fetchPostDetail()
 </script>
 
 <style scoped lang="scss">

@@ -2,11 +2,11 @@
 
 <template>
   <van-config-provider theme="dark" />
-  <router-view v-slot="{ Component }">
+  <router-view v-slot="{ Component, route }">
     <template v-if="Component">
       <keep-alive>
         <suspense>
-          <component :is="Component"></component>
+          <component :is="Component" :key="route.path"></component>
           <template #fallback>
             <div class="loading">
               <van-loading type="spinner" size="30px" />
