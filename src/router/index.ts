@@ -98,6 +98,11 @@ const router = createRouter({
         const postStore = usePostStore()
         let post = undefined
         if (from.name === 'home') post = postStore.myPosts.find((post) => post.id === postId)
+        if (from.name === 'userDetail') {
+          post = Object.values(postStore.userPosts)
+            .flat()
+            .find((post) => post.id === postId)
+        }
         else post = postStore.posts.find((post) => post.id === postId)
         if (post) {
           next()

@@ -6,10 +6,12 @@ import { ref } from 'vue'
 import postApi from '@/api/post'
 import { showSuccess } from '@/utils/show'
 import { useUserStore } from './user'
+import { User } from '@/types/User'
 
 export const usePostStore = defineStore('post', () => {
   const myPosts = ref<Post[]>([])
   const posts = ref<Post[]>([])
+  const userPosts = ref<Record<string, Post[]>>({})
   const pageSize = 10
   const page = ref(1)
   const hasFetchedAll = ref(false)
@@ -66,6 +68,15 @@ export const usePostStore = defineStore('post', () => {
     }
   }
 
+  async function fetchUserPosts(user: User) {
+    try {
+      const res = await postApi.getUserPosts(user.id)
+      userPosts.value[user.id] = res.data.data.posts.content
+    } catch (_) {
+      return Promise.reject()
+    }
+  }
+
   async function addPost(content: string, imageIds: string[]) {
     try {
       const res = await postApi.addPost(content, imageIds)
@@ -92,10 +103,12 @@ export const usePostStore = defineStore('post', () => {
     posts,
     page,
     hasFetchedAll,
+    userPosts,
     fetchPosts,
     clearPosts,
     syncPost,
     fetchMyPosts,
+    fetchUserPosts,
     addPost,
     deletePost,
     commentOnPost

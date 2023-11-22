@@ -65,6 +65,8 @@ import { computed } from 'vue'
 const root = ref<HTMLElement | undefined>()
 const scrollParent = useScrollParent(root) as Ref<HTMLElement>
 
+console.log('set up in post detail')
+
 const router = useRouter()
 const route = useRoute()
 
@@ -75,6 +77,11 @@ let from = ref(route.query.from)
 const post = computed(() => {
   if (from.value && from.value === 'home') {
     return postStore.myPosts.find((post) => post.id === postId.value)
+  }
+  if (from.value && from.value === 'user') {
+    return Object.values(postStore.userPosts)
+      .flat()
+      .find((post) => post.id === postId.value)
   }
   return postStore.posts.find((post) => post.id === postId.value)
 })
