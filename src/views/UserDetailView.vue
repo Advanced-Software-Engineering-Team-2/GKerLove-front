@@ -39,7 +39,7 @@ import type { User } from '@/types/User'
 import type { Post } from '@/types/Post'
 
 import { ref, onActivated } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import { useUserStore } from '@/stores/user'
 import { usePostStore } from '@/stores/post'
@@ -56,6 +56,7 @@ const user = ref<User>()
 const posts = ref<Post[]>([])
 const loading = ref(false)
 const postLoading = ref(false)
+let keep = false
 
 const fetchUserPosts = async () => {
   try {
@@ -88,10 +89,19 @@ const onRefresh = async () => {
   }
 }
 
+onBeforeRouteLeave((to, _, next) => {
+  if (to.name === 'postDetail') {
+    keep = true
+  } else {
+    keep = false
+  }
+  next()
+})
+
 onActivated(async () => {
   // 进入用户详情页面
   const userId = route.params.id as string
-  if (!user.value || user.value.id !== userId) {
+  if (!keep) {
     // 重用用户详情页组件
     // 如果用户详情页面的用户不是当前用户，需要重新获取用户信息
     try {
