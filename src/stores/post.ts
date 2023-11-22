@@ -11,7 +11,7 @@ import { User } from '@/types/User'
 export const usePostStore = defineStore('post', () => {
   const myPosts = ref<Post[]>([])
   const posts = ref<Post[]>([])
-  const userPosts = ref<Record<string, Post[]>>({})
+  const userPosts = ref<Map<string, Post[]>>(new Map())
   const pageSize = 10
   const page = ref(1)
   const hasFetchedAll = ref(false)
@@ -71,7 +71,7 @@ export const usePostStore = defineStore('post', () => {
   async function fetchUserPosts(user: User) {
     try {
       const res = await postApi.getUserPosts(user.id)
-      userPosts.value[user.id] = res.data.data.posts.content
+      userPosts.value.set(user.id, res.data.data.posts.content)
     } catch (_) {
       return Promise.reject()
     }

@@ -1,6 +1,7 @@
 <template>
   <div class="meet">
-    <van-swipe class="swipe" lazy-render :show-indicators="false">
+    <loading-card v-if="loading" />
+    <van-swipe class="swipe" lazy-render :show-indicators="false" v-else>
       <van-swipe-item v-for="user in meetStore.userList" :key="user.id">
         <user-card :user="user" class="user-card" @click="router.push(`/user/${user.id}`)" />
       </van-swipe-item>
@@ -14,15 +15,20 @@
 
 <script setup lang="ts">
 import { useMeetStore } from '@/stores/meet'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const meetStore = useMeetStore()
-try {
+const loading = ref(false)
+
+const getUserList = async () => {
+  loading.value = true
   await meetStore.getUserList()
-} catch (e) {
-  console.log(e)
+  loading.value = false
 }
+
+getUserList()
 </script>
 
 <style lang="scss" scoped>

@@ -11,17 +11,19 @@
     <van-divider />
     <loading-card v-if="loading" />
     <div v-else>
-      <div class="posts" v-if="posts.length">
-        <div class="post-container" v-for="post in posts" :key="post.id">
-          <post-card
-            :post="post"
-            :show-user="false"
-            @body-clicked="router.push(`/post/${post.id}?from=user`)"
-          />
-          <van-divider />
+      <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+        <div class="posts" v-if="posts.length">
+          <div class="post-container" v-for="post in posts" :key="post.id">
+            <post-card
+              :post="post"
+              :show-user="false"
+              @body-clicked="router.push(`/post/${post.id}?from=user`)"
+            />
+            <van-divider />
+          </div>
         </div>
-      </div>
-      <van-empty v-else description="暂无动态" image-size="8rem" />
+        <van-empty v-else description="暂无动态" image-size="8rem" />
+      </van-pull-refresh>
       <van-floating-bubble
         icon="chat"
         @click="handleChatClicked"
@@ -32,40 +34,36 @@
 </template>
 
 <script setup lang="ts">
+import type { User } from '@/types/User'
+import type { Post } from '@/types/Post'
+
+import { ref, onActivated } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import meetApi from '@/api/meet'
-import { ref } from 'vue'
-import { User } from '@/types/User'
+
 import { useUserStore } from '@/stores/user'
-import { Post } from '@/types/Post'
 import { usePostStore } from '@/stores/post'
 import { useMeetStore } from '@/stores/meet'
 
 const route = useRoute()
 const router = useRouter()
+
 const userStore = useUserStore()
 const postStore = usePostStore()
 const meetStore = useMeetStore()
-const user = meetStore.userList.find((user) => user.id === route.params.id) as User
-const posts = ref<Post[]>([])
 
+const user = ref<User>()
+const posts = ref<Post[]>([])
 const loading = ref(false)
+const refreshing = ref(false)
 
 const fetchUserDetail = async () => {
-  const id = route.params.id
-  if (!id || Array.isArray(id)) {
-    router.push('/404')
-  } else {
-    try {
-      loading.value = true
-      await meetApi.getUserById(id)
-      await postStore.fetchUserPosts(user)
-      posts.value = postStore.userPosts[user.id]
-    } catch (e) {
-      console.log(e)
-    } finally {
-      loading.value = false
-    }
+  try {
+    loading.value = true
+    await postStore.fetchUserPosts(user.value!)
+  } catch (_) {
+    /* empty */
+  } finally {
+    loading.value = false
   }
 }
 
@@ -73,12 +71,33 @@ const handleChatClicked = () => {
   router.push({
     name: 'chat',
     params: {
-      id: user.id
+      id: user.value!.id
     }
   })
 }
 
-fetchUserDetail()
+const onRefresh = async () => {
+  try {
+    await fetchUserDetail()
+    posts.value = postStore.userPosts.get(user.value!.id) || []
+  } catch (_) {
+    /* empty */
+  } finally {
+    loading.value = false
+  }
+}
+
+onActivated(async () => {
+  // 进入用户详情页面
+  const userId = route.params.id as string
+  if (!user.value || user.value.id !== userId) {
+    // 重用用户详情页组件
+    // 如果用户详情页面的用户不是当前用户，需要重新获取用户信息
+    user.value = meetStore.userList.find((user) => user.id === userId) as User
+    await fetchUserDetail()
+    posts.value = postStore.userPosts.get(user.value.id) || []
+  }
+})
 </script>
 
 <style scoped lang="scss">
@@ -86,9 +105,9 @@ fetchUserDetail()
   .user-card {
     height: 50vh;
   }
-}
 
-.posts {
-  margin: 10px 0;
+  .posts {
+    margin: 10px 0;
+  }
 }
 </style>

@@ -12,7 +12,7 @@
         <div class="post-card-container" v-for="post in postStore.posts" :key="post.id">
           <post-card
             :post="post"
-            @body-clicked="router.push(`/post/${post.id}`)"
+            @body-clicked="router.push(`/post/${post.id}?from=post`)"
             @avatar-clicked="router.push(`/user/${post.user.id}`)"
           />
           <van-divider />

@@ -48,20 +48,23 @@
         </div>
       </div>
       <van-divider />
-      <van-loading v-if="loading" />
-      <div class="post-card-list" v-else>
-        <div class="post-card-container" v-for="post in postStore.myPosts" :key="post.id">
-          <post-card
-            class="post-card"
-            :post="post"
-            :show-user="false"
-            :show-delete="true"
-            @delete-button-clicked="postStore.deletePost(post.id)"
-            @body-clicked="router.push(`/post/${post.id}?from=home`)"
-          />
-          <van-divider />
+      <loading-card v-if="loading" />
+      <div v-else>
+        <van-empty description="暂无动态" image-size="8rem" v-if="!postStore.myPosts.length" />
+        <div class="post-card-list" v-else>
+          <div class="post-card-container" v-for="post in postStore.myPosts" :key="post.id">
+            <post-card
+              class="post-card"
+              :post="post"
+              :show-user="false"
+              :show-delete="true"
+              @delete-button-clicked="postStore.deletePost(post.id)"
+              @body-clicked="router.push(`/post/${post.id}?from=home`)"
+            />
+            <van-divider />
+          </div>
+          <van-back-top right="10vw" bottom="10vh" />
         </div>
-        <van-back-top right="10vw" bottom="10vh" />
       </div>
     </div>
   </div>
@@ -95,14 +98,18 @@ const handleLogoutButtonClicked = async () => {
   }
 }
 
-try {
-  loading.value = true
-  await postStore.fetchMyPosts()
-} catch (_) {
-  /* empty */
-} finally {
-  loading.value = false
+const fetchMyPosts = async () => {
+  try {
+    loading.value = true
+    await postStore.fetchMyPosts()
+  } catch (_) {
+    /* empty */
+  } finally {
+    loading.value = false
+  }
 }
+
+fetchMyPosts()
 </script>
 
 <style scoped lang="scss">

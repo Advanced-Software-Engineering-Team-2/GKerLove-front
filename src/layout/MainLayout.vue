@@ -1,36 +1,24 @@
 <template>
-  <nav-bar :title="title" class="navbar van-safe-area-top" />
-  <div class="content">
-    <router-view v-slot="{ Component, route }">
-      <keep-alive>
-        <component :is="Component" :key="route.path"></component>
-      </keep-alive>
-    </router-view>
-    <!-- <router-view v-slot="{ Component }">
-      <template v-if="Component">
+  <div class="main-layout">
+    <nav-bar :title="title" class="navbar van-safe-area-top" />
+    <div class="content">
+      <router-view v-slot="{ Component }">
         <keep-alive>
-          <suspense>
-            <component :is="Component"></component>
-            <template #fallback>
-              <div class="loading">
-                <van-loading type="spinner" size="30px" />
-              </div>
-            </template>
-          </suspense>
+          <component :is="Component" />
         </keep-alive>
-      </template>
-    </router-view> -->
+      </router-view>
+    </div>
+    <van-tabbar v-model="active" route :border="false" class="tabbar van-safe-area-bottom">
+      <van-tabbar-item name="meet" to="/meet" :icon="active === 'meet' ? 'like' : 'like-o'" />
+      <van-tabbar-item
+        name="message"
+        to="/message"
+        :icon="active === 'message' ? 'chat' : 'chat-o'"
+      />
+      <van-tabbar-item name="post" to="/post" :icon="active === 'post' ? 'friends' : 'friends-o'" />
+      <van-tabbar-item name="home" to="/home" :icon="active === 'home' ? 'user' : 'user-o'" />
+    </van-tabbar>
   </div>
-  <van-tabbar v-model="active" route :border="false" class="tabbar van-safe-area-bottom">
-    <van-tabbar-item name="meet" to="/meet" :icon="active === 'meet' ? 'like' : 'like-o'" />
-    <van-tabbar-item
-      name="message"
-      to="/message"
-      :icon="active === 'message' ? 'chat' : 'chat-o'"
-    />
-    <van-tabbar-item name="post" to="/post" :icon="active === 'post' ? 'friends' : 'friends-o'" />
-    <van-tabbar-item name="home" to="/home" :icon="active === 'home' ? 'user' : 'user-o'" />
-  </van-tabbar>
 </template>
 
 <script setup lang="ts">

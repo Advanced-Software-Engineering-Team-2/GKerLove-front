@@ -3,6 +3,7 @@ import { getToken } from '@/utils/auth'
 
 import { useUserStore } from '@/stores/user'
 import { usePostStore } from '@/stores/post'
+import { useMeetStore } from '@/stores/meet'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -94,23 +95,21 @@ const router = createRouter({
         title: '动态详情'
       },
       beforeEnter: (to, from, next) => {
-        const postId = to.params.id
-        const postStore = usePostStore()
-        let post = undefined
-        if (from.name === 'home') {
-          post = postStore.myPosts.find((post) => post.id === postId)
-        } else if (from.name === 'userDetail') {
-          post = Object.values(postStore.userPosts)
-            .flat()
-            .find((post) => post.id === postId)
-        } else post = postStore.posts.find((post) => post.id === postId)
-
-        console.log(post)
-
-        if (post) {
-          next()
-        } else {
-          next('/404')
+        if (!to.query.from) next('/404')
+        else {
+          const postId = to.params.id
+          const postStore = usePostStore()
+          let post = undefined
+          if (from.name === 'home') {
+            post = postStore.myPosts.find((post) => post.id === postId)
+          } else if (from.name === 'userDetail') {
+            post = [...postStore.userPosts.values()].flat().find((post) => post.id === postId)
+          } else post = postStore.posts.find((post) => post.id === postId)
+          if (post) {
+            next()
+          } else {
+            next('/404')
+          }
         }
       }
     },
@@ -120,6 +119,16 @@ const router = createRouter({
       component: () => import('@/views/UserDetailView.vue'),
       meta: {
         title: '用户详情'
+      },
+      beforeEnter: (to, _, next) => {
+        const userId = to.params.id
+        const meetStore = useMeetStore()
+        const user = meetStore.userList.find((user) => user.id === userId)
+        if (user) {
+          next()
+        } else {
+          next('/404')
+        }
       }
     },
     {

@@ -1,14 +1,13 @@
 <template>
+  <van-nav-bar
+    left-arrow
+    title="动态详情"
+    @click-left="router.back()"
+    :border="false"
+    safe-area-inset-top
+  />
   <div class="post-detail-view">
     <div class="body">
-      <van-nav-bar
-        left-arrow
-        title="动态详情"
-        @click-left="router.back()"
-        :border="false"
-        safe-area-inset-top
-      />
-
       <div class="content">
         <post-card
           :post="post"
@@ -27,13 +26,10 @@
             <van-divider />
           </div>
         </div>
-
-        <van-loading class="loading" v-if="loading" size="2rem" />
-
+        <loading-card v-if="loading" />
         <van-back-top right="8vw" bottom="15vh" />
       </div>
     </div>
-
     <div class="footer">
       <van-field
         v-model="comment"
@@ -60,36 +56,18 @@ import { useScrollParent } from '@vant/use'
 
 import { showError } from '@/utils/show'
 import { usePostStore } from '@/stores/post'
-import { computed } from 'vue'
+import { Post } from '@/types/Post'
 
 const root = ref<HTMLElement | undefined>()
 const scrollParent = useScrollParent(root) as Ref<HTMLElement>
 
 const router = useRouter()
 const route = useRoute()
-
 const postStore = usePostStore()
-let postId = ref(route.params.id as string)
-let from = ref(route.query.from)
 
-const post = computed(() => {
-  if (from.value && from.value === 'home') {
-    return postStore.myPosts.find((post) => post.id === postId.value)
-  }
-  if (from.value && from.value === 'user') {
-    return Object.values(postStore.userPosts)
-      .flat()
-      .find((post) => post.id === postId.value)
-  }
-  return postStore.posts.find((post) => post.id === postId.value)
-})
-
-onActivated(() => {
-  fetchPostDetail()
-})
-
-const loading = ref(false)
+const post = ref<Post>()
 const comment = ref('')
+const loading = ref(false)
 
 const fetchPostDetail = async () => {
   if (!post.value) return
@@ -122,25 +100,42 @@ const handleSendButtonClicked = async () => {
     /* empty */
   }
 }
+
+onActivated(() => {
+  // 进入动态详情页面
+  const postId = route.params.id as string
+  const from = route.query.from as string
+  // 根据post存储位置获取post
+  if (from === 'home') {
+    post.value = postStore.myPosts.find((post) => post.id === postId)
+  }
+  if (from === 'user') {
+    post.value = [...postStore.userPosts.values()].flat().find((post) => post.id === postId)
+  } else {
+    post.value = postStore.posts.find((post) => post.id === postId)
+  }
+  // 更新post信息
+  fetchPostDetail()
+})
 </script>
 
 <style scoped lang="scss">
-.body {
-  height: calc(100vh - 100px);
-  overflow: auto;
-
-  .loading {
-    text-align: center;
+.post-detail-view {
+  .body {
+    height: calc(100vh - 100px - var(--height-navbar));
+    overflow: auto;
   }
-}
 
-.footer {
-  height: 68px;
-}
+  .footer {
+    height: 68px;
+  }
 
-.comment-container {
-  .comment-body {
-    padding: 15px 0;
+  .comment-list {
+    .comment-container {
+      .comment-body {
+        padding: 15px 0;
+      }
+    }
   }
 }
 </style>
