@@ -37,13 +37,14 @@
 import type { User } from '@/types/User'
 import type { Post } from '@/types/Post'
 
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import postApi from '@/api/post'
 import meetApi from '@/api/meet'
 import { useUserStore } from '@/stores/user'
 import { onActivated } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
@@ -54,6 +55,8 @@ const user = ref<User>()
 const posts = ref<Post[]>([])
 const loading = ref(false)
 const postLoading = ref(false)
+
+const scrollHeightStack: number[] = []
 
 const fetchUserInfo = async (id: string) => {
   loading.value = true
@@ -112,8 +115,16 @@ onActivated(() => {
     if (!router.options.history.state.forward || from === '/' || !user.value) {
       fetchUserInfo(userId)
       fetchUserPosts(userId)
+    } else {
+      nextTick(() => {
+        window.scrollTo({ top: scrollHeightStack.pop() ?? 0 })
+      })
     }
   }
+})
+
+onBeforeRouteLeave(() => {
+  scrollHeightStack.push(document.body.scrollHeight)
 })
 </script>
 

@@ -56,6 +56,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { showError, showSuccess } from '@/utils/show'
 import postApi from '@/api/post'
+import { onBeforeRouteLeave } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
@@ -64,6 +65,8 @@ const post = ref<Post>()
 const comment = ref('')
 const loading = ref(false)
 const commentLoading = ref(false)
+
+const scrollHeightStack: number[] = []
 
 const fetchPostDetail = async (id: string) => {
   try {
@@ -117,8 +120,16 @@ onActivated(async () => {
       loading.value = true
       await fetchPostDetail(postId)
       loading.value = false
+    } else {
+      nextTick(() => {
+        window.scrollTo({ top: scrollHeightStack.pop() ?? 0 })
+      })
     }
   }
+})
+
+onBeforeRouteLeave(() => {
+  scrollHeightStack.push(document.body.scrollHeight)
 })
 </script>
 
