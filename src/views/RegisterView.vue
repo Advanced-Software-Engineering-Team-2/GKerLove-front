@@ -141,7 +141,7 @@ const handleRegisterButtonClicked = async () => {
   try {
     await userApi.register(username.value, password.value, email.value, captcha.value, code.value)
     showSuccess('注册成功')
-    router.push('/login')
+    router.replace('/login')
   } catch (_) {
     captcha.value = ''
     refreshCaptcha()

@@ -9,10 +9,10 @@
           <component
             :is="Component"
             :key="
-              route.name === 'home' ||
               route.name === 'meet' ||
+              route.name === 'chat' ||
               route.name === 'post' ||
-              route.name === 'message'
+              route.name === 'home'
                 ? 'MainLayout'
                 : route.fullPath
             "

@@ -8,29 +8,28 @@
   />
   <loading-card v-if="loading" />
   <div class="user-detail-view" v-else>
+    <!-- only show user info when user is not null -->
     <user-card :user="user" v-if="user" />
     <van-divider />
-    <div>
-      <loading-card v-if="postLoading" />
-      <van-pull-refresh @refresh="onRefresh" v-else>
-        <div class="posts" v-if="posts.length">
-          <div class="post-container" v-for="post in posts" :key="post.id">
-            <post-card
-              :post="post"
-              :show-user="false"
-              @body-clicked="router.push(`/post/${post.id}?from=user`)"
-            />
-            <van-divider />
-          </div>
+    <loading-card v-if="postLoading" />
+    <van-pull-refresh @refresh="onRefresh" v-else>
+      <div class="posts" v-if="posts.length">
+        <div class="post-container" v-for="post in posts" :key="post.id">
+          <post-card
+            :post="post"
+            :show-user="false"
+            @body-clicked="router.push(`/post/${post.id}`)"
+          />
+          <van-divider />
         </div>
-        <van-empty v-else description="暂无动态" image-size="8rem" />
-      </van-pull-refresh>
-      <van-floating-bubble
-        icon="chat"
-        @click="handleChatClicked"
-        v-if="userStore.username !== user?.username"
-      />
-    </div>
+      </div>
+      <van-empty v-else description="暂无动态" image-size="8rem" />
+    </van-pull-refresh>
+    <van-floating-bubble
+      icon="chat"
+      @click="handleChatClicked"
+      v-if="userStore.username !== user?.username"
+    />
   </div>
 </template>
 
@@ -38,29 +37,45 @@
 import type { User } from '@/types/User'
 import type { Post } from '@/types/Post'
 
-import { ref, onActivated } from 'vue'
+import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import postApi from '@/api/post'
+import meetApi from '@/api/meet'
 import { useUserStore } from '@/stores/user'
-import { usePostStore } from '@/stores/post'
-import { useMeetStore } from '@/stores/meet'
+import { onActivated } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
 
 const userStore = useUserStore()
-const postStore = usePostStore()
-const meetStore = useMeetStore()
 
 const user = ref<User>()
 const posts = ref<Post[]>([])
 const loading = ref(false)
 const postLoading = ref(false)
 
-const fetchUserPosts = async () => {
+const fetchUserInfo = async (id: string) => {
+  loading.value = true
   try {
-    postLoading.value = true
-    await postStore.fetchUserPosts(user.value!)
+    const res = await meetApi.getUserById(id)
+    user.value = res.data.data.user
+    if (!user.value) {
+      router.push('/404')
+      return
+    }
+  } catch (_) {
+    /* empty */
+  } finally {
+    loading.value = false
+  }
+}
+
+const fetchUserPosts = async (id: string) => {
+  postLoading.value = true
+  try {
+    const res = await postApi.getUserPosts(id)
+    posts.value = res.data.data.posts.content
   } catch (_) {
     /* empty */
   } finally {
@@ -72,15 +87,15 @@ const handleChatClicked = () => {
   router.push({
     name: 'chat',
     params: {
-      id: user.value!.id
+      id: user.value?.id
     }
   })
 }
 
 const onRefresh = async () => {
+  if (!user.value) return
   try {
-    await fetchUserPosts()
-    posts.value = postStore.userPosts.get(user.value!.id) || []
+    await fetchUserPosts(user.value.id)
   } catch (_) {
     /* empty */
   } finally {
@@ -88,22 +103,16 @@ const onRefresh = async () => {
   }
 }
 
-onActivated(async () => {
-  // 进入用户详情页面
-  const userId = route.params.id as string
-  if (!user.value || user.value.id !== userId) {
-    // 重用用户详情页组件
-    // 如果用户详情页面的用户不是当前用户，需要重新获取用户信息
-    try {
-      loading.value = true
-      user.value = await meetStore.getUserById(userId)
-    } catch (_) {
-      router.push('/404')
-    } finally {
-      loading.value = false
+onActivated(() => {
+  const userId = route.params.id
+  if (!userId || Array.isArray(userId)) {
+    router.push('/404')
+  } else {
+    const from = route.meta.from?.path
+    if (!router.options.history.state.forward || from === '/' || !user.value) {
+      fetchUserInfo(userId)
+      fetchUserPosts(userId)
     }
-    await fetchUserPosts()
-    posts.value = postStore.userPosts.get(user.value!.id) || []
   }
 })
 </script>

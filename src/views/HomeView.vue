@@ -59,7 +59,7 @@
               :show-user="false"
               :show-delete="true"
               @delete-button-clicked="postStore.deletePost(post.id)"
-              @body-clicked="router.push(`/post/${post.id}?from=home`)"
+              @body-clicked="router.push(`/post/${post.id}`)"
             />
             <van-divider />
           </div>

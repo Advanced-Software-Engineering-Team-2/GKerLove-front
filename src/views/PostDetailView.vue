@@ -6,16 +6,19 @@
     :border="false"
     safe-area-inset-top
   />
-  <div class="post-detail-view">
+  <loading-card v-if="loading" />
+  <div class="post-detail-view" v-else>
     <div class="body">
       <div class="content">
+        <!-- only show post when post is not null -->
         <post-card
-          :post="post"
           v-if="post"
+          :post="post"
           @avatar-clicked="router.push(`/user/${post.user.id}`)"
         />
         <van-divider />
-        <div class="comment-list" ref="root">
+        <loading-card v-if="commentLoading" />
+        <div class="comment-list" v-else>
           <div class="comment-container" v-for="comment in post?.commentList" :key="comment.id">
             <post-card-header
               class="comment-header"
@@ -26,8 +29,6 @@
             <van-divider />
           </div>
         </div>
-        <loading-card v-if="loading" />
-        <van-back-top right="8vw" bottom="15vh" />
       </div>
     </div>
     <div class="footer">
@@ -48,38 +49,41 @@
 </template>
 
 <script setup lang="ts">
-import type { Ref } from 'vue'
+import type { Post } from '@/types/Post'
 
-import { ref, nextTick, onActivated } from 'vue'
+import { ref, onActivated, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useScrollParent } from '@vant/use'
 
-import { showError } from '@/utils/show'
-import { usePostStore } from '@/stores/post'
-import { Post } from '@/types/Post'
-import { usePreserveScroll } from '@/hooks/usePreserveScroll'
-
-const root = ref<HTMLElement | undefined>()
-const scrollParent = useScrollParent(root) as Ref<HTMLElement>
-usePreserveScroll(root, 'postDetail')
+import { showError, showSuccess } from '@/utils/show'
+import postApi from '@/api/post'
 
 const router = useRouter()
 const route = useRoute()
-const postStore = usePostStore()
 
 const post = ref<Post>()
 const comment = ref('')
 const loading = ref(false)
+const commentLoading = ref(false)
 
-const fetchPostDetail = async () => {
-  if (!post.value) return
+const fetchPostDetail = async (id: string) => {
   try {
-    loading.value = true
-    await postStore.syncPost(post.value)
+    const res = await postApi.getPostById(id)
+    post.value = res.data.data.post
+    if (!post.value) {
+      router.push('/404')
+      return
+    }
   } catch (_) {
-    router.push('/404')
-  } finally {
-    loading.value = false
+    /* empty */
+  }
+}
+
+const commentOnPost = async (id: string, content: string) => {
+  try {
+    const res = await postApi.commentOnPost(id, content)
+    showSuccess(res.data.message)
+  } catch (_) {
+    /* empty */
   }
 }
 
@@ -90,41 +94,38 @@ const handleSendButtonClicked = async () => {
   }
   if (!post.value) return
   try {
-    loading.value = true
-    await postStore.commentOnPost(post.value, comment.value)
+    commentLoading.value = true
+    await commentOnPost(post.value.id, comment.value)
     comment.value = ''
-    await postStore.syncPost(post.value)
-    loading.value = false
+    await fetchPostDetail(post.value.id)
+    commentLoading.value = false
     nextTick(() => {
-      scrollParent.value?.scrollTo({ top: scrollParent.value?.scrollHeight, behavior: 'smooth' })
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
     })
   } catch (_) {
     /* empty */
   }
 }
 
-onActivated(() => {
-  // 进入动态详情页面
-  const postId = route.params.id as string
-  const from = route.query.from as string
-  // 根据post存储位置获取post
-  if (from === 'home') {
-    post.value = postStore.myPosts.find((post) => post.id === postId)
-  } else if (from === 'user') {
-    post.value = [...postStore.userPosts.values()].flat().find((post) => post.id === postId)
+onActivated(async () => {
+  const postId = route.params.id
+  if (!postId || Array.isArray(postId)) {
+    router.push('/404')
   } else {
-    post.value = postStore.posts.find((post) => post.id === postId)
+    const from = route.meta.from?.path
+    if (!router.options.history.state.forward || from === '/' || !post.value) {
+      loading.value = true
+      await fetchPostDetail(postId)
+      loading.value = false
+    }
   }
-  // 更新post信息
-  fetchPostDetail()
 })
 </script>
 
 <style scoped lang="scss">
 .post-detail-view {
   .body {
-    height: calc(100vh - 100px - var(--height-navbar));
-    overflow: auto;
+    min-height: calc(100vh - 100px - var(--height-navbar));
   }
 
   .footer {

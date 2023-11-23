@@ -4,11 +4,11 @@
     <div class="content">
       <router-view v-slot="{ Component }">
         <keep-alive>
-          <component :is="Component" :key="route.fullPath" />
+          <component :is="Component" />
         </keep-alive>
       </router-view>
     </div>
-    <van-tabbar v-model="active" route :border="false" class="tabbar van-safe-area-bottom">
+    <van-tabbar route :border="false" class="tabbar van-safe-area-bottom">
       <van-tabbar-item name="meet" to="/meet" :icon="active === 'meet' ? 'like' : 'like-o'" />
       <van-tabbar-item
         name="message"
@@ -22,14 +22,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import NavBar from '@/shared/components/NavBar.vue'
 import { computed } from 'vue'
 
 const route = useRoute()
-const routeName = route.name?.toString()
-const active = ref(routeName || 'meet')
+const active = computed(() => route.name)
 const title = computed(() => {
   switch (active.value) {
     case 'meet':

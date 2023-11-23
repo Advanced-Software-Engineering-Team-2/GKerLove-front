@@ -2,17 +2,16 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { getToken } from '@/utils/auth'
 
 import { useUserStore } from '@/stores/user'
-import { usePostStore } from '@/stores/post'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  // scrollBehavior(to, from, savedPosition) {
-  //   if (savedPosition) {
-  //     return savedPosition
-  //   } else {
-  //     return { top: 0 }
-  //   }
-  // },
+  scrollBehavior(_to, _from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  },
   routes: [
     {
       path: '/',
@@ -61,14 +60,6 @@ const router = createRouter({
         title: '登录'
       }
     },
-    // {
-    //   path: '/test',
-    //   name: 'test',
-    //   component: () => import('@/views/test.vue'),
-    //   meta: {
-    //     title: '测试'
-    //   }
-    // },
     {
       path: '/register',
       name: 'register',
@@ -99,24 +90,6 @@ const router = createRouter({
       component: () => import('@/views/PostDetailView.vue'),
       meta: {
         title: '动态详情'
-      },
-      beforeEnter: (to, from, next) => {
-        if (!to.query.from) next('/404')
-        else {
-          const postId = to.params.id
-          const postStore = usePostStore()
-          let post = undefined
-          if (from.name === 'home') {
-            post = postStore.myPosts.find((post) => post.id === postId)
-          } else if (from.name === 'userDetail') {
-            post = [...postStore.userPosts.values()].flat().find((post) => post.id === postId)
-          } else post = postStore.posts.find((post) => post.id === postId)
-          if (post) {
-            next()
-          } else {
-            next('/404')
-          }
-        }
       }
     },
     {
@@ -152,7 +125,8 @@ const router = createRouter({
 
 const whiteList = ['/login', '/register'] // no redirect whitelist
 
-router.beforeEach(async (to, _, next) => {
+router.beforeEach(async (to, from, next) => {
+  to.meta.from = from // 记录路由来源
   document.title = to.meta.title as string
   const hasToken = getToken()
   if (!hasToken) {

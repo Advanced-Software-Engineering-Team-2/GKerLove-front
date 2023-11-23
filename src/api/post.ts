@@ -28,7 +28,7 @@ function deletePost(postId: string) {
 }
 
 function getPostById(postId: string) {
-  return request.get<R<{ post: Post }>>(`/post/${postId}`)
+  return request.get<R<{ post: Post | undefined }>>(`/post/${postId}`)
 }
 
 function commentOnPost(postId: string, content: string) {

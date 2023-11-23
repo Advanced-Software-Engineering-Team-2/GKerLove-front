@@ -1,48 +1,60 @@
 <template>
-  <div class="post" ref="root">
+  <div class="post-view" ref="root">
     <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
       <van-list
         v-model:loading="loading"
         v-model:error="error"
-        :finished="postStore.hasFetchedAll"
+        :finished="hasFetchedAll"
         finished-text="没有更多了"
         error-text="请求失败，请重试"
         @load="onLoad"
       >
-        <div class="post-card-container" v-for="post in postStore.posts" :key="post.id">
+        <div class="post-card-container" v-for="post in posts" :key="post.id">
           <post-card
             :post="post"
-            @body-clicked="router.push(`/post/${post.id}?from=post`)"
+            @body-clicked="router.push(`/post/${post.id}`)"
             @avatar-clicked="router.push(`/user/${post.user.id}`)"
           />
           <van-divider />
         </div>
       </van-list>
-      <van-back-top right="10vw" bottom="10vh" />
     </van-pull-refresh>
+    <van-back-top right="10vw" bottom="10vh" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { Post } from '@/types/Post'
+
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import postApi from '@/api/post'
+
 import { usePreserveScroll } from '@/hooks/usePreserveScroll'
-import { usePostStore } from '@/stores/post'
 
 const root = ref<HTMLElement | undefined>()
 usePreserveScroll(root, 'post')
 
 const router = useRouter()
-const postStore = usePostStore()
+const posts = ref<Post[]>([])
 
 const loading = ref(false)
 const error = ref(false)
 const refreshing = ref(false)
 
+const pageSize = 10
+const page = ref(1)
+const hasFetchedAll = ref(false)
+
 const onLoad = async () => {
   try {
-    await postStore.fetchPosts()
+    const res = await postApi.retrievePosts(page.value)
+    const newPosts = res.data.data.posts.content
+    if (page.value === 1) posts.value = newPosts
+    else posts.value.push(...newPosts)
+    hasFetchedAll.value = res.data.data.posts.total <= pageSize * page.value
+    page.value++
   } catch (_) {
     error.value = true
   } finally {
@@ -52,7 +64,8 @@ const onLoad = async () => {
 }
 
 const onRefresh = () => {
-  postStore.clearPosts()
+  page.value = 1
+  hasFetchedAll.value = false
   error.value = false
   loading.value = true
   onLoad()
