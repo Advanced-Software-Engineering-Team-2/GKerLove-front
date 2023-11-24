@@ -10,7 +10,7 @@ pipeline {
       agent none
       steps {
         container('nodejs') {
-          git(url: 'git@github.com:Advanced-Software-Engineering-Team-2/GKerLove-front.git', credentialsId: 'github', branch: 'master', changelog: true, poll: false)
+          git(url: 'https://gitee.com/gyr679/gker-love-front.git', credentialsId: 'gitee', branch: 'master', changelog: true, poll: false)
           sh 'ls -lh'
         }
 
