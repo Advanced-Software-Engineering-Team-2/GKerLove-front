@@ -18,5 +18,5 @@ export interface User {
   institute?: string
   introduction?: string
   likedByUserIdList: string[]
-  likesUserIdList: string[]
+  likeUserIdList: string[]
 }

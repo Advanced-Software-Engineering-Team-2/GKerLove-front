@@ -22,7 +22,7 @@ export const useUserStore = defineStore('user', () => {
   const institute = ref<string>()
   const introduction = ref<string>()
   const likedByUserIdList = ref<string[]>([])
-  const likesUserIdList = ref<string[]>([])
+  const likeUserIdList = ref<string[]>([])
   const posts = ref<Post[]>([])
   const OSSUtil = ref<OSS | null>(null)
 
@@ -41,7 +41,7 @@ export const useUserStore = defineStore('user', () => {
       institute.value = user.institute
       introduction.value = user.introduction
       likedByUserIdList.value = user.likedByUserIdList
-      likesUserIdList.value = user.likesUserIdList
+      likeUserIdList.value = user.likeUserIdList
       if (OSSUtil.value === null) {
         OSSUtil.value = await createOSSUtil()
       }
@@ -120,7 +120,7 @@ export const useUserStore = defineStore('user', () => {
     institute.value = undefined
     introduction.value = undefined
     likedByUserIdList.value = []
-    likesUserIdList.value = []
+    likeUserIdList.value = []
     OSSUtil.value = null
     removeToken()
   }
@@ -137,7 +137,7 @@ export const useUserStore = defineStore('user', () => {
     institute,
     introduction,
     likedByUserIdList,
-    likesUserIdList,
+    likeUserIdList,
     OSSUtil,
     posts,
     initUser,

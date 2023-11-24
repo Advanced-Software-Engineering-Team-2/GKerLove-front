@@ -32,9 +32,19 @@ function getUserById(id: string) {
   return request.get<R<{ user: User }>>(`/meet/${id}`)
 }
 
+function getMyLikes() {
+  return request.get<R<{ likes: User[] }>>(`/meet/likes`)
+}
+
+function getWhoLikeMe() {
+  return request.get<R<{ likedBy: User[] }>>(`/meet/likedBy`)
+}
+
 export default {
   getUserList,
   likeSomeone,
   dislikeSomeone,
-  getUserById
+  getUserById,
+  getMyLikes,
+  getWhoLikeMe
 }

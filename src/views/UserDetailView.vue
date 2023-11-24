@@ -27,7 +27,7 @@
     </van-pull-refresh>
     <chat-icon class="chat-icon" @click="handleChatClicked" />
     <dislike-icon
-      v-if="user && userStore.likesUserIdList.includes(user.id)"
+      v-if="user && userStore.likeUserIdList.includes(user.id)"
       class="like-icon"
       @click="handleDisLikeSomeone"
     />
@@ -101,8 +101,8 @@ const handleLikeSomeone = async () => {
   if (!user.value?.id) return
   try {
     const res = await meetApi.likeSomeone(user.value?.id!)
-    if (!userStore.likesUserIdList.includes(user.value.id)) {
-      userStore.likesUserIdList.push(user.value.id)
+    if (!userStore.likeUserIdList.includes(user.value.id)) {
+      userStore.likeUserIdList.push(user.value.id)
     }
     showSuccess(res.data.message)
   } catch (_) {
@@ -114,8 +114,8 @@ const handleDisLikeSomeone = async () => {
   if (!user.value?.id) return
   try {
     const res = await meetApi.dislikeSomeone(user.value.id!)
-    if (userStore.likesUserIdList.includes(user.value.id!)) {
-      userStore.likesUserIdList.splice(userStore.likesUserIdList.indexOf(user.value.id), 1)
+    if (userStore.likeUserIdList.includes(user.value.id!)) {
+      userStore.likeUserIdList.splice(userStore.likeUserIdList.indexOf(user.value.id), 1)
     }
     showSuccess(res.data.message)
   } catch (_) {

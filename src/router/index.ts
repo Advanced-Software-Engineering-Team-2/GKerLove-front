@@ -103,6 +103,14 @@ const router = createRouter({
       }
     },
     {
+      path: '/likes',
+      name: 'Likes',
+      component: () => import('@/views/LikesView.vue'),
+      meta: {
+        title: '我喜欢的人'
+      }
+    },
+    {
       path: '/selectMeet',
       name: 'selectMeet',
       component: () => import('@/views/SelectMeetView.vue'),
