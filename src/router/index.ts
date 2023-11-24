@@ -118,14 +118,14 @@ const router = createRouter({
         title: '喜欢我的人'
       }
     },
-    {
-      path: '/selectMeet',
-      name: 'selectMeet',
-      component: () => import('@/views/SelectMeetView.vue'),
-      meta: {
-        title: '对系统推荐的用户进行筛选'
-      }
-    },
+    // {
+    //   path: '/selectMeet',
+    //   name: 'selectMeet',
+    //   component: () => import('@/views/SelectMeetView.vue'),
+    //   meta: {
+    //     title: '对系统推荐的用户进行筛选'
+    //   }
+    // },
     {
       path: '/404',
       name: '404',
