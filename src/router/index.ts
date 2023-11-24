@@ -104,10 +104,18 @@ const router = createRouter({
     },
     {
       path: '/likes',
-      name: 'Likes',
+      name: 'likes',
       component: () => import('@/views/LikesView.vue'),
       meta: {
         title: '我喜欢的人'
+      }
+    },
+    {
+      path: '/likedBy',
+      name: 'likeBy',
+      component: () => import('@/views/LikedByView.vue'),
+      meta: {
+        title: '喜欢我的人'
       }
     },
     {
