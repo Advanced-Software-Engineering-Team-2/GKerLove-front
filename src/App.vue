@@ -6,7 +6,17 @@
     <template v-if="Component">
       <keep-alive>
         <suspense>
-          <component :is="Component" :key="route.params.id ?? 0" />
+          <component
+            :is="Component"
+            :key="
+              route.name === 'meet' ||
+              route.name === 'chat' ||
+              route.name === 'post' ||
+              route.name === 'home'
+                ? 'MainLayout'
+                : route.fullPath
+            "
+          />
           <template #fallback>
             <div class="loading">
               <van-loading type="spinner" size="30px" />

@@ -1,12 +1,14 @@
+import { UserInfo } from '@/types/User'
+import { Post } from '@/types/Post'
+
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import OSS from 'ali-oss'
+import { createOSSUtil } from '@/utils/OSS'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import userApi from '@/api/user'
-import { UserInfo } from '@/types/User'
+import postApi from '@/api/post'
 import { showSuccess, showError } from '@/utils/show'
-import { createOSSUtil } from '@/utils/OSS'
-import OSS from 'ali-oss'
-import { ref } from 'vue'
-import { Post } from '@/types/Post'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref(getToken())
@@ -75,6 +77,37 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  async function fetchPosts() {
+    if (!id.value) return
+    try {
+      const res = await postApi.getUserPosts(id.value)
+      posts.value = res.data.data.posts.content
+    } catch (_) {
+      return Promise.reject()
+    }
+  }
+
+  async function addPost(content: string, imageIds: string[]) {
+    try {
+      const res = await postApi.addPost(content, imageIds)
+      const post = res.data.data.post
+      posts.value.unshift(post)
+      showSuccess(res.data.message)
+    } catch (_) {
+      return Promise.reject()
+    }
+  }
+
+  async function deletePost(id: string) {
+    try {
+      const res = await postApi.deletePost(id)
+      posts.value = posts.value.filter((post) => post.id !== id)
+      showSuccess(res.data.message)
+    } catch (_) {
+      return Promise.reject()
+    }
+  }
+
   function $reset() {
     token.value = undefined
     id.value = undefined
@@ -110,6 +143,9 @@ export const useUserStore = defineStore('user', () => {
     initUser,
     login,
     updateInfo,
+    fetchPosts,
+    addPost,
+    deletePost,
     $reset
   }
 })

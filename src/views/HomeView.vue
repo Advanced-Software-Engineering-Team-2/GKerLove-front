@@ -50,15 +50,15 @@
       <van-divider />
       <loading-card v-if="loading" />
       <div v-else>
-        <van-empty description="暂无动态" image-size="8rem" v-if="!postStore.myPosts.length" />
+        <van-empty description="暂无动态" image-size="8rem" v-if="!user.posts.length" />
         <div class="post-card-list" v-else>
-          <div class="post-card-container" v-for="post in postStore.myPosts" :key="post.id">
+          <div class="post-card-container" v-for="post in user.posts" :key="post.id">
             <post-card
               class="post-card"
               :post="post"
               :show-user="false"
               :show-delete="true"
-              @delete-button-clicked="postStore.deletePost(post.id)"
+              @delete-button-clicked="user.deletePost(post.id)"
               @body-clicked="router.push(`/post/${post.id}`)"
             />
             <van-divider />
@@ -77,10 +77,8 @@ import { showSuccess } from '@/utils/show'
 import { TUICore } from '../TUIKit'
 import { ref } from 'vue'
 import { usePreserveScroll } from '@/hooks/usePreserveScroll'
-import { usePostStore } from '@/stores/post'
 
 const user = useUserStore()
-const postStore = usePostStore()
 const root = ref<HTMLElement | undefined>()
 const loading = ref(true)
 
@@ -98,10 +96,10 @@ const handleLogoutButtonClicked = async () => {
   }
 }
 
-const fetchMyPosts = async () => {
+const fetchPosts = async () => {
   try {
     loading.value = true
-    await postStore.fetchMyPosts()
+    await user.fetchPosts()
   } catch (_) {
     /* empty */
   } finally {
@@ -109,7 +107,7 @@ const fetchMyPosts = async () => {
   }
 }
 
-fetchMyPosts()
+fetchPosts()
 </script>
 
 <style scoped lang="scss">
