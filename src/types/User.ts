@@ -17,6 +17,6 @@ export interface User {
   city?: string
   institute?: string
   introduction?: string
-  likedBy: number
-  likes: number
+  likedByUserIdList: string[]
+  likesUserIdList: string[]
 }

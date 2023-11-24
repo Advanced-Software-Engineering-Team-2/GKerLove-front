@@ -21,8 +21,8 @@ export const useUserStore = defineStore('user', () => {
   const city = ref<string>()
   const institute = ref<string>()
   const introduction = ref<string>()
-  const likedBy = ref(0)
-  const likes = ref(0)
+  const likedByUserIdList = ref<string[]>([])
+  const likesUserIdList = ref<string[]>([])
   const posts = ref<Post[]>([])
   const OSSUtil = ref<OSS | null>(null)
 
@@ -40,8 +40,8 @@ export const useUserStore = defineStore('user', () => {
       city.value = user.city
       institute.value = user.institute
       introduction.value = user.introduction
-      likedBy.value = user.likedBy
-      likes.value = user.likes
+      likedByUserIdList.value = user.likedByUserIdList
+      likesUserIdList.value = user.likesUserIdList
       if (OSSUtil.value === null) {
         OSSUtil.value = await createOSSUtil()
       }
@@ -119,8 +119,8 @@ export const useUserStore = defineStore('user', () => {
     city.value = undefined
     institute.value = undefined
     introduction.value = undefined
-    likedBy.value = 0
-    likes.value = 0
+    likedByUserIdList.value = []
+    likesUserIdList.value = []
     OSSUtil.value = null
     removeToken()
   }
@@ -136,8 +136,8 @@ export const useUserStore = defineStore('user', () => {
     city,
     institute,
     introduction,
-    likedBy,
-    likes,
+    likedByUserIdList,
+    likesUserIdList,
     OSSUtil,
     posts,
     initUser,

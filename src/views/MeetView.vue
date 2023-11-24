@@ -1,13 +1,14 @@
 <template>
   <loading-card v-if="loading" />
   <div class="meet-view" v-else>
-    <van-swipe class="swipe" lazy-render :show-indicators="false">
+    <van-empty description="没有满足条件的用户" image-size="8rem" v-if="!users.length" />
+    <van-swipe class="swipe" lazy-render :show-indicators="false" v-else>
       <van-swipe-item v-for="user in users" :key="user.id">
         <user-card :user="user" class="user-card" @click="router.push(`/user/${user.id}`)" />
       </van-swipe-item>
     </van-swipe>
     <div class="footer">
-      <van-button icon="setting" />
+      <van-button type="success" @click="getUsers()"> 换一批 </van-button>
     </div>
   </div>
 </template>
@@ -55,9 +56,6 @@ getUsers()
 <style lang="scss" scoped>
 .meet-view {
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 
   .swipe {
     height: 80%;
@@ -67,6 +65,7 @@ getUsers()
     }
   }
   .footer {
+    margin-top: 25px;
     text-align: center;
   }
 }

@@ -21,8 +21,8 @@
       </div>
       <van-divider />
       <div class="row-3">
-        <span>人气: {{ user.likedBy }}</span>
-        <span>喜欢: {{ user.likes }}</span>
+        <span>人气: {{ user.likedByUserIdList?.length ?? 0 }}</span>
+        <span>喜欢: {{ user.likesUserIdList?.length ?? 0 }}</span>
         <div class="button-box">
           <van-button
             color="blue"

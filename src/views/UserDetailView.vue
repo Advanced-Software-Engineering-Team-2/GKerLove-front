@@ -25,11 +25,13 @@
       </div>
       <van-empty v-else description="暂无动态" image-size="8rem" />
     </van-pull-refresh>
-    <van-floating-bubble
-      icon="chat"
-      @click="handleChatClicked"
-      v-if="userStore.username !== user?.username"
+    <chat-icon class="chat-icon" @click="handleChatClicked" />
+    <dislike-icon
+      v-if="user && userStore.likesUserIdList.includes(user.id)"
+      class="like-icon"
+      @click="handleDisLikeSomeone"
     />
+    <like-icon v-else class="like-icon" @click="handleLikeSomeone" />
   </div>
 </template>
 
@@ -42,13 +44,13 @@ import { useRoute, useRouter } from 'vue-router'
 
 import postApi from '@/api/post'
 import meetApi from '@/api/meet'
-import { useUserStore } from '@/stores/user'
 import { onActivated } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
+import { showSuccess } from '@/utils/show'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
 const router = useRouter()
-
 const userStore = useUserStore()
 
 const user = ref<User>()
@@ -95,6 +97,32 @@ const handleChatClicked = () => {
   })
 }
 
+const handleLikeSomeone = async () => {
+  if (!user.value?.id) return
+  try {
+    const res = await meetApi.likeSomeone(user.value?.id!)
+    if (!userStore.likesUserIdList.includes(user.value.id)) {
+      userStore.likesUserIdList.push(user.value.id)
+    }
+    showSuccess(res.data.message)
+  } catch (_) {
+    /* empty */
+  }
+}
+
+const handleDisLikeSomeone = async () => {
+  if (!user.value?.id) return
+  try {
+    const res = await meetApi.dislikeSomeone(user.value.id!)
+    if (userStore.likesUserIdList.includes(user.value.id!)) {
+      userStore.likesUserIdList.splice(userStore.likesUserIdList.indexOf(user.value.id), 1)
+    }
+    showSuccess(res.data.message)
+  } catch (_) {
+    /* empty */
+  }
+}
+
 const onRefresh = async () => {
   if (!user.value) return
   try {
@@ -136,6 +164,22 @@ onBeforeRouteLeave(() => {
 
   .posts {
     margin: 10px 0;
+  }
+
+  .chat-icon {
+    width: 4rem;
+    height: 4rem;
+    position: fixed;
+    right: 5vh;
+    bottom: 5vh;
+  }
+
+  .like-icon {
+    width: 4rem;
+    height: 4rem;
+    position: fixed;
+    left: 5vh;
+    bottom: 5vh;
   }
 }
 </style>

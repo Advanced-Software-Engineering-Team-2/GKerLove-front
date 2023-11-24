@@ -20,21 +20,12 @@ function getUserList(
   })
 }
 
-function addlove(fromusername: string, tousername: string) {
-  return request.post<R>('/meet/addlove', null, {
-    params: {
-      fromusername: fromusername,
-      tousername: tousername
-    }
-  })
+function likeSomeone(userId: string) {
+  return request.post<R>(`/meet/like/${userId}`)
 }
-function notlove(fromusername: string, tousername: string) {
-  return request.post<R>('/meet/notlove', null, {
-    params: {
-      fromusername: fromusername,
-      tousername: tousername
-    }
-  })
+
+function dislikeSomeone(userId: string) {
+  return request.post<R>(`/meet/dislike/${userId}`)
 }
 
 function getUserById(id: string) {
@@ -43,7 +34,7 @@ function getUserById(id: string) {
 
 export default {
   getUserList,
-  addlove,
-  notlove,
+  likeSomeone,
+  dislikeSomeone,
   getUserById
 }
