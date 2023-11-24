@@ -24,4 +24,15 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   }
+  // server: {
+  //   cors: true,
+  //   proxy: {
+  //     '/api': {
+  //       target: 'http://server.cqupt-gyr.xyz:30222',
+  //       changeOrigin: true,
+  //       ws: true,
+  //       rewrite: (path) => path.replace(/^\/api/, '')
+  //     }
+  //   }
+  // }
 })

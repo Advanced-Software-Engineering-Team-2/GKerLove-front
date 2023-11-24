@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: gkerlove-front
+  name: gkerlove-front
+  namespace: gker-love
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gkerlove-front
+  template:
+    metadata:
+      labels:
+        app: gkerlove-front
+    spec:
+      imagePullSecrets:
+        - name: alibaba-docker-registry-secret
+      containers:
+        - image: $REGISTRY/$DOCKERHUB_NAMESPACE/gkerlove-front:SNAPSHOT-$BUILD_NUMBER
+          imagePullPolicy: Always
+          name: app
+          ports:
+            - containerPort: 80
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: gkerlove-front
+  name: gkerlove-front
+  namespace: gker-love
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: gkerlove-front
+  type: ClusterIP
