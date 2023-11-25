@@ -45,7 +45,11 @@
           round
           block
           type="primary"
-          @click="$router.push('/login')"
+          @click="
+            $router.push({
+              name: 'login'
+            })
+          "
           style="margin-left: 2rem"
         >
           登录

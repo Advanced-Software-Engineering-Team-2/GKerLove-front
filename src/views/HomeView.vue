@@ -21,14 +21,22 @@
       </div>
       <van-divider />
       <div class="row-3">
-        <span @click="router.push('/likedBy')">人气: {{ user.likedByUserIdList?.length ?? 0 }}</span>
-        <span @click="router.push('/likes')">喜欢: {{ user.likeUserIdList?.length ?? 0 }}</span>
+        <span @click="router.push({ name: 'likedBy' })"
+          >人气: {{ user.likedByUserIdList?.length ?? 0 }}</span
+        >
+        <span @click="router.push({ name: 'likes' })"
+          >喜欢: {{ user.likeUserIdList?.length ?? 0 }}</span
+        >
         <div class="button-box">
           <van-button
             color="blue"
             round
             size="small"
-            @click="router.push('/updateInfo')"
+            @click="
+              router.push({
+                name: 'updateInfo'
+              })
+            "
             style="margin-right: 5px"
           >
             完善信息
@@ -37,7 +45,7 @@
             color="green"
             round
             size="small"
-            @click="router.push('/newPost')"
+            @click="router.push({ name: 'newPost' })"
             style="margin-right: 5px"
           >
             发布动态
@@ -89,7 +97,9 @@ const handleLogoutButtonClicked = async () => {
     const TUIins = TUICore.instance
     await TUIins.logout()
     showSuccess('退出登录成功')
-    router.push('/login')
+    router.push({
+      name: 'login'
+    })
     user.$reset()
   } catch (err) {
     console.log(err)

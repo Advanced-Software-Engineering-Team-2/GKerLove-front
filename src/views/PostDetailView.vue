@@ -73,7 +73,9 @@ const fetchPostDetail = async (id: string) => {
     const res = await postApi.getPostById(id)
     post.value = res.data.data.post
     if (!post.value) {
-      router.push('/404')
+      router.push({
+        name: '404'
+      })
       return
     }
   } catch (_) {
@@ -113,7 +115,9 @@ const handleSendButtonClicked = async () => {
 onActivated(async () => {
   const postId = route.params.id
   if (!postId || Array.isArray(postId)) {
-    router.push('/404')
+    router.push({
+      name: '404'
+    })
   } else {
     const from = route.meta.from?.path
     if (!router.options.history.state.forward || from === '/' || !post.value) {

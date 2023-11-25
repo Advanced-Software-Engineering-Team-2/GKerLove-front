@@ -66,7 +66,9 @@ const fetchUserInfo = async (id: string) => {
     const res = await meetApi.getUserById(id)
     user.value = res.data.data.user
     if (!user.value) {
-      router.push('/404')
+      router.push({
+        name: '404'
+      })
       return
     }
   } catch (_) {
@@ -137,7 +139,9 @@ const onRefresh = async () => {
 onActivated(() => {
   const userId = route.params.id
   if (!userId || Array.isArray(userId)) {
-    router.push('/404')
+    router.push({
+      name: '404'
+    })
   } else {
     const from = route.meta.from?.path
     if (!router.options.history.state.forward || from === '/' || !user.value) {

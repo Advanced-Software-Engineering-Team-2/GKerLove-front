@@ -4,7 +4,7 @@ import { getToken } from '@/utils/auth'
 import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   // scrollBehavior(_to, _from, savedPosition) {
   //   console.log(savedPosition)
 

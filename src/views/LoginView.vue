@@ -22,7 +22,11 @@
           round
           block
           type="success"
-          @click="$router.push('/register')"
+          @click="
+            $router.push({
+              name: 'register'
+            })
+          "
           style="margin-left: 2rem"
         >
           注册

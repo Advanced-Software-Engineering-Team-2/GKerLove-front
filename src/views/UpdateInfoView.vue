@@ -194,7 +194,9 @@ const handleSubmitButtonClicked = async () => {
       institute: institute.value,
       introduction: introduction.value
     })
-    router.push('/home')
+    router.push({
+      name: 'home'
+    })
   } catch (_) {
     /* empty */
   }

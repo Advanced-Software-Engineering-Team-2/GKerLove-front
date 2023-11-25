@@ -9,6 +9,7 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: 'https://love.gkers.cqupt-gyr.xyz',
   plugins: [
     vue(),
     Components({
@@ -28,7 +29,7 @@ export default defineConfig({
   //   cors: true,
   //   proxy: {
   //     '/api': {
-  //       target: 'http://server.cqupt-gyr.xyz:30222',
+  //       target: 'https://back.love.gkers.cqupt-gyr.xyz:1111',
   //       changeOrigin: true,
   //       ws: true,
   //       rewrite: (path) => path.replace(/^\/api/, '')

@@ -92,7 +92,9 @@ const handleSubmitButtonClicked = async () => {
     content.value = ''
     imageList.value = []
     imageUrls = []
-    router.push('/home')
+    router.push({
+      name: 'home'
+    })
   } catch (_) {
     /* empty */
   }
