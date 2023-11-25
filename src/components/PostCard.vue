@@ -22,7 +22,14 @@
       <div class="content">{{ post.content }}</div>
 
       <div class="image-container">
-        <van-image v-for="image in post.imageList" :key="image" :src="image" lazy-load />
+        <van-image
+          class="image"
+          v-for="image in post.imageList"
+          :key="image"
+          :src="image"
+          lazy-load
+          @click="showImage(image)"
+        />
       </div>
 
       <div class="footer">评论数量: {{ post.commentCnt }}</div>
@@ -34,6 +41,7 @@
 import type { Post } from '@/types/Post'
 import moment from 'moment'
 import { computed, toRefs } from 'vue'
+import { showImagePreview } from 'vant'
 
 const props = withDefaults(
   defineProps<{
@@ -49,6 +57,10 @@ const { post, showUser, showDelete } = toRefs(props)
 const formattedTime = computed(() => {
   return moment(post.value.time).format('MM月DD日 HH:mm')
 })
+
+const showImage = (image: string) => {
+  showImagePreview({ images: [image], closeable: true, showIndex: false })
+}
 </script>
 
 <style scoped lang="scss">
@@ -57,10 +69,13 @@ const formattedTime = computed(() => {
     padding: 15px 0;
   }
   .image-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 15px;
+    // display: grid;
+    // grid-template-columns: 1fr 1fr;
+    // gap: 10px;
+    // margin-bottom: 15px;
+    .image {
+      width: 100%;
+    }
   }
 }
 

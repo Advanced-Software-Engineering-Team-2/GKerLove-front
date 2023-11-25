@@ -27,7 +27,7 @@
           <van-uploader
             v-model="imageList"
             :after-read="afterReadImage"
-            :max-count="4"
+            :max-count="1"
             :max-size="10 * 1024 * 1024"
           />
         </template>
