@@ -25,13 +25,19 @@
       </div>
       <van-empty v-else description="暂无动态" image-size="8rem" />
     </van-pull-refresh>
-    <chat-icon class="chat-icon" @click="handleChatClicked" />
-    <dislike-icon
-      v-if="user && userStore.likeUserIdList.includes(user.id)"
-      class="like-icon"
-      @click="handleDisLikeSomeone"
+    <chat-icon
+      class="chat-icon"
+      @click="handleChatClicked"
+      v-if="user && user.id !== userStore.id"
     />
-    <like-icon v-else class="like-icon" @click="handleLikeSomeone" />
+    <div v-if="user && user.id !== userStore.id">
+      <dislike-icon
+        v-if="user && userStore.likeUserIdList.includes(user.id)"
+        class="like-icon"
+        @click="handleDisLikeSomeone"
+      />
+      <like-icon v-else class="like-icon" @click="handleLikeSomeone" />
+    </div>
   </div>
 </template>
 

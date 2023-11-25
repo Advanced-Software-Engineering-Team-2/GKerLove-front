@@ -112,7 +112,7 @@ const router = createRouter({
     },
     {
       path: '/likedBy',
-      name: 'likeBy',
+      name: 'likedBy',
       component: () => import('@/views/LikedByView.vue'),
       meta: {
         title: '喜欢我的人'

@@ -10,7 +10,7 @@
           <div class="detail">
             <p>性别： {{ user.gender ? user.gender : '未填写' }}</p>
             <p>年龄： {{ user.age ? user.age : '未填写' }}</p>
-            <p>所在城市： {{ user.city }}</p>
+            <p>所在城市： {{ user.city ? user.city : '未填写' }}</p>
             <p>培养单位： {{ user.institute ? user.institute : '未填写' }}</p>
           </div>
         </div>
