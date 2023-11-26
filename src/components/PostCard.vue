@@ -18,8 +18,8 @@
       </template>
     </post-card-header>
 
-    <div class="body" @click="$emit('body-clicked')">
-      <div class="content">{{ post.content }}</div>
+    <div class="body">
+      <div class="content" @click="$emit('body-clicked')">{{ post.content }}</div>
 
       <div class="image-container">
         <van-image
@@ -59,7 +59,7 @@ const formattedTime = computed(() => {
 })
 
 const showImage = (image: string) => {
-  showImagePreview({ images: [image], closeable: true, showIndex: false })
+  showImagePreview({ images: [image] })
 }
 </script>
 
