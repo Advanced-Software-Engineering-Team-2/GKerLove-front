@@ -25,7 +25,7 @@
         </div>
       </div>
     </div>
-    <div class="footer">
+    <van-sticky position="bottom">
       <van-field
         v-model="comment"
         label="评论"
@@ -38,7 +38,7 @@
           <van-button size="small" type="primary" @click="handleSendButtonClicked">发送</van-button>
         </template>
       </van-field>
-    </div>
+    </van-sticky>
   </div>
 </template>
 
