@@ -2,13 +2,12 @@
   <back-nav-bar title="喜欢的人" />
   <loading-card v-if="loading" />
   <div class="likes-view" v-else>
-    <div class="likes-view-body">
-      <div class="user-list">
-        <user-list
-          :user-list="meetStore.likeUserList"
-          @item-clicked="(userId: string) => router.push(`user/${userId}`)"
-        />
-      </div>
+    <van-empty v-if="!meetStore.likeUserList.length" description="暂无喜欢的人" />
+    <div class="user-list">
+      <user-list
+        :user-list="meetStore.likeUserList"
+        @item-clicked="(userId: string) => router.push(`user/${userId}`)"
+      />
     </div>
   </div>
 </template>
