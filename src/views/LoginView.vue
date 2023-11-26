@@ -41,7 +41,6 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { showError } from '@/utils/show'
-import { TUICore, genTestUserSig } from '../TUIKit'
 
 const baseUrl = import.meta.env.VITE_API_URL
 

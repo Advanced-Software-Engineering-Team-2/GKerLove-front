@@ -32,6 +32,8 @@
         />
       </div>
 
+      <van-image-preview v-model:show="showPreview" :images="previewImages" :show-index="false" />
+
       <div class="footer">评论数量: {{ post.commentCnt }}</div>
     </div>
   </div>
@@ -40,8 +42,7 @@
 <script setup lang="ts">
 import type { Post } from '@/types/Post'
 import moment from 'moment'
-import { computed, toRefs } from 'vue'
-import { showImagePreview } from 'vant'
+import { computed, ref, toRefs } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -51,6 +52,8 @@ const props = withDefaults(
   }>(),
   { showUser: true, showDelete: false }
 )
+const showPreview = ref(false)
+const previewImages = ref<string[]>([])
 
 const { post, showUser, showDelete } = toRefs(props)
 
@@ -59,7 +62,8 @@ const formattedTime = computed(() => {
 })
 
 const showImage = (image: string) => {
-  showImagePreview({ images: [image] })
+  showPreview.value = true
+  previewImages.value = [image]
 }
 </script>
 
