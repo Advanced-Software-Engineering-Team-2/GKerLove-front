@@ -2,6 +2,7 @@
   <div class="post-view" ref="root">
     <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
       <van-list
+        class="post-list"
         v-model:loading="loading"
         v-model:error="error"
         :finished="hasFetchedAll"
@@ -72,4 +73,10 @@ const onRefresh = () => {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.post-view {
+  .post-list {
+    min-height: calc(100vh - var(--height-navbar) - var(--height-tabbar));
+  }
+}
+</style>

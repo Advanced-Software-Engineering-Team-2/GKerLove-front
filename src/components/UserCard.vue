@@ -4,7 +4,7 @@
     :style="{
       backgroundImage: `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6)), url(${user.avatar})`,
       backgroundPosition: 'center',
-      backgroundSize: 'cover',
+      backgroundSize: 'contain',
       backgroundRepeat: 'no-repeat'
     }"
   >
