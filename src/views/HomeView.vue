@@ -22,10 +22,10 @@
       <van-divider />
       <div class="row-3">
         <span @click="router.push({ name: 'likedBy' })"
-          >人气: {{ user.likedByUserIdList?.length ?? 0 }}</span
+          >人气: {{ meetStore.likedByUserList.length }}</span
         >
         <span @click="router.push({ name: 'likes' })"
-          >喜欢: {{ user.likeUserIdList?.length ?? 0 }}</span
+          >喜欢: {{ meetStore.likeUserList.length }}</span
         >
         <div class="button-box">
           <van-button
@@ -58,16 +58,16 @@
       <van-divider />
       <loading-card v-if="loading" />
       <div v-else>
-        <van-empty description="暂无动态" image-size="8rem" v-if="!user.posts.length" />
+        <van-empty description="暂无动态" image-size="8rem" v-if="!postStore.myPosts.length" />
         <div class="post-card-list" v-else>
-          <div class="post-card-container" v-for="post in user.posts" :key="post.id">
+          <div class="post-card-container" v-for="post in postStore.myPosts" :key="post.id">
             <post-card
               class="post-card"
               :post="post"
               :show-user="false"
               :show-delete="true"
-              @delete-button-clicked="user.deletePost(post.id)"
-              @body-clicked="router.push(`/post/${post.id}`)"
+              @delete-button-clicked="postStore.deletePost(post.id)"
+              @body-clicked="router.push(`/post/${post.id}?source=my`)"
             />
             <van-divider />
           </div>
@@ -85,8 +85,12 @@ import { showSuccess } from '@/utils/show'
 import { TUICore } from '../TUIKit'
 import { ref } from 'vue'
 import { usePreserveScroll } from '@/hooks/usePreserveScroll'
+import { usePostStore } from '@/stores/post'
+import { useMeetStore } from '@/stores/meet'
 
 const user = useUserStore()
+const postStore = usePostStore()
+const meetStore = useMeetStore()
 const root = ref<HTMLElement | undefined>()
 const loading = ref(true)
 
@@ -109,7 +113,7 @@ const handleLogoutButtonClicked = async () => {
 const fetchPosts = async () => {
   try {
     loading.value = true
-    await user.fetchPosts()
+    await postStore.fetchMyPosts()
   } catch (_) {
     /* empty */
   } finally {

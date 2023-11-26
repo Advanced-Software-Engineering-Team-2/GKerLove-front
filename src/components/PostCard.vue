@@ -34,7 +34,7 @@
 
       <van-image-preview v-model:show="showPreview" :images="previewImages" :show-index="false" />
 
-      <div class="footer">评论数量: {{ post.commentCnt }}</div>
+      <div class="footer" @click="$emit('body-clicked')">评论数量: {{ post.commentCnt }}</div>
     </div>
   </div>
 </template>
@@ -73,10 +73,6 @@ const showImage = (image: string) => {
     padding: 15px 0;
   }
   .image-container {
-    // display: grid;
-    // grid-template-columns: 1fr 1fr;
-    // gap: 10px;
-    // margin-bottom: 15px;
     .image {
       width: 100%;
     }

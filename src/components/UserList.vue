@@ -6,7 +6,7 @@
       :key="user.id"
       @click="$emit('item-clicked', user.id)"
     >
-      <van-space>
+      <van-space size="2rem">
         <van-image class="avatar" round :src="user.avatar" lazy-load />
         <span class="username">{{ user.username }}</span>
       </van-space>

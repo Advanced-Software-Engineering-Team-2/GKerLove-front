@@ -1,13 +1,7 @@
 <!-- 完善信息页面，允许用户不填任何信息 -->
 <template>
+  <back-nav-bar title="完善信息" />
   <div class="update-info">
-    <van-nav-bar
-      title="完善信息"
-      left-arrow
-      @click-left="onClickBack"
-      :border="false"
-      safe-area-inset-top
-    />
     <van-form>
       <van-cell-group inset>
         <van-field label="头像" placeholder="头像" center>
@@ -200,10 +194,6 @@ const handleSubmitButtonClicked = async () => {
   } catch (_) {
     /* empty */
   }
-}
-
-const onClickBack = () => {
-  router.back()
 }
 </script>
 

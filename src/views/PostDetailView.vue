@@ -1,11 +1,5 @@
 <template>
-  <van-nav-bar
-    left-arrow
-    title="动态详情"
-    @click-left="router.back()"
-    :border="false"
-    safe-area-inset-top
-  />
+  <back-nav-bar title="动态详情" />
   <loading-card v-if="loading" />
   <div class="post-detail-view" v-else>
     <div class="body">
@@ -54,12 +48,13 @@ import type { Post } from '@/types/Post'
 import { ref, onActivated, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { showError, showSuccess } from '@/utils/show'
-import postApi from '@/api/post'
+import { showError } from '@/utils/show'
 import { onBeforeRouteLeave } from 'vue-router'
+import { usePostStore } from '@/stores/post'
 
 const router = useRouter()
 const route = useRoute()
+const postStore = usePostStore()
 
 const post = ref<Post>()
 const comment = ref('')
@@ -68,25 +63,15 @@ const commentLoading = ref(false)
 
 const scrollHeightStack: number[] = []
 
-const fetchPostDetail = async (id: string) => {
+const fetchPostDetail = async (id: string, from: string | null) => {
   try {
-    const res = await postApi.getPostById(id)
-    post.value = res.data.data.post
+    post.value = await postStore.fetchPostDetail(id, from)
     if (!post.value) {
       router.push({
         name: '404'
       })
       return
     }
-  } catch (_) {
-    /* empty */
-  }
-}
-
-const commentOnPost = async (id: string, content: string) => {
-  try {
-    const res = await postApi.commentOnPost(id, content)
-    showSuccess(res.data.message)
   } catch (_) {
     /* empty */
   }
@@ -99,11 +84,10 @@ const handleSendButtonClicked = async () => {
   }
   if (!post.value) return
   try {
-    commentLoading.value = true
-    await commentOnPost(post.value.id, comment.value)
+    const postedComment = await postStore.commentOnPost(post.value.id, comment.value)
     comment.value = ''
-    await fetchPostDetail(post.value.id)
-    commentLoading.value = false
+    post.value.commentList.push(postedComment)
+    post.value.commentCnt++
     nextTick(() => {
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
     })
@@ -114,6 +98,7 @@ const handleSendButtonClicked = async () => {
 
 onActivated(async () => {
   const postId = route.params.id
+  let source = route.query.source
   if (!postId || Array.isArray(postId)) {
     router.push({
       name: '404'
@@ -122,7 +107,10 @@ onActivated(async () => {
     const from = route.meta.from?.path
     if (!router.options.history.state.forward || from === '/' || !post.value) {
       loading.value = true
-      await fetchPostDetail(postId)
+      if (Array.isArray(source)) {
+        source = source[0]
+      }
+      await fetchPostDetail(postId, source)
       loading.value = false
     } else {
       nextTick(() => {

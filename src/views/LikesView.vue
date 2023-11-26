@@ -1,17 +1,11 @@
 <template>
-  <van-nav-bar
-    left-arrow
-    title="喜欢的人"
-    @click-left="router.back()"
-    :border="false"
-    safe-area-inset-top
-  />
-  <van-loading v-if="loading" />
+  <back-nav-bar title="喜欢的人" />
+  <loading-card v-if="loading" />
   <div class="likes-view" v-else>
     <div class="likes-view-body">
       <div class="user-list">
         <user-list
-          :user-list="users"
+          :user-list="meetStore.likeUserList"
           @item-clicked="(userId: string) => router.push(`user/${userId}`)"
         />
       </div>
@@ -20,19 +14,16 @@
 </template>
 
 <script setup lang="ts">
-import { User } from '@/types/User'
-
 import { ref } from 'vue'
 
-import meetApi from '@/api/meet'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { onActivated } from 'vue'
 import { useRoute } from 'vue-router'
+import { useMeetStore } from '@/stores/meet'
 
 const router = useRouter()
 const route = useRoute()
-
-const users = ref<User[]>([])
+const meetStore = useMeetStore()
 
 const loading = ref(false)
 
@@ -41,8 +32,7 @@ const scrollHeightStack: number[] = []
 const fetchUsers = async () => {
   try {
     loading.value = true
-    const res = await meetApi.getMyLikes()
-    users.value = res.data.data.likes
+    await meetStore.getLikeUserList()
   } catch (_) {
     /* empty */
   } finally {

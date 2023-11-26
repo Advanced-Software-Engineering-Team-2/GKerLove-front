@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 import type { R } from '@/types/R'
-import type { Post } from '@/types/Post'
+import type { Post, Comment } from '@/types/Post'
 import type { Page } from '@/types/Page'
 
 function addPost(content: string, imageList: string[]) {
@@ -32,7 +32,7 @@ function getPostById(postId: string) {
 }
 
 function commentOnPost(postId: string, content: string) {
-  return request.post<R>(`/post/comment/${postId}`, {
+  return request.post<R<{ comment: Comment }>>(`/post/comment/${postId}`, {
     content
   })
 }

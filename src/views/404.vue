@@ -1,13 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
+  <back-nav-bar title="404" />
   <div class="not-found">
-    <van-nav-bar
-      left-arrow
-      @click-left="router.back()"
-      title="404"
-      :border="false"
-      safe-area-inset-top
-    />
     <div class="wrapper">
       <h1>页面不存在</h1>
     </div>
@@ -15,9 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeRouteLeave, useRouter } from 'vue-router'
-
-const router = useRouter()
+import { onBeforeRouteLeave } from 'vue-router'
 
 onBeforeRouteLeave((to, _, next) => {
   if (to.name === 'postDetail') {

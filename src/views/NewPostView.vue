@@ -1,44 +1,38 @@
 <!-- 发布动态页面 -->
 <template>
+  <back-nav-bar title="发布动态" />
   <div class="new-post">
-    <van-nav-bar
-      title="发布动态"
-      left-arrow
-      @click-left="onClickBack"
-      :border="false"
-      safe-area-inset-top
-    />
+    <van-form>
+      <van-cell-group inset>
+        <van-field
+          v-model="content"
+          rows="10"
+          autosize
+          label="内容"
+          type="textarea"
+          maxlength="200"
+          placeholder="和大家交流一下想法和感受吧..."
+          show-word-limit
+          center
+        />
+        <van-field label="图片" placeholder="图片" center>
+          <template #input>
+            <van-uploader
+              v-model="imageList"
+              :after-read="afterReadImage"
+              :max-count="1"
+              :max-size="10 * 1024 * 1024"
+            />
+          </template>
+        </van-field>
+      </van-cell-group>
+      <div style="margin: 16px">
+        <van-button color="blue" round block type="primary" @click="handleSubmitButtonClicked">
+          发布
+        </van-button>
+      </div>
+    </van-form>
   </div>
-  <van-form>
-    <van-cell-group inset>
-      <van-field
-        v-model="content"
-        rows="10"
-        autosize
-        label="内容"
-        type="textarea"
-        maxlength="200"
-        placeholder="和大家交流一下想法和感受吧..."
-        show-word-limit
-        center
-      />
-      <van-field label="图片" placeholder="图片" center>
-        <template #input>
-          <van-uploader
-            v-model="imageList"
-            :after-read="afterReadImage"
-            :max-count="1"
-            :max-size="10 * 1024 * 1024"
-          />
-        </template>
-      </van-field>
-    </van-cell-group>
-    <div style="margin: 16px">
-      <van-button color="blue" round block type="primary" @click="handleSubmitButtonClicked">
-        发布
-      </van-button>
-    </div>
-  </van-form>
 </template>
 
 <script setup lang="ts">
@@ -48,17 +42,15 @@ import { UploaderFileListItem } from 'vant'
 import { v4 as uuidv4 } from 'uuid'
 
 import { useUserStore } from '@/stores/user'
+import { usePostStore } from '@/stores/post'
 
 const router = useRouter()
 const user = useUserStore()
+const postStore = usePostStore()
 
 const content = ref('')
 const imageList = ref([])
 let imageUrls: string[] = []
-
-const onClickBack = () => {
-  router.back()
-}
 
 const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem[]) => {
   if (!Array.isArray(files)) {
@@ -88,7 +80,7 @@ const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem
 
 const handleSubmitButtonClicked = async () => {
   try {
-    await user.addPost(content.value, imageUrls)
+    await postStore.addPost(content.value, imageUrls)
     content.value = ''
     imageList.value = []
     imageUrls = []

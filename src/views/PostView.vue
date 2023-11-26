@@ -5,15 +5,15 @@
         class="post-list"
         v-model:loading="loading"
         v-model:error="error"
-        :finished="hasFetchedAll"
+        :finished="postStore.hasFetchedAll"
         finished-text="没有更多了"
         error-text="请求失败，请重试"
         @load="onLoad"
       >
-        <div class="post-card-container" v-for="post in posts" :key="post.id">
+        <div class="post-card-container" v-for="post in postStore.posts" :key="post.id">
           <post-card
             :post="post"
-            @body-clicked="router.push(`/post/${post.id}`)"
+            @body-clicked="router.push(`/post/${post.id}?source=posts`)"
             @avatar-clicked="router.push(`/user/${post.user.id}`)"
           />
           <van-divider />
@@ -25,37 +25,25 @@
 </template>
 
 <script setup lang="ts">
-import { Post } from '@/types/Post'
-
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import postApi from '@/api/post'
-
 import { usePreserveScroll } from '@/hooks/usePreserveScroll'
+import { usePostStore } from '@/stores/post'
 
 const root = ref<HTMLElement | undefined>()
 usePreserveScroll(root, 'post')
 
 const router = useRouter()
-const posts = ref<Post[]>([])
+const postStore = usePostStore()
 
 const loading = ref(false)
 const error = ref(false)
 const refreshing = ref(false)
 
-const pageSize = 10
-const page = ref(1)
-const hasFetchedAll = ref(false)
-
 const onLoad = async () => {
   try {
-    const res = await postApi.retrievePosts(page.value)
-    const newPosts = res.data.data.posts.content
-    if (page.value === 1) posts.value = newPosts
-    else posts.value.push(...newPosts)
-    hasFetchedAll.value = res.data.data.posts.total <= pageSize * page.value
-    page.value++
+    await postStore.fetchPosts()
   } catch (_) {
     error.value = true
   } finally {
@@ -65,8 +53,7 @@ const onLoad = async () => {
 }
 
 const onRefresh = () => {
-  page.value = 1
-  hasFetchedAll.value = false
+  postStore.clearPosts()
   error.value = false
   loading.value = true
   onLoad()

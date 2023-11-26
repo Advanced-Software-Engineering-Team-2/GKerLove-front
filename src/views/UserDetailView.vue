@@ -1,30 +1,22 @@
 <template>
-  <van-nav-bar
-    left-arrow
-    title="用户详情"
-    @click-left="router.back()"
-    :border="false"
-    safe-area-inset-top
-  />
+  <back-nav-bar title="用户详情" />
   <loading-card v-if="loading" />
   <div class="user-detail-view" v-else>
     <!-- only show user info when user is not null -->
     <user-card :user="user" v-if="user" />
     <van-divider />
     <loading-card v-if="postLoading" />
-    <van-pull-refresh @refresh="onRefresh" v-else>
-      <div class="posts" v-if="posts.length">
-        <div class="post-container" v-for="post in posts" :key="post.id">
-          <post-card
-            :post="post"
-            :show-user="false"
-            @body-clicked="router.push(`/post/${post.id}`)"
-          />
-          <van-divider />
-        </div>
+    <div class="posts" v-if="user && postStore.userPosts.get(user.id)?.length">
+      <div class="post-container" v-for="post in postStore.userPosts.get(user.id)" :key="post.id">
+        <post-card
+          :post="post"
+          :show-user="false"
+          @body-clicked="router.push(`/post/${post.id}?source=${user.id}`)"
+        />
+        <van-divider />
       </div>
-      <van-empty v-else description="暂无动态" image-size="8rem" />
-    </van-pull-refresh>
+    </div>
+    <van-empty v-else description="暂无动态" image-size="8rem" />
     <chat-icon
       class="chat-icon"
       @click="handleChatClicked"
@@ -32,7 +24,7 @@
     />
     <div v-if="user && user.id !== userStore.id">
       <dislike-icon
-        v-if="user && userStore.likeUserIdList.includes(user.id)"
+        v-if="user && meetStore.likeUserList.some((u) => u.id === user!.id)"
         class="like-icon"
         @click="handleDisLikeSomeone"
       />
@@ -43,24 +35,24 @@
 
 <script setup lang="ts">
 import type { User } from '@/types/User'
-import type { Post } from '@/types/Post'
 
 import { nextTick, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import postApi from '@/api/post'
 import meetApi from '@/api/meet'
 import { onActivated } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
-import { showSuccess } from '@/utils/show'
 import { useUserStore } from '@/stores/user'
+import { usePostStore } from '@/stores/post'
+import { useMeetStore } from '@/stores/meet'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const postStore = usePostStore()
+const meetStore = useMeetStore()
 
 const user = ref<User>()
-const posts = ref<Post[]>([])
 const loading = ref(false)
 const postLoading = ref(false)
 
@@ -87,8 +79,7 @@ const fetchUserInfo = async (id: string) => {
 const fetchUserPosts = async (id: string) => {
   postLoading.value = true
   try {
-    const res = await postApi.getUserPosts(id)
-    posts.value = res.data.data.posts.content
+    await postStore.fetchUserPosts(id)
   } catch (_) {
     /* empty */
   } finally {
@@ -106,39 +97,20 @@ const handleChatClicked = () => {
 }
 
 const handleLikeSomeone = async () => {
-  if (!user.value?.id) return
+  if (!user.value) return
   try {
-    const res = await meetApi.likeSomeone(user.value?.id!)
-    if (!userStore.likeUserIdList.includes(user.value.id)) {
-      userStore.likeUserIdList.push(user.value.id)
-    }
-    showSuccess(res.data.message)
+    await meetStore.likeSomeone(user.value)
   } catch (_) {
     /* empty */
   }
 }
 
 const handleDisLikeSomeone = async () => {
-  if (!user.value?.id) return
-  try {
-    const res = await meetApi.dislikeSomeone(user.value.id!)
-    if (userStore.likeUserIdList.includes(user.value.id!)) {
-      userStore.likeUserIdList.splice(userStore.likeUserIdList.indexOf(user.value.id), 1)
-    }
-    showSuccess(res.data.message)
-  } catch (_) {
-    /* empty */
-  }
-}
-
-const onRefresh = async () => {
   if (!user.value) return
   try {
-    await fetchUserPosts(user.value.id)
+    await meetStore.unlikeSomeone(user.value)
   } catch (_) {
     /* empty */
-  } finally {
-    loading.value = false
   }
 }
 
