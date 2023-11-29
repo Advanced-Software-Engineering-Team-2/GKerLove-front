@@ -135,6 +135,14 @@ const router = createRouter({
       }
     },
     {
+      path: '/chat/:id',
+      name: 'chat',
+      component: () => import('@/views/ChatView.vue'),
+      meta: {
+        title: '聊天'
+      }
+    },
+    {
       path: '/:pathMatch(.*)',
       redirect: '/404'
     }

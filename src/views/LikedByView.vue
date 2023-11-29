@@ -3,12 +3,11 @@
   <loading-card v-if="loading" />
   <div class="liked-by-view" v-else>
     <van-empty v-if="!meetStore.likeUserList.length" description="暂无喜欢我的人" />
-    <div class="user-list" v-else>
-      <user-list
-        :user-list="meetStore.likedByUserList"
-        @item-clicked="(userId: string) => router.push(`user/${userId}`)"
-      />
-    </div>
+    <user-list
+      v-else
+      :user-list="meetStore.likedByUserList"
+      @item-clicked="(userId: string) => router.push(`user/${userId}`)"
+    />
   </div>
 </template>
 

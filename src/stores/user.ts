@@ -8,6 +8,7 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 import userApi from '@/api/user'
 import { showSuccess, showError } from '@/utils/show'
 import { useMeetStore } from './meet'
+import { useMessageStore } from './message'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref(getToken())
@@ -40,8 +41,11 @@ export const useUserStore = defineStore('user', () => {
         OSSUtil.value = await createOSSUtil()
       }
       const meetStore = useMeetStore()
-      meetStore.getLikeUserList()
-      meetStore.getLikedByUserList()
+      await meetStore.getLikeUserList()
+      await meetStore.getLikedByUserList()
+      const messageStore = useMessageStore()
+      await messageStore.initSessions()
+      messageStore.connectChatServer(token.value)
     } catch (_) {
       showError('初始化用户失败')
     }
