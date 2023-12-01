@@ -1,4 +1,4 @@
-import { UserInfo } from '@/types/User'
+import { User, UserInfo } from '@/types/User'
 
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
@@ -22,6 +22,7 @@ export const useUserStore = defineStore('user', () => {
   const institute = ref<string>()
   const introduction = ref<string>()
   const OSSUtil = ref<OSS | null>(null)
+  const me = ref<User>()
 
   async function initUser() {
     if (!token.value) return null
@@ -40,6 +41,7 @@ export const useUserStore = defineStore('user', () => {
       if (OSSUtil.value === null) {
         OSSUtil.value = await createOSSUtil()
       }
+      me.value = user
       const meetStore = useMeetStore()
       await meetStore.getLikeUserList()
       await meetStore.getLikedByUserList()
@@ -90,11 +92,13 @@ export const useUserStore = defineStore('user', () => {
     institute.value = undefined
     introduction.value = undefined
     OSSUtil.value = null
+    me.value = undefined
     removeToken()
   }
 
   return {
     token,
+    me,
     id,
     username,
     email,

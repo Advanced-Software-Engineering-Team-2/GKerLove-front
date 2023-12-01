@@ -3,7 +3,7 @@
     <p v-if="showTime" class="timestamp">{{ message.timestamp }}</p>
     <div class="content" :class="author.id === user.id ? 'sent' : 'received'">
       <div class="user-avatar">
-        <van-image :src="author.avatar" round />
+        <van-image :src="author.avatar" round width="3rem" height="3rem" />
       </div>
       <TextMessage v-if="message.type === 'text'" :message="message" />
       <ImageMessage v-else-if="message.type === 'image'" :message="message" />

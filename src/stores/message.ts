@@ -1,16 +1,68 @@
 import { Session } from '@/types/Session'
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import socket from '@/socket'
 import messageApi from '@/api/message'
-import { SockeIoMessage } from '@/types/socket.io'
+import meetApi from '@/api/meet'
+import { showError } from '@/utils/show'
+import { useRouter } from 'vue-router'
+import { Message } from '@/types/Message'
 
 export const useMessageStore = defineStore('message', () => {
   const sessions = ref<Session[]>([])
-  const sortedSessions = computed(() =>
-    sessions.value.sort((a, b) => b.lastUpdated.getTime() - a.lastUpdated.getTime())
-  )
 
+  // 连接私信服务器
+  function connectChatServer(token: string) {
+    socket.auth = { token }
+    socket.connect()
+  }
+
+  // 绑定事件
+  function bindEvents() {
+    // 连接私信服务器成功
+    socket.on('connect', () => {
+      console.log('Connected to chat server')
+    })
+
+    // 收到私信
+    socket.on('privateMessage', async (payload) => {
+      const session = fetchSession(payload.sessionId)
+      // 如果会话已存在，将消息添加到会话中
+      if (session) {
+        session.messages.push(payload.message)
+      } else {
+        // 否则，说明是一个新会话
+        // 获取会话对方信息
+        const senderId = payload.message.senderId
+        try {
+          const res = await meetApi.getUserById(senderId)
+          const peer = res.data.data.user
+          if (!peer) return
+          // 创建会话
+          const session: Session = {
+            id: payload.sessionId,
+            peer,
+            messages: [payload.message]
+          }
+          // 加入sessions前，二次校验
+          if (sessions.value.findIndex((s) => s.id === session.id) !== -1) {
+            sessions.value.push(session)
+          }
+        } catch (error) {
+          /* empty */
+        }
+      }
+    })
+
+    // 处理连接错误
+    socket.on('connect_error', (error) => {
+      showError(error.message)
+      const router = useRouter()
+      router.push('/login')
+    })
+  }
+
+  // 获取聊天会话列表
   async function initSessions() {
     try {
       const res = await messageApi.getSessions()
@@ -21,38 +73,37 @@ export const useMessageStore = defineStore('message', () => {
     }
   }
 
+  // 创建聊天会话
   async function createSession(recipientId: string) {
     try {
-      const res = await messageApi.createSession(recipientId)
-      sessions.value.push(res.data.data.session)
-      return fetchSession(recipientId)
+      const res = await meetApi.getUserById(recipientId)
+      const peer = res.data.data.user
+      if (!peer) {
+        return Promise.reject('聊天用户不存在')
+      }
+      const session: Session = {
+        id: '',
+        peer,
+        messages: []
+      }
+      sessions.value.push(session)
+      return fetchSession(session.id)
     } catch (error) {
       return Promise.reject(error)
     }
   }
 
-  function fetchSession(recipientId: string) {
-    return sessions.value.find((session) => session.recipient.id === recipientId)
+  function fetchSession(sessionId: string) {
+    return sessions.value.find((session) => session.id === sessionId)
   }
 
-  function bindEvents() {
-    socket.on('connect', () => {
-      console.log('connected to chat server')
-    })
-
-    socket.on('privateMessage', (message) => {
-      addMessageToSession(message)
-    })
-  }
-
-  function connectChatServer(token: string) {
-    socket.auth = { token }
-    socket.connect()
-  }
-
-  function sendMessage(content: string, to: string, type: 'text' | 'image') {
-    socket.emit('privateMessage', content, to, type, (message) => {
-      addMessageToSession(message)
+  function sendMessage(session: Session, message: Message) {
+    socket.emit('privateMessage', message, (res) => {
+      if (!session.id) {
+        session.id = res.sessionId
+        sessions.value.push(session)
+      }
+      session.messages.push(res.message)
     })
   }
 
@@ -60,29 +111,8 @@ export const useMessageStore = defineStore('message', () => {
     socket.emit('readMessages', sessionId)
   }
 
-  function addMessageToSession(message: SockeIoMessage) {
-    const session = sessions.value.find(
-      (session) =>
-        (session.initiator.id === message.sender_id &&
-          session.recipient.id === message.recipient_id) ||
-        (session.initiator.id === message.recipient_id &&
-          session.recipient.id === message.sender_id)
-    )
-
-    if (session) {
-      session.messages.push({
-        id: message.id,
-        timestamp: message.timestamp,
-        type: message.type,
-        senderId: message.sender_id,
-        recipientId: message.recipient_id,
-        content: message.content
-      })
-    }
-  }
-
   return {
-    sortedSessions,
+    sessions,
     initSessions,
     fetchSession,
     createSession,

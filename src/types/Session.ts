@@ -3,10 +3,8 @@ import { User } from './User'
 
 export interface Session {
   id: string
-  initiator: User
-  recipient: User
-  lastUpdated: Date
-  initiatorLastRead?: Date
-  recipientLastRead?: Date
+  peer: User
   messages: Message[]
+  lastRead?: Date
+  peerLastRead?: Date
 }

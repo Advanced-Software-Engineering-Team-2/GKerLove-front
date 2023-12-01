@@ -5,7 +5,7 @@
       v-for="message in session.messages"
       :key="message.id"
       :message="message"
-      :author="message.senderId === session.initiator.id ? session.initiator : session.recipient"
+      :author="message.senderId === session.peer.id ? session.peer : me"
     />
 
     <van-field
@@ -24,28 +24,43 @@
 import { useMessageStore } from '@/stores/message'
 import { useUserStore } from '@/stores/user'
 import { Session } from '@/types/Session'
-import { User } from '@/types/User'
+import { showError } from '@/utils/show'
+import type { Message } from '@/types/Message'
 import { onActivated, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router'
+import { User } from '@/types/User'
 
+const userStore = useUserStore()
 const messageStore = useMessageStore()
-const me = useUserStore()
 const route = useRoute()
 const router = useRouter()
 
 const session = ref<Session>()
-
-let targetUser: User | undefined = undefined
-
 const content = ref('')
+const me = userStore.me as User
 
 const handleSendButtonClicked = () => {
-  if (!targetUser) return
+  if (!session.value) {
+    showError('会话不存在')
+    return
+  }
+  if (!me) {
+    showError('未登录')
+    return
+  }
   if (content.value.trim() === '') {
     return
   }
-  messageStore.sendMessage(content.value, targetUser.id, 'text')
+  const message: Message = {
+    id: '',
+    content: content.value,
+    senderId: me.id,
+    recipientId: session.value.peer.id,
+    type: 'text',
+    timestamp: new Date()
+  }
+  messageStore.sendMessage(session.value, message)
   content.value = ''
 }
 
@@ -56,23 +71,13 @@ onActivated(async () => {
       name: '404'
     })
   } else {
-    let s = messageStore.fetchSession(recipientId)
+    const s = messageStore.sessions.find((s) => s.peer.id === recipientId)
     if (s) {
       session.value = s
-      targetUser =
-        session.value.recipient.id === me.id ? session.value.initiator : session.value.recipient
     } else {
       try {
-        let s = await messageStore.createSession(recipientId)
-        if (!s) {
-          router.push({
-            name: '404'
-          })
-          return
-        }
+        const s = await messageStore.createSession(recipientId)
         session.value = s
-        targetUser =
-          session.value.recipient.id === me.id ? session.value.initiator : session.value.recipient
       } catch (_) {
         router.push({
           name: '404'
