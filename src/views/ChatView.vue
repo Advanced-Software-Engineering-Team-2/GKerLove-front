@@ -6,7 +6,13 @@
           <div class="user">
             <van-row>
               <van-col span="4" style="display: flex">
-                <van-image round :src="session.peer.avatar" class="avatar" />
+                <van-badge
+                  :content="messageStore.countUnreadMessages(session)"
+                  max="99"
+                  :show-zero="false"
+                >
+                  <van-image round :src="session.peer.avatar" class="avatar" />
+                </van-badge>
               </van-col>
               <van-col span="20" style="display: flex">
                 <div class="info" style="width: 100%">
@@ -47,15 +53,9 @@ const formatTime = (timestamp: string) => {
     height: 100%;
     overflow-y: auto;
     li {
-      margin-bottom: 20px;
-      &:last-child {
-        margin-bottom: 0;
-      }
+      margin-top: 20px;
     }
     .user {
-      &:last-child {
-        margin-bottom: 0;
-      }
       .avatar {
         width: 50px;
         height: 50px;

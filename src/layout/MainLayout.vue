@@ -14,6 +14,8 @@
         name="message"
         to="/message"
         :icon="active === 'message' ? 'chat' : 'chat-o'"
+        :badge="messageStore.totalUnread"
+        :badge-props="{ showZero: false }"
       />
       <van-tabbar-item name="post" to="/post" :icon="active === 'post' ? 'friends' : 'friends-o'" />
       <van-tabbar-item name="home" to="/home" :icon="active === 'home' ? 'user' : 'user-o'" />
@@ -25,6 +27,7 @@
 import { useRoute } from 'vue-router'
 import NavBar from '@/shared/components/NavBar.vue'
 import { computed } from 'vue'
+import { useMessageStore } from '@/stores/message'
 
 const route = useRoute()
 const active = computed(() => route.name)
@@ -42,6 +45,7 @@ const title = computed(() => {
       return '导航'
   }
 })
+const messageStore = useMessageStore()
 </script>
 
 <style scoped lang="scss">

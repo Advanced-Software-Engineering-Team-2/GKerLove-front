@@ -30,6 +30,7 @@ import { onActivated, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router'
 import { User } from '@/types/User'
+import { onBeforeRouteLeave } from 'vue-router'
 
 const userStore = useUserStore()
 const messageStore = useMessageStore()
@@ -58,7 +59,7 @@ const handleSendButtonClicked = () => {
     senderId: me.id,
     recipientId: session.value.peer.id,
     type: 'text',
-    timestamp: new Date()
+    timestamp: new Date().toISOString()
   }
   messageStore.sendMessage(session.value, message)
   content.value = ''
@@ -84,6 +85,12 @@ onActivated(async () => {
         })
       }
     }
+  }
+})
+
+onBeforeRouteLeave(() => {
+  if (session.value) {
+    messageStore.readMessages(session.value)
   }
 })
 </script>

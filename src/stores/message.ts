@@ -7,6 +7,7 @@ import meetApi from '@/api/meet'
 import { showError } from '@/utils/show'
 import { useRouter } from 'vue-router'
 import { Message } from '@/types/Message'
+import moment from 'moment'
 
 export const useMessageStore = defineStore('message', () => {
   const sessions = ref<Session[]>([])
@@ -17,6 +18,14 @@ export const useMessageStore = defineStore('message', () => {
         new Date(a.messages.slice(-1)[0].timestamp).getTime()
       )
     })
+  })
+  const totalUnread = computed(() => {
+    return sessions.value.reduce((count, session) => {
+      const unreadInSession = session.messages.filter((message) =>
+        moment(message.timestamp).isAfter(moment(session.lastRead))
+      )
+      return count + unreadInSession.length
+    }, 0)
   })
 
   // 连接私信服务器
@@ -115,19 +124,32 @@ export const useMessageStore = defineStore('message', () => {
     })
   }
 
-  function readMessages(sessionId: string) {
-    socket.emit('readMessages', sessionId)
+  function readMessages(session: Session) {
+    socket.emit('readMessages', session.id)
+    session.lastRead = new Date().toISOString()
+  }
+
+  function countUnreadMessages(session: Session) {
+    const lastRead = session.lastRead
+    if (!lastRead) return session.messages.length
+    const lastReadTime = moment(lastRead)
+    const unreadMessages = session.messages.filter((message) =>
+      moment(message.timestamp).isAfter(lastReadTime)
+    )
+    return unreadMessages.length
   }
 
   return {
     sessions,
     sortedSessions,
+    totalUnread,
     initSessions,
     fetchSession,
     createSession,
     bindEvents,
     connectChatServer,
     sendMessage,
-    readMessages
+    readMessages,
+    countUnreadMessages
   }
 })
