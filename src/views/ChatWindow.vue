@@ -1,5 +1,8 @@
 <template>
-  <back-nav-bar title="聊天" />
+  <van-sticky>
+    <back-nav-bar title="聊天" />
+  </van-sticky>
+
   <div class="chat-view" v-if="session">
     <Message
       v-for="message in session.messages"
@@ -8,15 +11,13 @@
       :author="message.senderId === session.peer.id ? session.peer : me"
     />
 
-    <van-field
-      v-model="content"
-      label="消息"
-      type="textarea"
-      maxlength="50"
-      placeholder="输入消息..."
-      show-word-limit
-    />
-    <van-button size="small" type="primary" @click="handleSendButtonClicked">发送</van-button>
+    <van-sticky position="bottom">
+      <van-field v-model="content" type="textarea" maxlength="50" show-word-limit>
+        <template #button>
+          <van-button size="small" type="primary" @click="handleSendButtonClicked">发送</van-button>
+        </template>
+      </van-field>
+    </van-sticky>
   </div>
 </template>
 
@@ -26,7 +27,7 @@ import { useUserStore } from '@/stores/user'
 import { Session } from '@/types/Session'
 import { showError } from '@/utils/show'
 import type { Message } from '@/types/Message'
-import { onActivated, ref } from 'vue'
+import { nextTick, onActivated, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router'
 import { User } from '@/types/User'
@@ -41,7 +42,7 @@ const session = ref<Session>()
 const content = ref('')
 const me = userStore.me as User
 
-const handleSendButtonClicked = () => {
+const handleSendButtonClicked = async () => {
   if (!session.value) {
     showError('会话不存在')
     return
@@ -61,8 +62,11 @@ const handleSendButtonClicked = () => {
     type: 'text',
     timestamp: new Date().toISOString()
   }
-  messageStore.sendMessage(session.value, message)
+  await messageStore.sendMessage(session.value, message)
   content.value = ''
+  nextTick(() => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+  })
 }
 
 onActivated(async () => {

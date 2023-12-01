@@ -1,5 +1,7 @@
 <template>
-  <back-nav-bar title="动态详情" />
+  <van-sticky>
+    <back-nav-bar title="动态详情" />
+  </van-sticky>
   <loading-card v-if="loading" />
   <div class="post-detail-view" v-else>
     <div class="body">

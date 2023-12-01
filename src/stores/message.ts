@@ -115,12 +115,15 @@ export const useMessageStore = defineStore('message', () => {
   }
 
   function sendMessage(session: Session, message: Message) {
-    socket.emit('privateMessage', message, (res) => {
-      if (!session.id) {
-        session.id = res.sessionId
-        sessions.value.push(session)
-      }
-      session.messages.push(res.message)
+    return new Promise((resolve) => {
+      socket.emit('privateMessage', message, (res) => {
+        if (!session.id) {
+          session.id = res.sessionId
+          sessions.value.push(session)
+        }
+        session.messages.push(res.message)
+        resolve(res)
+      })
     })
   }
 
