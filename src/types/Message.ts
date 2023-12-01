@@ -1,6 +1,6 @@
 export interface Message {
   id: string
-  timestamp: Date
+  timestamp: string
   type: 'text' | 'image'
   senderId: string
   recipientId: string

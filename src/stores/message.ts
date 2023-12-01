@@ -1,6 +1,6 @@
 import { Session } from '@/types/Session'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import socket from '@/socket'
 import messageApi from '@/api/message'
 import meetApi from '@/api/meet'
@@ -10,6 +10,14 @@ import { Message } from '@/types/Message'
 
 export const useMessageStore = defineStore('message', () => {
   const sessions = ref<Session[]>([])
+  const sortedSessions = computed(() => {
+    return sessions.value.sort((a, b) => {
+      return (
+        new Date(b.messages.slice(-1)[0].timestamp).getTime() -
+        new Date(a.messages.slice(-1)[0].timestamp).getTime()
+      )
+    })
+  })
 
   // 连接私信服务器
   function connectChatServer(token: string) {
@@ -45,7 +53,7 @@ export const useMessageStore = defineStore('message', () => {
             messages: [payload.message]
           }
           // 加入sessions前，二次校验
-          if (sessions.value.findIndex((s) => s.id === session.id) !== -1) {
+          if (sessions.value.findIndex((s) => s.id === session.id) === -1) {
             sessions.value.push(session)
           }
         } catch (error) {
@@ -113,6 +121,7 @@ export const useMessageStore = defineStore('message', () => {
 
   return {
     sessions,
+    sortedSessions,
     initSessions,
     fetchSession,
     createSession,

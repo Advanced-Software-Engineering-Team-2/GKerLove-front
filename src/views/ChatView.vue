@@ -1,7 +1,7 @@
 <template>
   <div class="chat-view">
     <ul class="user-list">
-      <li v-for="session in sessions" :key="session.id">
+      <li v-for="session in messageStore.sortedSessions" :key="session.id">
         <router-link :to="{ name: 'chatWindow', params: { id: session.peer.id } }">
           <div class="user">
             <van-row>
@@ -12,9 +12,13 @@
                 <div class="info" style="width: 100%">
                   <div class="header">
                     <div class="name">{{ session.peer.username }}</div>
-                    <div class="time">{{ formatTime(session.messages[0].timestamp) }}</div>
+                    <div class="time">
+                      {{ formatTime(session.messages[session.messages.length - 1].timestamp) }}
+                    </div>
                   </div>
-                  <van-text-ellipsis class="last-message" :content="session.messages[0].content" />
+                  <div class="last-message">
+                    {{ session.messages[session.messages.length - 1].content }}
+                  </div>
                 </div>
               </van-col>
             </van-row>
@@ -30,9 +34,8 @@ import moment from 'moment'
 import { useMessageStore } from '@/stores/message'
 
 const messageStore = useMessageStore()
-const sessions = messageStore.sessions
 
-const formatTime = (timestamp: Date) => {
+const formatTime = (timestamp: string) => {
   return moment(timestamp).format('MM/DD')
 }
 </script>
@@ -42,7 +45,7 @@ const formatTime = (timestamp: Date) => {
   height: 100%;
   .user-list {
     height: 100%;
-    overflow-y: auto; 
+    overflow-y: auto;
     li {
       margin-bottom: 20px;
       &:last-child {
@@ -62,6 +65,12 @@ const formatTime = (timestamp: Date) => {
         .header {
           display: flex;
           justify-content: space-between;
+        }
+
+        .last-message {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
     }

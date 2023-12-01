@@ -5,6 +5,6 @@ export interface Session {
   id: string
   peer: User
   messages: Message[]
-  lastRead?: Date
-  peerLastRead?: Date
+  lastRead?: string
+  peerLastRead?: string
 }
