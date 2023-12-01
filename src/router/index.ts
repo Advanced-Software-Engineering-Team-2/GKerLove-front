@@ -31,7 +31,7 @@ const router = createRouter({
         {
           path: 'message',
           name: 'message',
-          component: () => import('@/views/MessageView.vue'),
+          component: () => import('@/views/ChatView.vue'),
           meta: {
             title: '消息'
           }
@@ -136,8 +136,8 @@ const router = createRouter({
     },
     {
       path: '/chat/:id',
-      name: 'chat',
-      component: () => import('@/views/ChatView.vue'),
+      name: 'chatWindow',
+      component: () => import('@/views/ChatWindow.vue'),
       meta: {
         title: '聊天'
       }

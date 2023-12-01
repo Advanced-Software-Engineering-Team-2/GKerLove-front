@@ -1,91 +1,70 @@
 <template>
-  <back-nav-bar title="聊天" />
-  <div class="chat-view" v-if="session">
-    <Message
-      v-for="message in session.messages"
-      :key="message.id"
-      :message="message"
-      :author="message.senderId === session.peer.id ? session.peer : me"
-    />
-
-    <van-field
-      v-model="content"
-      label="消息"
-      type="textarea"
-      maxlength="50"
-      placeholder="输入消息..."
-      show-word-limit
-    />
-    <van-button size="small" type="primary" @click="handleSendButtonClicked">发送</van-button>
+  <div class="chat-view">
+    <ul class="user-list">
+      <li v-for="session in sessions" :key="session.id">
+        <router-link :to="{ name: 'chatWindow', params: { id: session.peer.id } }">
+          <div class="user">
+            <van-row>
+              <van-col span="4" style="display: flex">
+                <van-image round :src="session.peer.avatar" class="avatar" />
+              </van-col>
+              <van-col span="20" style="display: flex">
+                <div class="info" style="width: 100%">
+                  <div class="header">
+                    <div class="name">{{ session.peer.username }}</div>
+                    <div class="time">{{ formatTime(session.messages[0].timestamp) }}</div>
+                  </div>
+                  <van-text-ellipsis class="last-message" :content="session.messages[0].content" />
+                </div>
+              </van-col>
+            </van-row>
+          </div>
+        </router-link>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script setup lang="ts">
+import moment from 'moment'
 import { useMessageStore } from '@/stores/message'
-import { useUserStore } from '@/stores/user'
-import { Session } from '@/types/Session'
-import { showError } from '@/utils/show'
-import type { Message } from '@/types/Message'
-import { onActivated, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useRoute } from 'vue-router'
-import { User } from '@/types/User'
 
-const userStore = useUserStore()
 const messageStore = useMessageStore()
-const route = useRoute()
-const router = useRouter()
+const sessions = messageStore.sessions
 
-const session = ref<Session>()
-const content = ref('')
-const me = userStore.me as User
-
-const handleSendButtonClicked = () => {
-  if (!session.value) {
-    showError('会话不存在')
-    return
-  }
-  if (!me) {
-    showError('未登录')
-    return
-  }
-  if (content.value.trim() === '') {
-    return
-  }
-  const message: Message = {
-    id: '',
-    content: content.value,
-    senderId: me.id,
-    recipientId: session.value.peer.id,
-    type: 'text',
-    timestamp: new Date()
-  }
-  messageStore.sendMessage(session.value, message)
-  content.value = ''
+const formatTime = (timestamp: Date) => {
+  return moment(timestamp).format('MM/DD')
 }
+</script>
 
-onActivated(async () => {
-  const recipientId = route.params.id
-  if (!recipientId || Array.isArray(recipientId)) {
-    router.push({
-      name: '404'
-    })
-  } else {
-    const s = messageStore.sessions.find((s) => s.peer.id === recipientId)
-    if (s) {
-      session.value = s
-    } else {
-      try {
-        const s = await messageStore.createSession(recipientId)
-        session.value = s
-      } catch (_) {
-        router.push({
-          name: '404'
-        })
+<style scoped lang="scss">
+.chat-view {
+  height: 100%;
+  .user-list {
+    height: 100%;
+    overflow-y: auto; 
+    li {
+      margin-bottom: 20px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    .user {
+      &:last-child {
+        margin-bottom: 0;
+      }
+      .avatar {
+        width: 50px;
+        height: 50px;
+        margin-right: 5px;
+      }
+      .info {
+        .header {
+          display: flex;
+          justify-content: space-between;
+        }
       }
     }
   }
-})
-</script>
-
-<style scoped lang="scss"></style>
+}
+</style>
