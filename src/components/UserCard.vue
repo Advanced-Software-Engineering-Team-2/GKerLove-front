@@ -13,6 +13,9 @@
         <van-space>
           <span>{{ user.username }}</span>
           <van-tag v-if="user.online" type="success" size="large">在线</van-tag>
+          <van-tag v-else-if="user.lastOnline" type="warning" size="large">
+            {{ '上次在线: ' + getLastOnlineInfo(user.lastOnline) }}
+          </van-tag>
         </van-space>
       </h1>
       <p>性别： {{ user.gender ? user.gender : '未填写' }}</p>
@@ -27,12 +30,26 @@
 <script setup lang="ts">
 import { User } from '@/types/User'
 import { toRefs } from '@vueuse/core'
+import moment from 'moment'
 
 const props = defineProps<{
   user: User
 }>()
 
 const { user } = toRefs(props)
+
+const getLastOnlineInfo = (lastOnline: string) => {
+  const days = Math.floor(moment.duration(moment().diff(moment(lastOnline))).asDays())
+  if (days === 0) {
+    return '今天'
+  } else if (days === 1) {
+    return '昨天'
+  } else if (days === 2) {
+    return '前天'
+  } else {
+    return `${days}天前`
+  }
+}
 </script>
 
 <style scoped lang="scss">

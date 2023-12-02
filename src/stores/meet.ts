@@ -30,7 +30,7 @@ export const useMeetStore = defineStore('meet', () => {
       const res = await meetApi.getUserById(id)
       const user = res.data.data.user
       if (!user) return undefined
-      const index = userList.value.findIndex((user) => user.id == user.id)
+      const index = userList.value.findIndex((user) => user.id === id)
       if (index != -1) {
         userList.value[index] = user
         return userList.value[index]
