@@ -3,12 +3,13 @@
     <back-nav-bar title="聊天" />
   </van-sticky>
 
-  <div class="chat-view" v-if="session">
+  <div class="chat-window" v-if="session">
     <Message
       v-for="message in session.messages"
       :key="message.id"
       :message="message"
       :author="message.senderId === session.peer.id ? session.peer : me"
+      class="message"
     />
 
     <van-sticky position="bottom">
@@ -99,4 +100,10 @@ onBeforeRouteLeave(() => {
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.chat-window {
+  .message {
+    margin-top: 15px;
+  }
+}
+</style>

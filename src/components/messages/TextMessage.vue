@@ -14,3 +14,11 @@ const props = defineProps<{
 
 const { message } = toRefs(props)
 </script>
+
+<style scoped lang="scss">
+.text-message-content {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+</style>
