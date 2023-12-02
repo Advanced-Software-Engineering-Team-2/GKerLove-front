@@ -7,4 +7,5 @@ export interface Session {
   messages: Message[]
   lastRead?: string
   peerLastRead?: string
+  isPeerTyping?: boolean
 }

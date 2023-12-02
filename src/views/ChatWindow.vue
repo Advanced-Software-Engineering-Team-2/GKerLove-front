@@ -1,6 +1,6 @@
 <template>
   <van-sticky>
-    <back-nav-bar title="聊天" />
+    <back-nav-bar :title="session?.isPeerTyping ? '对方正在输入...' : '聊天'" />
   </van-sticky>
 
   <div class="chat-window" v-if="session">
@@ -21,7 +21,14 @@
     />
 
     <van-sticky position="bottom">
-      <van-field v-model="content" type="textarea" maxlength="50" show-word-limit>
+      <van-field
+        v-model="content"
+        type="textarea"
+        maxlength="50"
+        show-word-limit
+        @focus="messageStore.startTyping(session)"
+        @blur="messageStore.stopTyping(session)"
+      >
         <template #button>
           <van-button size="small" type="primary" @click="handleSendButtonClicked">发送</van-button>
         </template>

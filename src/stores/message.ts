@@ -75,6 +75,22 @@ export const useMessageStore = defineStore('message', () => {
       }
     })
 
+    // 收到正在输入事件
+    socket.on('startTyping', (sessionId) => {
+      const session = fetchSession(sessionId)
+      if (session) {
+        session.isPeerTyping = true
+      }
+    })
+
+    // 收到停止输入事件
+    socket.on('stopTyping', (sessionId) => {
+      const session = fetchSession(sessionId)
+      if (session) {
+        session.isPeerTyping = false
+      }
+    })
+
     // 处理连接错误
     socket.on('connect_error', (error) => {
       showError(error.message)
@@ -131,6 +147,16 @@ export const useMessageStore = defineStore('message', () => {
     })
   }
 
+  function startTyping(session: Session) {
+    if (!session.id) return
+    socket.emit('startTyping', session.id)
+  }
+
+  function stopTyping(session: Session) {
+    if (!session.id) return
+    socket.emit('stopTyping', session.id)
+  }
+
   function readMessages(session: Session) {
     socket.emit('readMessages', session.id)
     session.lastRead = new Date().toISOString()
@@ -156,6 +182,8 @@ export const useMessageStore = defineStore('message', () => {
     bindEvents,
     connectChatServer,
     sendMessage,
+    startTyping,
+    stopTyping,
     readMessages,
     countUnreadMessages
   }
