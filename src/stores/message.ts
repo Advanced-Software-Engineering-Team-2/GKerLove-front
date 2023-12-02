@@ -21,10 +21,14 @@ export const useMessageStore = defineStore('message', () => {
   })
   const totalUnread = computed(() => {
     return sessions.value.reduce((count, session) => {
-      const unreadInSession = session.messages.filter((message) =>
-        moment(message.timestamp).isAfter(moment(session.lastRead))
-      )
-      return count + unreadInSession.length
+      if (!session.lastRead) {
+        return count + session.messages.length
+      } else {
+        const unreadInSession = session.messages.filter((message) =>
+          moment(message.timestamp).isAfter(moment(session.lastRead))
+        )
+        return count + unreadInSession.length
+      }
     }, 0)
   })
 

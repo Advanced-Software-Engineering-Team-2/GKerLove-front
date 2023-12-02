@@ -28,7 +28,7 @@ import { useUserStore } from '@/stores/user'
 import { Session } from '@/types/Session'
 import { showError } from '@/utils/show'
 import type { Message } from '@/types/Message'
-import { nextTick, onActivated, ref } from 'vue'
+import { nextTick, onActivated, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router'
 import { User } from '@/types/User'
@@ -80,10 +80,16 @@ onActivated(async () => {
     const s = messageStore.sessions.find((s) => s.peer.id === recipientId)
     if (s) {
       session.value = s
+      nextTick(() => {
+        window.scrollTo({ top: document.body.scrollHeight })
+      })
     } else {
       try {
         const s = await messageStore.createSession(recipientId)
         session.value = s
+        nextTick(() => {
+          window.scrollTo({ top: document.body.scrollHeight })
+        })
       } catch (_) {
         router.push({
           name: '404'
@@ -92,6 +98,15 @@ onActivated(async () => {
     }
   }
 })
+
+watch(
+  () => session.value?.messages.length,
+  () => {
+    nextTick(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+    })
+  }
+)
 
 onBeforeRouteLeave(() => {
   if (session.value) {
