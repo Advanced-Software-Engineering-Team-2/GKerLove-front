@@ -3,9 +3,9 @@
     <van-image
       class="image-message-content"
       :src="message.content"
-      lazy-load
       width="40vw"
       @click="$emit('image-clicked')"
+      @load="$emit('image-loaded')"
     />
   </div>
 </template>

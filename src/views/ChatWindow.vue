@@ -19,6 +19,7 @@
         })
       "
       @image-clicked="showImage"
+      @image-loaded="handleImageLoaded"
       class="message"
     />
 
@@ -115,6 +116,23 @@ const showBottom = ref(false)
 const imageList = ref([])
 const showPreview = ref(false)
 const previewImages = ref<string[]>([])
+let loadImage = 0
+
+const handleImageLoaded = () => {
+  if (!session.value) return
+  loadImage++
+  let imageMessageCnt = 0
+  session.value.messages.forEach((message) => {
+    if (message.type === 'image') {
+      imageMessageCnt++
+    }
+  })
+  if (loadImage === imageMessageCnt) {
+    nextTick(() => {
+      window.scrollTo({ top: document.body.scrollHeight })
+    })
+  }
+}
 
 const showImage = (message: Message) => {
   if (message.type === 'image') {
@@ -213,6 +231,7 @@ onActivated(async () => {
       name: '404'
     })
   } else {
+    loadImage = 0
     const s = messageStore.sessions.find((s) => s.peer.id === recipientId)
     if (s) {
       session.value = s

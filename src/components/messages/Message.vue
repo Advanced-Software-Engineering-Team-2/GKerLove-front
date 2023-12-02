@@ -11,6 +11,7 @@
         :message="message"
         class="image-message"
         @image-clicked="$emit('image-clicked', message)"
+        @image-loaded="$emit('image-loaded')"
       />
     </div>
   </div>
