@@ -10,6 +10,7 @@ interface ServerToClientEvents {
   privateMessage: (message: SockeIoMessage) => void
   startTyping: (sessionId: string) => void
   stopTyping: (sessionId: string) => void
+  viewImage: (sessionId: string, messageId: string) => void
 }
 
 interface ClientToServerEvents {
@@ -17,5 +18,6 @@ interface ClientToServerEvents {
   readMessages: (sessionId: string) => void
   startTyping: (sessionId: string) => void
   stopTyping: (sessionId: string) => void
+  viewImage: (sessionId: string, messageId: string) => void
 }
 export { ServerToClientEvents, ClientToServerEvents, SockeIoMessage }

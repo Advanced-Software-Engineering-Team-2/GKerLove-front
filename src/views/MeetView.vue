@@ -36,14 +36,6 @@ const institute = ref<string>()
 const getUsers = async () => {
   loading.value = true
   try {
-    // const res = await meetApi.getUserList(
-    //   gender.value,
-    //   minAge.value,
-    //   maxAge.value,
-    //   city.value,
-    //   institute.value
-    // )
-    // users.value = res.data.data.userList
     await meetStore.getUserList(
       gender.value,
       minAge.value,

@@ -18,17 +18,19 @@
                 <div class="info" style="width: 100%">
                   <div class="header">
                     <div class="name">{{ session.peer.username }}</div>
-                    <div class="time">
+                    <div class="time" v-if="session.messages.length">
                       {{ formatTime(session.messages[session.messages.length - 1].timestamp) }}
                     </div>
                   </div>
-                  <div
-                    class="last-message"
-                    v-if="session.messages[session.messages.length - 1].type === 'text'"
-                  >
-                    {{ session.messages[session.messages.length - 1].content }}
+                  <div v-if="session.messages.length">
+                    <div
+                      class="last-message"
+                      v-if="session.messages[session.messages.length - 1].type === 'text'"
+                    >
+                      {{ session.messages[session.messages.length - 1].content }}
+                    </div>
+                    <div class="last-message" v-else>[ 图片 ]</div>
                   </div>
-                  <div class="last-message" v-else>[ 图片 ]</div>
                 </div>
               </van-col>
             </van-row>

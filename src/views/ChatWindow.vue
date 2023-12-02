@@ -4,49 +4,48 @@
   </van-sticky>
 
   <div class="chat-window" v-if="session">
-    <Message
-      v-for="(message, index) in session.messages"
-      :key="message.id"
-      :message="message"
-      :author="message.senderId === session.peer.id ? session.peer : me"
-      :show-time="shouldShowTime(index)"
-      @avatar-clicked="
-        router.push({
-          name: 'userDetail',
-          params: {
-            id: message.senderId
-          }
-        })
-      "
-      @image-clicked="showImage"
-      @image-loaded="handleImageLoaded"
-      class="message"
-    />
-
-    <van-sticky position="bottom">
-      <div class="footer">
-        <van-field
-          v-model="content"
-          type="textarea"
-          maxlength="50"
-          show-word-limit
-          @focus="messageStore.startTyping(session)"
-          @blur="messageStore.stopTyping(session)"
-        >
-          <template #button>
-            <van-button
-              icon="plus"
-              round
-              size="small"
-              style="margin-right: 10px"
-              @click="handlePlusButtonClicked"
-            />
-            <van-button size="small" type="primary" @click="handleSendButtonClicked"
-              >发送</van-button
-            >
-          </template>
-        </van-field>
-      </div>
+    <div class="message-list">
+      <Message
+        v-for="(message, index) in session.messages"
+        :key="message.id"
+        :message="message"
+        :author="message.senderId === session.peer.id ? session.peer : me"
+        :show-time="shouldShowTime(index)"
+        @avatar-clicked="
+          router.push({
+            name: 'userDetail',
+            params: {
+              id: message.senderId
+            }
+          })
+        "
+        @image-clicked="showImage"
+        @image-loaded="handleImageLoaded"
+        @disappearing-image-clicked="showDisappearingImage"
+        class="message"
+      />
+    </div>
+    <van-sticky>
+      <van-field
+        class="user-input"
+        v-model="content"
+        type="textarea"
+        maxlength="50"
+        show-word-limit
+        @focus="messageStore.startTyping(session)"
+        @blur="messageStore.stopTyping(session)"
+      >
+        <template #button>
+          <van-button
+            icon="plus"
+            round
+            size="small"
+            style="margin-right: 10px"
+            @click="handlePlusButtonClicked"
+          />
+          <van-button size="small" type="primary" @click="handleSendButtonClicked">发送</van-button>
+        </template>
+      </van-field>
     </van-sticky>
     <van-popup v-model:show="showBottom" position="bottom">
       <div class="pop-up">
@@ -75,8 +74,8 @@
           >
             <van-uploader
               class="picture-uploader"
-              v-model="imageList"
-              :after-read="afterReadImage"
+              v-model="disappearingImageList"
+              :after-read="afterReadDisapperingImage"
               :max-count="1"
               :max-size="10 * 1024 * 1024"
             />
@@ -114,6 +113,7 @@ const me = userStore.me as User
 
 const showBottom = ref(false)
 const imageList = ref([])
+const disappearingImageList = ref([])
 const showPreview = ref(false)
 const previewImages = ref<string[]>([])
 let loadImage = 0
@@ -123,7 +123,7 @@ const handleImageLoaded = () => {
   loadImage++
   let imageMessageCnt = 0
   session.value.messages.forEach((message) => {
-    if (message.type === 'image') {
+    if (message.type === 'image' || message.type === 'disappearing') {
       imageMessageCnt++
     }
   })
@@ -138,6 +138,22 @@ const showImage = (message: Message) => {
   if (message.type === 'image') {
     previewImages.value = [message.content]
     showPreview.value = true
+  }
+}
+
+const showDisappearingImage = (message: Message) => {
+  if (message.type === 'disappearing') {
+    previewImages.value = [message.content]
+    showPreview.value = true
+    if (message.senderId !== me.id) {
+      if (!session.value) return
+      messageStore.viewImage(session.value, message)
+      setTimeout(() => {
+        if (!session.value) return
+        messageStore.deleteMessage(session.value, message.id)
+        showPreview.value = false
+      }, 1000)
+    }
   }
 }
 
@@ -167,16 +183,40 @@ const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem
       )
       file.status = 'done'
       file.message = '上传成功'
-      const message: Message = {
-        id: '',
-        content: res.url,
-        senderId: me.id,
-        recipientId: session.value.peer.id,
-        type: 'image',
-        timestamp: new Date().toISOString()
-      }
-      await messageStore.sendMessage(session.value, message)
+      await sendImageMessage(res.url, 'image')
       imageList.value = []
+      showBottom.value = false
+    } catch (_) {
+      file.status = 'failed'
+      file.message = '上传失败'
+    }
+  }
+}
+
+const afterReadDisapperingImage = async (files: UploaderFileListItem | UploaderFileListItem[]) => {
+  if (!session.value || !userStore.OSSUtil) return
+  if (!Array.isArray(files)) {
+    files = [files]
+  }
+  for (const file of files) {
+    file.status = 'uploading'
+    file.message = '上传中'
+    try {
+      const uuid = uuidv4()
+      const res = await userStore.OSSUtil.put(
+        `${me.username}/messages/${session.value.id}/${uuid}`,
+        file.file,
+        {
+          timeout: 5000,
+          headers: {
+            'Cache-Control': 'max-age=8640000'
+          }
+        }
+      )
+      file.status = 'done'
+      file.message = '上传成功'
+      await sendImageMessage(res.url, 'disappearing')
+      disappearingImageList.value = []
       showBottom.value = false
       nextTick(() => {
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
@@ -186,6 +226,19 @@ const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem
       file.message = '上传失败'
     }
   }
+}
+
+const sendImageMessage = async (url: string, type: 'image' | 'disappearing') => {
+  if (!session.value) return
+  const message: Message = {
+    id: '',
+    content: url,
+    senderId: me.id,
+    recipientId: session.value.peer.id,
+    type,
+    timestamp: new Date().toISOString()
+  }
+  await messageStore.sendMessage(session.value, message)
 }
 
 const shouldShowTime = (index: number) => {
@@ -272,6 +325,9 @@ onBeforeRouteLeave(() => {
 
 <style scoped lang="scss">
 .chat-window {
+  .message-list {
+    min-height: calc(100vh - var(--height-navbar) - 100px);
+  }
   .message {
     margin-top: 15px;
   }

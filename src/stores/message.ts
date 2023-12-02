@@ -97,6 +97,11 @@ export const useMessageStore = defineStore('message', () => {
       const router = useRouter()
       router.push('/login')
     })
+
+    socket.on('viewImage', (sessionId, messageId) => {
+      const session = fetchSession(sessionId)
+      if (session) deleteMessage(session, messageId)
+    })
   }
 
   // 获取聊天会话列表
@@ -156,9 +161,20 @@ export const useMessageStore = defineStore('message', () => {
     socket.emit('stopTyping', session.id)
   }
 
+  function viewImage(session: Session, message: Message) {
+    socket.emit('viewImage', session.id, message.id)
+  }
+
   function readMessages(session: Session) {
     socket.emit('readMessages', session.id)
     session.lastRead = new Date().toISOString()
+  }
+
+  function deleteMessage(session: Session, messageId: string) {
+    const index = session.messages.findIndex((m) => m.id === messageId)
+    if (index !== -1) {
+      session.messages.splice(index, 1)
+    }
   }
 
   function countUnreadMessages(session: Session) {
@@ -181,8 +197,10 @@ export const useMessageStore = defineStore('message', () => {
     bindEvents,
     connectChatServer,
     sendMessage,
+    deleteMessage,
     startTyping,
     stopTyping,
+    viewImage,
     readMessages,
     countUnreadMessages
   }
