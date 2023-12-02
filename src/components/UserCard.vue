@@ -12,7 +12,7 @@
       <h1 class="username">
         <van-space>
           <span>{{ user.username }}</span>
-          <van-tag type="success" size="large">在线</van-tag>
+          <van-tag v-if="user.online" type="success" size="large">在线</van-tag>
         </van-space>
       </h1>
       <p>性别： {{ user.gender ? user.gender : '未填写' }}</p>

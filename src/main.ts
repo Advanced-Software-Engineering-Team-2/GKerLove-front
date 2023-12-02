@@ -10,22 +10,9 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-import { TUIComponents, TUICore } from './TUIKit'
-import { TUICallKit } from '@tencentcloud/call-uikit-vue'
-
-const SDKAppID = 1600009914 // Your SDKAppID
-
-const TUIKit = TUICore.init({
-  SDKAppID
-})
-
-TUIKit.use(TUIComponents)
-TUIKit.use(TUICallKit)
-
 const app = createApp(App)
 
 app.use(Lazyload)
 app.use(createPinia())
 app.use(router)
-app.use(TUIKit)
 app.mount('#app')

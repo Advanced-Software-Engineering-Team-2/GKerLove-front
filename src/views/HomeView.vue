@@ -82,7 +82,6 @@
 import router from '@/router'
 import { useUserStore } from '@/stores/user'
 import { showSuccess } from '@/utils/show'
-import { TUICore } from '../TUIKit'
 import { ref } from 'vue'
 import { usePreserveScroll } from '@/hooks/usePreserveScroll'
 import { usePostStore } from '@/stores/post'
@@ -98,8 +97,6 @@ usePreserveScroll(root, 'home')
 
 const handleLogoutButtonClicked = async () => {
   try {
-    const TUIins = TUICore.instance
-    await TUIins.logout()
     showSuccess('退出登录成功')
     router.push({
       name: 'login'

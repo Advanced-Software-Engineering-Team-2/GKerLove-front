@@ -104,7 +104,6 @@ export const useMessageStore = defineStore('message', () => {
     try {
       const res = await messageApi.getSessions()
       sessions.value = res.data.data.sessions
-      console.log(sessions.value)
     } catch (_) {
       return Promise.reject()
     }

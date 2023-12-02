@@ -2,7 +2,7 @@
   <back-nav-bar title="喜欢我的人" />
   <loading-card v-if="loading" />
   <div class="liked-by-view" v-else>
-    <van-empty v-if="!meetStore.likeUserList.length" description="暂无喜欢我的人" />
+    <van-empty v-if="!meetStore.likedByUserList.length" description="暂无喜欢我的人" />
     <user-list
       v-else
       :user-list="meetStore.likedByUserList"

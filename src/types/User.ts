@@ -17,4 +17,6 @@ export interface User {
   city?: string
   institute?: string
   introduction?: string
+  online?: boolean
+  lastOnline?: string
 }

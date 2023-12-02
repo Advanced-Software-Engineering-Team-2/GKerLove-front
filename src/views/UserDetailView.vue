@@ -39,7 +39,6 @@ import type { User } from '@/types/User'
 import { nextTick, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import meetApi from '@/api/meet'
 import { onActivated } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { useUserStore } from '@/stores/user'
@@ -61,8 +60,8 @@ const scrollHeightStack: number[] = []
 const fetchUserInfo = async (id: string) => {
   loading.value = true
   try {
-    const res = await meetApi.getUserById(id)
-    user.value = res.data.data.user
+    const res = await meetStore.getUserById(id)
+    user.value = res
     if (!user.value) {
       router.push({
         name: '404'

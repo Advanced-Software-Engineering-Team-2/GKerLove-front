@@ -21,7 +21,6 @@ declare module 'vue' {
     TextMessage: typeof import('./src/components/messages/TextMessage.vue')['default']
     UserCard: typeof import('./src/components/UserCard.vue')['default']
     UserList: typeof import('./src/components/UserList.vue')['default']
-    VanActionSheet: typeof import('vant/es')['ActionSheet']
     VanBackTop: typeof import('vant/es')['BackTop']
     VanBadge: typeof import('vant/es')['Badge']
     VanButton: typeof import('vant/es')['Button']
@@ -32,7 +31,6 @@ declare module 'vue' {
     VanEmpty: typeof import('vant/es')['Empty']
     VanField: typeof import('vant/es')['Field']
     VanForm: typeof import('vant/es')['Form']
-    VanIcon: typeof import('vant/es')['Icon']
     VanImage: typeof import('vant/es')['Image']
     VanImagePreview: typeof import('vant/es')['ImagePreview']
     VanList: typeof import('vant/es')['List']
@@ -48,12 +46,9 @@ declare module 'vue' {
     VanSticky: typeof import('vant/es')['Sticky']
     VanSwipe: typeof import('vant/es')['Swipe']
     VanSwipeItem: typeof import('vant/es')['SwipeItem']
-    VanTab: typeof import('vant/es')['Tab']
     VanTabbar: typeof import('vant/es')['Tabbar']
     VanTabbarItem: typeof import('vant/es')['TabbarItem']
-    VanTabs: typeof import('vant/es')['Tabs']
     VanTag: typeof import('vant/es')['Tag']
-    VanTextEllipsis: typeof import('vant/es')['TextEllipsis']
     VanUploader: typeof import('vant/es')['Uploader']
   }
 }
