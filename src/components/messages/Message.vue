@@ -2,7 +2,7 @@
   <div class="message">
     <p v-if="showTime" class="timestamp">{{ message.timestamp }}</p>
     <div class="content" :class="author.id === user.id ? 'sent' : 'received'">
-      <div class="user-avatar">
+      <div class="user-avatar" @click="$emit('avatar-clicked')">
         <van-image :src="author.avatar" round width="2.5rem" height="2.5rem" class="avatar" />
       </div>
       <TextMessage v-if="message.type === 'text'" :message="message" class="text-message" />

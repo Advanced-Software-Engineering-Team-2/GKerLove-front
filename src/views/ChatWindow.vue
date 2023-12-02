@@ -9,6 +9,14 @@
       :key="message.id"
       :message="message"
       :author="message.senderId === session.peer.id ? session.peer : me"
+      @avatar-clicked="
+        router.push({
+          name: 'userDetail',
+          params: {
+            id: message.senderId
+          }
+        })
+      "
       class="message"
     />
 

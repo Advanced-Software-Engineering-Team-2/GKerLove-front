@@ -89,7 +89,7 @@ const fetchUserPosts = async (id: string) => {
 
 const handleChatClicked = () => {
   router.push({
-    name: 'chat',
+    name: 'chatWindow',
     params: {
       id: user.value?.id
     }
