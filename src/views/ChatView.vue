@@ -22,9 +22,13 @@
                       {{ formatTime(session.messages[session.messages.length - 1].timestamp) }}
                     </div>
                   </div>
-                  <div class="last-message">
+                  <div
+                    class="last-message"
+                    v-if="session.messages[session.messages.length - 1].type === 'text'"
+                  >
                     {{ session.messages[session.messages.length - 1].content }}
                   </div>
+                  <div class="last-message" v-else>[ 图片 ]</div>
                 </div>
               </van-col>
             </van-row>

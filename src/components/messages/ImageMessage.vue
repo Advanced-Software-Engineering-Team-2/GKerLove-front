@@ -1,6 +1,12 @@
 <template>
   <div class="image-message">
-    <van-image class="image-message-content" :src="message.content" lazy-load />
+    <van-image
+      class="image-message-content"
+      :src="message.content"
+      lazy-load
+      width="40vw"
+      @click="$emit('image-clicked')"
+    />
   </div>
 </template>
 

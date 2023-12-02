@@ -6,7 +6,12 @@
         <van-image :src="author.avatar" round width="2.5rem" height="2.5rem" class="avatar" />
       </div>
       <TextMessage v-if="message.type === 'text'" :message="message" class="text-message" />
-      <ImageMessage v-else-if="message.type === 'image'" :message="message" class="image-message" />
+      <ImageMessage
+        v-else-if="message.type === 'image'"
+        :message="message"
+        class="image-message"
+        @image-clicked="$emit('image-clicked', message)"
+      />
     </div>
   </div>
 </template>
