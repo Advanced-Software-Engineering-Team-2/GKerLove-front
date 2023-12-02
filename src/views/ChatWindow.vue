@@ -5,10 +5,11 @@
 
   <div class="chat-window" v-if="session">
     <Message
-      v-for="message in session.messages"
+      v-for="(message, index) in session.messages"
       :key="message.id"
       :message="message"
       :author="message.senderId === session.peer.id ? session.peer : me"
+      :show-time="shouldShowTime(index)"
       @avatar-clicked="
         router.push({
           name: 'userDetail',
@@ -38,6 +39,7 @@
 </template>
 
 <script setup lang="ts">
+import moment from 'moment'
 import { useMessageStore } from '@/stores/message'
 import { useUserStore } from '@/stores/user'
 import { Session } from '@/types/Session'
@@ -57,6 +59,15 @@ const router = useRouter()
 const session = ref<Session>()
 const content = ref('')
 const me = userStore.me as User
+
+const shouldShowTime = (index: number) => {
+  if (!session.value) return false
+  if (index == 0) return true
+  const currentMessageTime = moment(session.value.messages[index].timestamp)
+  const prevMessageTime = moment(session.value.messages[index - 1].timestamp)
+  const diffMinutes = currentMessageTime.diff(prevMessageTime, 'minutes')
+  return diffMinutes >= 5
+}
 
 const handleSendButtonClicked = async () => {
   if (!session.value) {

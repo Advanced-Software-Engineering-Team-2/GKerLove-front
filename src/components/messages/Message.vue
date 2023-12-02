@@ -1,6 +1,6 @@
 <template>
   <div class="message">
-    <p v-if="showTime" class="timestamp">{{ message.timestamp }}</p>
+    <p v-if="showTime" class="timestamp">{{ moment(message.timestamp).format('MM/DD HH:mm') }}</p>
     <div class="content" :class="author.id === user.id ? 'sent' : 'received'">
       <div class="user-avatar" @click="$emit('avatar-clicked')">
         <van-image :src="author.avatar" round width="2.5rem" height="2.5rem" class="avatar" />
@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import moment from 'moment'
 import { useUserStore } from '@/stores/user'
 import { Message } from '@/types/Message'
 import { User } from '@/types/User'
@@ -35,6 +36,12 @@ const user = useUserStore()
 
 <style scoped lang="scss">
 .message {
+  .timestamp {
+    margin: 5px 0;
+    text-align: center;
+    font-size: small;
+  }
+
   .content {
     width: 100%;
     display: flex;
