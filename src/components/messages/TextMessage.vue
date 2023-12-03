@@ -17,6 +17,7 @@ const { message } = toRefs(props)
 
 <style scoped lang="scss">
 .text-message-content {
+  white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-all;
