@@ -161,14 +161,15 @@ router.beforeEach(async (to, from, next) => {
     } else {
       next('/login')
     }
-  }
-  const user = useUserStore()
-  if (!user.username) {
-    if (whiteList.indexOf(to.path) === -1) {
-      await user.initUser()
+  } else {
+    const user = useUserStore()
+    if (!user.username) {
+      if (whiteList.indexOf(to.path) === -1) {
+        await user.initUser()
+      }
     }
+    next()
   }
-  next()
 })
 
 export default router

@@ -39,6 +39,11 @@ export const useMessageStore = defineStore('message', () => {
     socket.connect()
   }
 
+  // 断开私信服务器
+  function disconnectChatServer() {
+    socket.disconnect()
+  }
+
   // 绑定事件
   function bindEvents() {
     // 连接私信服务器成功
@@ -227,6 +232,7 @@ export const useMessageStore = defineStore('message', () => {
     createSession,
     bindEvents,
     connectChatServer,
+    disconnectChatServer,
     sendMessage,
     startTyping,
     stopTyping,
