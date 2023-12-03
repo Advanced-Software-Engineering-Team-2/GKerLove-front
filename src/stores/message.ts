@@ -72,9 +72,7 @@ export const useMessageStore = defineStore('message', () => {
             messages: [payload.message]
           }
           // 加入sessions前，二次校验
-          if (sessions.value.findIndex((s) => s.id === session.id) === -1) {
-            sessions.value.push(session)
-          }
+          addSession(session)
         } catch (error) {
           /* empty */
         }
@@ -121,6 +119,12 @@ export const useMessageStore = defineStore('message', () => {
     }
   }
 
+  function addSession(session: Session) {
+    if (sessions.value.findIndex((s) => s.id === session.id) === -1) {
+      sessions.value.push(session)
+    }
+  }
+
   // 创建聊天会话
   async function createSession(recipientId: string) {
     try {
@@ -134,7 +138,7 @@ export const useMessageStore = defineStore('message', () => {
         peer,
         messages: []
       }
-      sessions.value.push(session)
+      addSession(session)
       return fetchSession(session.id)
     } catch (error) {
       return Promise.reject(error)
@@ -154,7 +158,7 @@ export const useMessageStore = defineStore('message', () => {
         }
         if (!session.id) {
           session.id = res.data!.sessionId
-          sessions.value.push(session)
+          addSession(session)
         }
         session.messages.push(res.data!.message)
         resolve(res)
