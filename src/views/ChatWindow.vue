@@ -144,6 +144,9 @@ const showDisappearingImage = async (message: Message) => {
         if (typeof err === 'string') showError(err)
         else showError('查看失败')
       }
+    } else {
+      previewImages.value = [message.content]
+      showPreview.value = true
     }
   }
 }

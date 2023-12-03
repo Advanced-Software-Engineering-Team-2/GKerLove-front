@@ -46,7 +46,7 @@ export const useUserStore = defineStore('user', () => {
       await meetStore.getLikeUserList()
       await meetStore.getLikedByUserList()
       const messageStore = useMessageStore()
-      // await messageStore.initSessions()
+      await messageStore.initSessions()
       messageStore.connectChatServer(token.value)
     } catch (_) {
       showError('初始化用户失败')

@@ -44,7 +44,6 @@ export const useMessageStore = defineStore('message', () => {
     // 连接私信服务器成功
     socket.on('connect', () => {
       console.log('Connected to chat server')
-      initSessions()
     })
 
     // 收到私信
@@ -100,6 +99,7 @@ export const useMessageStore = defineStore('message', () => {
       router.push('/login')
     })
 
+    // 对方查看了自己发送的闪图
     socket.on('viewDisappearingImage', (sessionId, messageId) => {
       const session = fetchSession(sessionId)
       if (session) deleteMessage(session, messageId)
