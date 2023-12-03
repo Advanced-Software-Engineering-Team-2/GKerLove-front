@@ -17,6 +17,7 @@
         v-else-if="message.type === 'disappearing'"
         class="disappearing-image-message"
         @disappearing-image-clicked="$emit('disappearing-image-clicked', message)"
+        @image-loaded="$emit('image-loaded')"
       />
     </div>
   </div>
