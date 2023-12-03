@@ -1,23 +1,38 @@
-import { Message } from '@/types/Message'
+import { Message, messageType } from '@/types/Message'
 
-interface SockeIoMessage {
+interface R<T = void> {
+  type: 'SUCCESS' | 'ERROR'
+  message?: string
+  data?: T
+}
+
+interface IServerToClientMessage {
   sessionId: string
   message: Message
 }
 
+interface IClientToServerMessage {
+  type: messageType
+  recipientId: string
+  content: string
+}
+
 interface ServerToClientEvents {
-  messages: (messages: Message[]) => void
-  privateMessage: (message: SockeIoMessage) => void
+  privateMessage: (message: IServerToClientMessage) => void
+  viewDisappearingImage: (sessionId: string, messageId: string) => void
   startTyping: (sessionId: string) => void
   stopTyping: (sessionId: string) => void
-  viewImage: (sessionId: string, messageId: string) => void
 }
 
 interface ClientToServerEvents {
-  privateMessage: (message: Message, callback: (message: SockeIoMessage) => void) => void
-  readMessages: (sessionId: string) => void
-  startTyping: (sessionId: string) => void
-  stopTyping: (sessionId: string) => void
-  viewImage: (sessionId: string, messageId: string) => void
+  privateMessage: (
+    message: IClientToServerMessage,
+    callback: (res: R<IServerToClientMessage>) => void
+  ) => void
+  viewDisappearingImage: (sessionId: string, messageId: string, callback: (res: R) => void) => void
+  startTyping: (sessionId: string, callback: (res: R) => void) => void
+  stopTyping: (sessionId: string, callback: (res: R) => void) => void
+  readMessages: (sessionId: string, callback: (res: R) => void) => void
 }
-export { ServerToClientEvents, ClientToServerEvents, SockeIoMessage }
+
+export { IClientToServerMessage, ServerToClientEvents, ClientToServerEvents }

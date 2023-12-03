@@ -8,6 +8,7 @@ import { showError } from '@/utils/show'
 import { useRouter } from 'vue-router'
 import { Message } from '@/types/Message'
 import moment from 'moment'
+import { IClientToServerMessage } from '@/types/socket.io'
 
 export const useMessageStore = defineStore('message', () => {
   const sessions = ref<Session[]>([])
@@ -43,6 +44,7 @@ export const useMessageStore = defineStore('message', () => {
     // 连接私信服务器成功
     socket.on('connect', () => {
       console.log('Connected to chat server')
+      initSessions()
     })
 
     // 收到私信
@@ -98,7 +100,7 @@ export const useMessageStore = defineStore('message', () => {
       router.push('/login')
     })
 
-    socket.on('viewImage', (sessionId, messageId) => {
+    socket.on('viewDisappearingImage', (sessionId, messageId) => {
       const session = fetchSession(sessionId)
       if (session) deleteMessage(session, messageId)
     })
@@ -138,14 +140,18 @@ export const useMessageStore = defineStore('message', () => {
     return sessions.value.find((session) => session.id === sessionId)
   }
 
-  function sendMessage(session: Session, message: Message) {
-    return new Promise((resolve) => {
-      socket.emit('privateMessage', message, (res) => {
+  function sendMessage(session: Session, message: IClientToServerMessage) {
+    return new Promise((resolve, reject) => {
+      socket.timeout(5000).emit('privateMessage', message, (err, res) => {
+        if (err) reject(err)
+        if (res.type === 'ERROR') {
+          reject(res.message)
+        }
         if (!session.id) {
-          session.id = res.sessionId
+          session.id = res.data!.sessionId
           sessions.value.push(session)
         }
-        session.messages.push(res.message)
+        session.messages.push(res.data!.message)
         resolve(res)
       })
     })
@@ -153,25 +159,50 @@ export const useMessageStore = defineStore('message', () => {
 
   function startTyping(session: Session) {
     if (!session.id) return
-    socket.emit('startTyping', session.id)
+    socket.emit('startTyping', session.id, (res) => {
+      if (res.type === 'ERROR') {
+        console.warn(res.message)
+      }
+    })
   }
 
   function stopTyping(session: Session) {
     if (!session.id) return
-    socket.emit('stopTyping', session.id)
+    socket.emit('stopTyping', session.id, (res) => {
+      if (res.type === 'ERROR') {
+        console.warn(res.message)
+      }
+    })
   }
 
-  function viewImage(session: Session, message: Message) {
-    socket.emit('viewImage', session.id, message.id)
+  function viewDisappearingImage(session: Session, message: Message) {
+    return new Promise((resolve, reject) => {
+      socket.timeout(5000).emit('viewDisappearingImage', session.id, message._id, (err, res) => {
+        if (err) {
+          reject(err)
+        }
+        if (res.type === 'ERROR') {
+          reject(res.message)
+        }
+        deleteMessage(session, message._id)
+        resolve(res)
+      })
+    })
   }
 
   function readMessages(session: Session) {
-    socket.emit('readMessages', session.id)
+    socket.timeout(5000).emit('readMessages', session.id, (err, res) => {
+      if (err) {
+        console.warn(err)
+      } else if (res.type === 'ERROR') {
+        console.warn(res.message)
+      }
+    })
     session.lastRead = new Date().toISOString()
   }
 
   function deleteMessage(session: Session, messageId: string) {
-    const index = session.messages.findIndex((m) => m.id === messageId)
+    const index = session.messages.findIndex((m) => m._id === messageId)
     if (index !== -1) {
       session.messages.splice(index, 1)
     }
@@ -197,10 +228,9 @@ export const useMessageStore = defineStore('message', () => {
     bindEvents,
     connectChatServer,
     sendMessage,
-    deleteMessage,
     startTyping,
     stopTyping,
-    viewImage,
+    viewDisappearingImage,
     readMessages,
     countUnreadMessages
   }

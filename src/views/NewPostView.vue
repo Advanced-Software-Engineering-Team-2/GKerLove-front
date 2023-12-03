@@ -62,7 +62,7 @@ const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem
     try {
       const uuid = uuidv4()
       const res = await user.OSSUtil?.put(`${user.username}/posts/${uuid}`, file.file, {
-        timeout: 5000,
+        timeout: 20000,
         // 对于动态图片，不会被修改，因此缓存时间可以设置的很长
         headers: {
           'Cache-Control': 'max-age=8640000'

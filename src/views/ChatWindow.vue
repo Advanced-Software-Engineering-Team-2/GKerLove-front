@@ -7,7 +7,7 @@
     <div class="message-list">
       <Message
         v-for="(message, index) in session.messages"
-        :key="message.id"
+        :key="message._id"
         :message="message"
         :author="message.senderId === session.peer.id ? session.peer : me"
         :show-time="shouldShowTime(index)"
@@ -41,7 +41,7 @@
             round
             size="small"
             style="margin-right: 10px"
-            @click="handlePlusButtonClicked"
+            @click="showBottom = true"
           />
           <van-button size="small" type="primary" @click="handleSendButtonClicked">发送</van-button>
         </template>
@@ -93,7 +93,7 @@ import { useMessageStore } from '@/stores/message'
 import { useUserStore } from '@/stores/user'
 import { Session } from '@/types/Session'
 import { showError } from '@/utils/show'
-import type { Message } from '@/types/Message'
+import type { Message, messageType } from '@/types/Message'
 import { nextTick, onActivated, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router'
@@ -101,6 +101,7 @@ import { User } from '@/types/User'
 import { onBeforeRouteLeave } from 'vue-router'
 import { UploaderFileListItem } from 'vant'
 import { v4 as uuidv4 } from 'uuid'
+import type { IClientToServerMessage } from '@/types/socket.io.ts'
 
 const userStore = useUserStore()
 const messageStore = useMessageStore()
@@ -116,22 +117,9 @@ const imageList = ref([])
 const disappearingImageList = ref([])
 const showPreview = ref(false)
 const previewImages = ref<string[]>([])
-let loadImage = 0
 
 const handleImageLoaded = () => {
-  if (!session.value) return
-  loadImage++
-  let imageMessageCnt = 0
-  session.value.messages.forEach((message) => {
-    if (message.type === 'image' || message.type === 'disappearing') {
-      imageMessageCnt++
-    }
-  })
-  if (loadImage === imageMessageCnt) {
-    nextTick(() => {
-      window.scrollTo({ top: document.body.scrollHeight })
-    })
-  }
+  window.scrollTo({ top: document.body.scrollHeight })
 }
 
 const showImage = (message: Message) => {
@@ -141,104 +129,90 @@ const showImage = (message: Message) => {
   }
 }
 
-const showDisappearingImage = (message: Message) => {
+const showDisappearingImage = async (message: Message) => {
+  if (!session.value) return
   if (message.type === 'disappearing') {
-    previewImages.value = [message.content]
-    showPreview.value = true
     if (message.senderId !== me.id) {
-      if (!session.value) return
-      messageStore.viewImage(session.value, message)
-      setTimeout(() => {
-        if (!session.value) return
-        messageStore.deleteMessage(session.value, message.id)
-        showPreview.value = false
-      }, 1000)
+      try {
+        await messageStore.viewDisappearingImage(session.value, message)
+        previewImages.value = [message.content]
+        showPreview.value = true
+        setTimeout(() => {
+          showPreview.value = false
+        }, 1000)
+      } catch (err) {
+        if (typeof err === 'string') showError(err)
+        else showError('查看失败')
+      }
     }
   }
 }
 
-const handlePlusButtonClicked = () => {
-  showBottom.value = true
+const uploadImage = async (file: UploaderFileListItem) => {
+  if (!session.value || !userStore.OSSUtil) return
+  file.status = 'uploading'
+  file.message = '上传中'
+  try {
+    const uuid = uuidv4()
+    const res = await userStore.OSSUtil.put(
+      `${me.username}/messages/${session.value.id}/${uuid}`,
+      file.file,
+      {
+        timeout: 20000,
+        headers: {
+          'Cache-Control': 'max-age=8640000'
+        }
+      }
+    )
+    file.status = 'done'
+    file.message = '上传成功'
+    return res.url
+  } catch (_) {
+    file.status = 'failed'
+    file.message = '上传失败'
+  }
+  return ''
 }
 
-const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem[]) => {
-  if (!session.value || !userStore.OSSUtil) return
-  if (!Array.isArray(files)) {
-    files = [files]
-  }
-  for (const file of files) {
-    file.status = 'uploading'
-    file.message = '上传中'
-    try {
-      const uuid = uuidv4()
-      const res = await userStore.OSSUtil.put(
-        `${me.username}/messages/${session.value.id}/${uuid}`,
-        file.file,
-        {
-          timeout: 5000,
-          headers: {
-            'Cache-Control': 'max-age=8640000'
-          }
-        }
-      )
-      file.status = 'done'
-      file.message = '上传成功'
-      await sendImageMessage(res.url, 'image')
+const afterReadImage = async (file: UploaderFileListItem | UploaderFileListItem[]) => {
+  if (Array.isArray(file)) file = file[0]
+  const url = await uploadImage(file)
+  if (url) {
+    const res = await sendMessage(url, 'image')
+    if (res) {
       imageList.value = []
       showBottom.value = false
-    } catch (_) {
-      file.status = 'failed'
-      file.message = '上传失败'
     }
   }
 }
 
-const afterReadDisapperingImage = async (files: UploaderFileListItem | UploaderFileListItem[]) => {
-  if (!session.value || !userStore.OSSUtil) return
-  if (!Array.isArray(files)) {
-    files = [files]
-  }
-  for (const file of files) {
-    file.status = 'uploading'
-    file.message = '上传中'
-    try {
-      const uuid = uuidv4()
-      const res = await userStore.OSSUtil.put(
-        `${me.username}/messages/${session.value.id}/${uuid}`,
-        file.file,
-        {
-          timeout: 5000,
-          headers: {
-            'Cache-Control': 'max-age=8640000'
-          }
-        }
-      )
-      file.status = 'done'
-      file.message = '上传成功'
-      await sendImageMessage(res.url, 'disappearing')
+const afterReadDisapperingImage = async (file: UploaderFileListItem | UploaderFileListItem[]) => {
+  if (Array.isArray(file)) file = file[0]
+  const url = await uploadImage(file)
+  if (url) {
+    const res = await sendMessage(url, 'disappearing')
+    if (res) {
       disappearingImageList.value = []
       showBottom.value = false
-      nextTick(() => {
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-      })
-    } catch (_) {
-      file.status = 'failed'
-      file.message = '上传失败'
     }
   }
 }
 
-const sendImageMessage = async (url: string, type: 'image' | 'disappearing') => {
-  if (!session.value) return
-  const message: Message = {
-    id: '',
-    content: url,
-    senderId: me.id,
+const sendMessage = async (content: string, type: messageType) => {
+  if (!session.value) return false
+  const message: IClientToServerMessage = {
+    content,
     recipientId: session.value.peer.id,
-    type,
-    timestamp: new Date().toISOString()
+    type
   }
-  await messageStore.sendMessage(session.value, message)
+  try {
+    await messageStore.sendMessage(session.value, message)
+    return true
+  } catch (err) {
+    if (typeof err === 'string') showError(err)
+    else showError('发送失败')
+  }
+  return false
 }
 
 const shouldShowTime = (index: number) => {
@@ -251,30 +225,9 @@ const shouldShowTime = (index: number) => {
 }
 
 const handleSendButtonClicked = async () => {
-  if (!session.value) {
-    showError('会话不存在')
-    return
-  }
-  if (!me) {
-    showError('未登录')
-    return
-  }
-  if (content.value.trim() === '') {
-    return
-  }
-  const message: Message = {
-    id: '',
-    content: content.value,
-    senderId: me.id,
-    recipientId: session.value.peer.id,
-    type: 'text',
-    timestamp: new Date().toISOString()
-  }
-  await messageStore.sendMessage(session.value, message)
-  content.value = ''
-  nextTick(() => {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-  })
+  if (content.value.trim() === '') return
+  const res = await sendMessage(content.value, 'text')
+  if (res) content.value = ''
 }
 
 onActivated(async () => {
@@ -284,26 +237,23 @@ onActivated(async () => {
       name: '404'
     })
   } else {
-    loadImage = 0
     const s = messageStore.sessions.find((s) => s.peer.id === recipientId)
     if (s) {
       session.value = s
-      nextTick(() => {
-        window.scrollTo({ top: document.body.scrollHeight })
-      })
     } else {
       try {
         const s = await messageStore.createSession(recipientId)
         session.value = s
-        nextTick(() => {
-          window.scrollTo({ top: document.body.scrollHeight })
-        })
       } catch (_) {
         router.push({
           name: '404'
         })
+        return
       }
     }
+    nextTick(() => {
+      window.scrollTo({ top: document.body.scrollHeight })
+    })
   }
 })
 

@@ -166,7 +166,7 @@ const afterReadAvatar = async (file: UploaderFileListItem | UploaderFileListItem
       // headers: {
       //   'Cache-Control': 'max-age=86400'
       // },
-      timeout: 5000
+      timeout: 20000
     })
     avatar = res!.url
   } catch (_) {

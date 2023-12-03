@@ -1,8 +1,11 @@
+export type messageType = 'text' | 'image' | 'disappearing'
+
 export interface Message {
-  id: string
+  _id: string
   timestamp: string
-  type: 'text' | 'image' | 'disappearing'
+  type: messageType
   senderId: string
   recipientId: string
   content: string
+  viewed?: boolean
 }
