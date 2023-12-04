@@ -1,14 +1,16 @@
 import { Session } from '@/types/Session'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import socket from '@/socket'
 import messageApi from '@/api/message'
 import meetApi from '@/api/meet'
-import { showError } from '@/utils/show'
-import { useRouter } from 'vue-router'
 import { Message } from '@/types/Message'
 import moment from 'moment'
-import { IClientToServerMessage } from '@/types/socket.io'
+import {
+  ClientToServerEvents,
+  IClientToServerMessage,
+  ServerToClientEvents
+} from '@/types/socket.io'
+import { Socket, io } from 'socket.io-client'
 
 export const useMessageStore = defineStore('message', () => {
   const sessions = ref<Session[]>([])
@@ -32,27 +34,31 @@ export const useMessageStore = defineStore('message', () => {
       }
     }, 0)
   })
+  let socket: Socket<ServerToClientEvents, ClientToServerEvents> | undefined = undefined
 
   // 连接私信服务器
   function connectChatServer(token: string) {
-    socket.auth = { token }
-    socket.connect()
+    socket = io(import.meta.env.VITE_CHAT_SERVER_URL, {
+      auth: { token }
+    })
+    bindEvents()
   }
 
   // 断开私信服务器
   function disconnectChatServer() {
-    socket.disconnect()
+    socket?.disconnect()
   }
 
   // 绑定事件
   function bindEvents() {
     // 连接私信服务器成功
-    socket.on('connect', () => {
+    socket?.on('connect', () => {
       console.log('Connected to chat server')
+      restoreSessions()
     })
 
     // 收到私信
-    socket.on('privateMessage', async (payload) => {
+    socket?.on('privateMessage', async (payload) => {
       const session = fetchSession(payload.sessionId)
       // 如果会话已存在，将消息添加到会话中
       if (session) {
@@ -80,7 +86,7 @@ export const useMessageStore = defineStore('message', () => {
     })
 
     // 收到正在输入事件
-    socket.on('startTyping', (sessionId) => {
+    socket?.on('startTyping', (sessionId) => {
       const session = fetchSession(sessionId)
       if (session) {
         session.isPeerTyping = true
@@ -88,7 +94,7 @@ export const useMessageStore = defineStore('message', () => {
     })
 
     // 收到停止输入事件
-    socket.on('stopTyping', (sessionId) => {
+    socket?.on('stopTyping', (sessionId) => {
       const session = fetchSession(sessionId)
       if (session) {
         session.isPeerTyping = false
@@ -96,14 +102,12 @@ export const useMessageStore = defineStore('message', () => {
     })
 
     // 处理连接错误
-    socket.on('connect_error', (error) => {
-      showError(error.message)
-      const router = useRouter()
-      router.push('/login')
+    socket?.on('connect_error', (error) => {
+      console.warn(error.message)
     })
 
     // 对方查看了自己发送的闪图
-    socket.on('viewDisappearingImage', (sessionId, messageId) => {
+    socket?.on('viewDisappearingImage', (sessionId, messageId) => {
       const session = fetchSession(sessionId)
       if (session) deleteMessage(session, messageId)
     })
@@ -114,6 +118,24 @@ export const useMessageStore = defineStore('message', () => {
     try {
       const res = await messageApi.getSessions()
       sessions.value = res.data.data.sessions
+    } catch (_) {
+      return Promise.reject()
+    }
+  }
+
+  // 断线重连，恢复会话列表
+  async function restoreSessions() {
+    try {
+      const res = await messageApi.getSessions()
+      const restoreSessions = res.data.data.sessions
+      for (const session of restoreSessions) {
+        const index = sessions.value.findIndex((s) => s.id === session.id)
+        if (index === -1) {
+          sessions.value.push(session)
+        } else {
+          Object.assign(sessions.value[index], session)
+        }
+      }
     } catch (_) {
       return Promise.reject()
     }
@@ -151,7 +173,7 @@ export const useMessageStore = defineStore('message', () => {
 
   function sendMessage(session: Session, message: IClientToServerMessage) {
     return new Promise((resolve, reject) => {
-      socket.timeout(5000).emit('privateMessage', message, (err, res) => {
+      socket?.timeout(5000).emit('privateMessage', message, (err, res) => {
         if (err) reject(err)
         if (res.type === 'ERROR') {
           reject(res.message)
@@ -168,7 +190,7 @@ export const useMessageStore = defineStore('message', () => {
 
   function startTyping(session: Session) {
     if (!session.id) return
-    socket.emit('startTyping', session.id, (res) => {
+    socket?.emit('startTyping', session.id, (res) => {
       if (res.type === 'ERROR') {
         console.warn(res.message)
       }
@@ -177,7 +199,7 @@ export const useMessageStore = defineStore('message', () => {
 
   function stopTyping(session: Session) {
     if (!session.id) return
-    socket.emit('stopTyping', session.id, (res) => {
+    socket?.emit('stopTyping', session.id, (res) => {
       if (res.type === 'ERROR') {
         console.warn(res.message)
       }
@@ -186,7 +208,7 @@ export const useMessageStore = defineStore('message', () => {
 
   function viewDisappearingImage(session: Session, message: Message) {
     return new Promise((resolve, reject) => {
-      socket.timeout(5000).emit('viewDisappearingImage', session.id, message._id, (err, res) => {
+      socket?.timeout(5000).emit('viewDisappearingImage', session.id, message._id, (err, res) => {
         if (err) {
           reject(err)
         }
@@ -200,7 +222,7 @@ export const useMessageStore = defineStore('message', () => {
   }
 
   function readMessages(session: Session) {
-    socket.timeout(5000).emit('readMessages', session.id, (err, res) => {
+    socket?.timeout(5000).emit('readMessages', session.id, (err, res) => {
       if (err) {
         console.warn(err)
       } else if (res.type === 'ERROR') {

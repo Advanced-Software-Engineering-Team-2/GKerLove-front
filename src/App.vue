@@ -1,11 +1,4 @@
-<script setup lang="ts">
-import socket from '@/socket'
-import { useMessageStore } from './stores/message'
-
-socket.off()
-const messageStore = useMessageStore()
-messageStore.bindEvents()
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <van-config-provider theme="dark" />
