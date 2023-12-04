@@ -1,6 +1,7 @@
 <template>
   <div class="chat-view">
-    <ul class="user-list">
+    <van-empty description="暂无消息" v-if="!messageStore.sortedSessions.length" />
+    <ul class="user-list" v-else>
       <li v-for="session in messageStore.sortedSessions" :key="session.id">
         <router-link :to="{ name: 'chatWindow', params: { id: session.peer.id } }">
           <div class="user">
