@@ -141,7 +141,7 @@ const showDisappearingImage = async (message: Message) => {
         showPreview.value = true
         setTimeout(() => {
           showPreview.value = false
-        }, 1000)
+        }, 10000)
       } catch (err) {
         if (typeof err === 'string') showError(err)
         else showError('查看失败')
