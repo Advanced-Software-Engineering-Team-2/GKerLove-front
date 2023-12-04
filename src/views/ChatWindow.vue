@@ -206,7 +206,8 @@ const sendMessage = async (content: string, type: messageType) => {
   const message: IClientToServerMessage = {
     content,
     recipientId: session.value.peer.id,
-    type
+    type,
+    timestamp: new Date().toISOString()
   }
   try {
     await messageStore.sendMessage(session.value, message)
