@@ -263,10 +263,12 @@ onActivated(async () => {
 
 watch(
   () => session.value?.messages.length,
-  () => {
-    nextTick(() => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-    })
+  (newValue, oldValue) => {
+    if (newValue && oldValue && newValue > oldValue) {
+      nextTick(() => {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+      })
+    }
   }
 )
 
