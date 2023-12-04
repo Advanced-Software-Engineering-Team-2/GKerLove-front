@@ -8,12 +8,14 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BackNavBar: typeof import('./src/components/BackNavBar.vue')['default']
-    ChatIcon: typeof import('./src/components/icons/chatIcon.vue')['default']
+    ChatIcon: typeof import('./src/components/icons/ChatIcon.vue')['default']
     DisappearingImageMessage: typeof import('./src/components/messages/DisappearingImageMessage.vue')['default']
     DislikeIcon: typeof import('./src/components/icons/DislikeIcon.vue')['default']
+    FemaleIcon: typeof import('./src/components/icons/FemaleIcon.vue')['default']
     ImageMessage: typeof import('./src/components/messages/ImageMessage.vue')['default']
     LikeIcon: typeof import('./src/components/icons/LikeIcon.vue')['default']
     LoadingCard: typeof import('./src/components/LoadingCard.vue')['default']
+    MaleIcon: typeof import('./src/components/icons/MaleIcon.vue')['default']
     Message: typeof import('./src/components/messages/Message.vue')['default']
     PostCard: typeof import('./src/components/PostCard.vue')['default']
     PostCardHeader: typeof import('./src/components/PostCardHeader.vue')['default']

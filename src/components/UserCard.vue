@@ -12,13 +12,14 @@
       <h1 class="username">
         <van-space>
           <span>{{ user.username }}</span>
+          <male-icon class="gender-icon" v-if="user.gender && user.gender === '男'" />
+          <female-icon class="gender-icon" v-if="user.gender && user.gender === '女'" />
           <van-tag v-if="user.online" type="success" size="large">在线</van-tag>
           <van-tag v-else-if="user.lastOnline" type="warning" size="large">
             {{ '上次在线: ' + getLastOnlineInfo(user.lastOnline) }}
           </van-tag>
         </van-space>
       </h1>
-      <p>性别： {{ user.gender ? user.gender : '未填写' }}</p>
       <p>年龄： {{ user.age ? user.age : '未填写' }}</p>
       <p>所在城市： {{ user.city ? user.city : '未填写' }}</p>
       <p>培养单位： {{ user.institute ? user.institute : '未填写' }}</p>
@@ -61,6 +62,11 @@ const getLastOnlineInfo = (lastOnline: string) => {
     padding: 10px;
     position: absolute;
     bottom: 0;
+  }
+
+  .gender-icon {
+    width: 2rem;
+    height: 2rem;
   }
 }
 </style>
