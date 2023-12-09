@@ -32,7 +32,7 @@
         class="user-input"
         v-model="content"
         type="textarea"
-        maxlength="50"
+        maxlength="500"
         show-word-limit
         @focus="messageStore.startTyping(session)"
         @blur="messageStore.stopTyping(session)"

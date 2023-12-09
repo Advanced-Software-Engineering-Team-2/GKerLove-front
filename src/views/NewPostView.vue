@@ -10,7 +10,7 @@
           autosize
           label="内容"
           type="textarea"
-          maxlength="200"
+          maxlength="500"
           placeholder="和大家交流一下想法和感受吧..."
           show-word-limit
           center
