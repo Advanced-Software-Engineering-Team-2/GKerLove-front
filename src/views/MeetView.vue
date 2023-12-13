@@ -6,7 +6,7 @@
       image-size="8rem"
       v-if="!meetStore.userList.length"
     />
-    <van-swipe class="swipe" lazy-render :show-indicators="false" v-else>
+    <van-swipe v-else class="swipe" lazy-render :show-indicators="false" :loop="false">
       <van-swipe-item v-for="user in meetStore.userList" :key="user.id">
         <user-card :user="user" class="user-card" @click="router.push(`/user/${user.id}`)" />
       </van-swipe-item>

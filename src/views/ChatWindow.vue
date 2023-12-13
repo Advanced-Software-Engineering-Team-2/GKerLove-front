@@ -141,7 +141,7 @@ const showDisappearingImage = async (message: Message) => {
         showPreview.value = true
         setTimeout(() => {
           showPreview.value = false
-        }, 10000)
+        }, 5000)
       } catch (err) {
         if (typeof err === 'string') showError(err)
         else showError('查看失败')
@@ -160,7 +160,9 @@ const uploadImage = async (file: UploaderFileListItem) => {
   try {
     const uuid = uuidv4()
     const res = await userStore.OSSUtil.put(
-      `${me.username}/messages/${session.value.id}/${uuid}`,
+      `${me.username}/messages/${session.value.id}/${uuid}.${
+        file.file?.type?.split('/')[1] || 'jpg'
+      }`,
       file.file,
       {
         timeout: 20000,
