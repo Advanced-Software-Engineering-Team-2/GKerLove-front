@@ -71,7 +71,6 @@
             />
             <van-divider />
           </div>
-          <van-back-top right="10vw" bottom="10vh" />
         </div>
       </div>
     </div>

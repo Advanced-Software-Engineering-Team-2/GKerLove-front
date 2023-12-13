@@ -20,7 +20,6 @@
         </div>
       </van-list>
     </van-pull-refresh>
-    <van-back-top right="10vw" bottom="10vh" />
   </div>
 </template>
 

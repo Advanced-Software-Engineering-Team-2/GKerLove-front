@@ -24,7 +24,6 @@ declare module 'vue' {
     TextMessage: typeof import('./src/components/messages/TextMessage.vue')['default']
     UserCard: typeof import('./src/components/UserCard.vue')['default']
     UserList: typeof import('./src/components/UserList.vue')['default']
-    VanBackTop: typeof import('vant/es')['BackTop']
     VanBadge: typeof import('vant/es')['Badge']
     VanButton: typeof import('vant/es')['Button']
     VanCellGroup: typeof import('vant/es')['CellGroup']
