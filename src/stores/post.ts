@@ -73,9 +73,9 @@ export const usePostStore = defineStore('post', () => {
     }
   }
 
-  async function commentOnPost(postId: string, content: string) {
+  async function commentOnPost(postId: string, content: string, anonymous: boolean) {
     try {
-      const res = await postApi.commentOnPost(postId, content)
+      const res = await postApi.commentOnPost(postId, content, anonymous)
       showSuccess(res.data.message)
       return res.data.data.comment
     } catch (_) {
@@ -102,11 +102,13 @@ export const usePostStore = defineStore('post', () => {
     }
   }
 
-  async function addPost(content: string, imageIds: string[]) {
+  async function addPost(content: string, imageIds: string[], anonymous: boolean) {
     try {
-      const res = await postApi.addPost(content, imageIds)
+      const res = await postApi.addPost(content, imageIds, anonymous)
       const post = res.data.data.post
-      myPosts.value.unshift(post)
+      if (!anonymous) {
+        myPosts.value.unshift(post)
+      }
       showSuccess(res.data.message)
     } catch (_) {
       return Promise.reject()

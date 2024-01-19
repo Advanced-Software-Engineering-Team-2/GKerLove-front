@@ -25,6 +25,11 @@
             />
           </template>
         </van-field>
+        <van-field label="匿名发布" center>
+          <template #input>
+            <van-switch v-model="anonymous" />
+          </template>
+        </van-field>
       </van-cell-group>
       <div style="margin: 16px">
         <van-button color="blue" round block type="primary" @click="handleSubmitButtonClicked">
@@ -50,6 +55,7 @@ const postStore = usePostStore()
 
 const content = ref('')
 const imageList = ref([])
+const anonymous = ref(false)
 let imageUrls: string[] = []
 
 const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem[]) => {
@@ -80,7 +86,7 @@ const afterReadImage = async (files: UploaderFileListItem | UploaderFileListItem
 
 const handleSubmitButtonClicked = async () => {
   try {
-    await postStore.addPost(content.value, imageUrls)
+    await postStore.addPost(content.value, imageUrls, anonymous.value)
     content.value = ''
     imageList.value = []
     imageUrls = []

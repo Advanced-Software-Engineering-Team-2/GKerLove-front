@@ -4,10 +4,11 @@ import type { R } from '@/types/R'
 import type { Post, Comment } from '@/types/Post'
 import type { Page } from '@/types/Page'
 
-function addPost(content: string, imageList: string[]) {
+function addPost(content: string, imageList: string[], anonymous: boolean) {
   return request.post<R<{ post: Post }>>('/post', {
     content,
-    imageList
+    imageList,
+    anonymous
   })
 }
 
@@ -31,9 +32,10 @@ function getPostById(postId: string) {
   return request.get<R<{ post: Post | undefined }>>(`/post/${postId}`)
 }
 
-function commentOnPost(postId: string, content: string) {
+function commentOnPost(postId: string, content: string, anonymous: boolean) {
   return request.post<R<{ comment: Comment }>>(`/post/comment/${postId}`, {
-    content
+    content,
+    anonymous
   })
 }
 

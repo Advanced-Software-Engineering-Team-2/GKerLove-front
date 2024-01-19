@@ -14,7 +14,13 @@
           <post-card
             :post="post"
             @body-clicked="router.push(`/post/${post.id}?source=posts`)"
-            @avatar-clicked="router.push(`/user/${post.user.id}`)"
+            @avatar-clicked="
+              () => {
+                if (post.user.id !== 'Anonymous') {
+                  router.push(`/user/${post.user.id}?source=posts`)
+                }
+              }
+            "
           />
           <van-divider />
         </div>

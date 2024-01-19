@@ -32,8 +32,8 @@ const { userList } = toRefs(props)
     margin: 10px;
 
     .avatar {
-      width: 5rem;
-      height: 5rem;
+      width: 4rem;
+      height: 4rem;
     }
 
     .username {

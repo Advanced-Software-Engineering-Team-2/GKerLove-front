@@ -10,7 +10,13 @@
         <post-card
           v-if="post"
           :post="post"
-          @avatar-clicked="router.push(`/user/${post.user.id}`)"
+          @avatar-clicked="
+            () => {
+              if (post && post.user.id !== 'Anonymous') {
+                router.push(`/user/${post.user.id}`)
+              }
+            }
+          "
         />
         <van-divider />
         <loading-card v-if="commentLoading" />
@@ -19,7 +25,13 @@
             <post-card-header
               class="comment-header"
               :post="comment"
-              @avatar-clicked="router.push(`/user/${comment.user.id}`)"
+              @avatar-clicked="
+                () => {
+                  if (comment.user.id !== 'Anonymous') {
+                    router.push(`/user/${comment.user.id}`)
+                  }
+                }
+              "
             />
             <div class="comment-body">{{ comment.content }}</div>
             <van-divider />
@@ -27,7 +39,7 @@
         </div>
       </div>
     </div>
-    <van-sticky position="bottom">
+    <van-sticky position="bottom" class="van-safe-area-bottom">
       <van-field
         v-model="comment"
         label="评论"
@@ -36,8 +48,29 @@
         placeholder="输入评论..."
         show-word-limit
       >
-        <template #button>
-          <van-button size="small" type="primary" @click="handleSendButtonClicked">发送</van-button>
+        <template #extra>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 2px;
+              "
+            >
+              匿名：<van-switch v-model="anonymous" size="small" />
+            </div>
+            <van-button size="small" type="primary" @click="handleSendButtonClicked">
+              发送
+            </van-button>
+          </div>
         </template>
       </van-field>
     </van-sticky>
@@ -60,6 +93,7 @@ const postStore = usePostStore()
 
 const post = ref<Post>()
 const comment = ref('')
+const anonymous = ref(false)
 const loading = ref(false)
 const commentLoading = ref(false)
 
@@ -86,7 +120,7 @@ const handleSendButtonClicked = async () => {
   }
   if (!post.value) return
   try {
-    const postedComment = await postStore.commentOnPost(post.value.id, comment.value)
+    const postedComment = await postStore.commentOnPost(post.value.id, comment.value, anonymous.value)
     comment.value = ''
     post.value.commentList.push(postedComment)
     post.value.commentCnt++
