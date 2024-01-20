@@ -48,7 +48,8 @@ export const useUserStore = defineStore('user', () => {
       const messageStore = useMessageStore()
       await messageStore.initSessions()
       messageStore.connectChatServer(token.value)
-    } catch (_) {
+    } catch (err) {
+      console.log(err)
       showError('初始化用户失败')
     }
   }

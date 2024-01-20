@@ -215,9 +215,13 @@ export const useMessageStore = defineStore('message', () => {
   function sendMessage(session: Session, message: IClientToServerMessage) {
     return new Promise((resolve, reject) => {
       socket?.timeout(5000).emit('privateMessage', session.id, message, (err, res) => {
-        if (err) reject(err)
+        if (err) {
+          reject(err)
+          return
+        }
         if (res.type === 'ERROR') {
           reject(res.message)
+          return
         }
         if (!session.id) {
           session.id = res.data!.sessionId
@@ -252,9 +256,11 @@ export const useMessageStore = defineStore('message', () => {
       socket?.timeout(5000).emit('viewDisappearingImage', session.id, message._id, (err, res) => {
         if (err) {
           reject(err)
+          return
         }
         if (res.type === 'ERROR') {
           reject(res.message)
+          return
         }
         deleteMessage(session, message._id)
         resolve(res)
@@ -294,10 +300,14 @@ export const useMessageStore = defineStore('message', () => {
     return new Promise((resolve, reject) => {
       socket?.timeout(5000).emit('matchRequest', (err, res) => {
         if (err) {
+          isMatching.value = false
           reject(err)
+          return
         }
         if (res.type === 'ERROR') {
+          isMatching.value = false
           reject(res.message)
+          return
         }
         isMatching.value = true
         resolve(res)
@@ -310,9 +320,11 @@ export const useMessageStore = defineStore('message', () => {
       socket?.timeout(5000).emit('matchCancel', (err, res) => {
         if (err) {
           reject(err)
+          return
         }
         if (res.type === 'ERROR') {
           reject(res.message)
+          return
         }
         isMatching.value = false
         resolve(res)
@@ -325,11 +337,12 @@ export const useMessageStore = defineStore('message', () => {
       socket?.timeout(5000).emit('matchLeave', (err, res) => {
         if (err) {
           reject(err)
+          return
         }
         if (res.type === 'ERROR') {
           reject(res.message)
+          return
         }
-        isMatching.value = false
         resolve(res)
       })
     })
