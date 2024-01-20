@@ -8,4 +8,5 @@ export interface Session {
   lastRead?: string
   peerLastRead?: string
   isPeerTyping?: boolean
+  anonymous?: boolean
 }

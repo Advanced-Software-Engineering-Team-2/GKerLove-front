@@ -244,6 +244,14 @@ onActivated(async () => {
     router.push({
       name: '404'
     })
+  } else if (recipientId === 'Anonymous') {
+    session.value = messageStore.matchSession
+    if (!session.value) {
+      router.push({
+        name: '404'
+      })
+      return
+    }
   } else {
     const s = messageStore.sessions.find((s) => s.peer.id === recipientId)
     if (s) {
@@ -276,10 +284,21 @@ watch(
   }
 )
 
-onBeforeRouteLeave(() => {
+onBeforeRouteLeave(async (_to, _from, next) => {
   if (session.value) {
     messageStore.readMessages(session.value)
+    if (session.value.anonymous) {
+      try {
+        await messageStore.matchLeave()
+      } catch (err) {
+        if (typeof err === 'string') showError(err)
+        else showError('离开出错')
+        next(false)
+        return
+      }
+    }
   }
+  next()
 })
 </script>
 

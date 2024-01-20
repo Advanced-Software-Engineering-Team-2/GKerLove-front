@@ -11,6 +11,8 @@ import {
   ServerToClientEvents
 } from '@/types/socket.io'
 import { Socket, io } from 'socket.io-client'
+import router from '@/router'
+import { showDialog } from 'vant'
 
 export const useMessageStore = defineStore('message', () => {
   const sessions = ref<Session[]>([])
@@ -35,6 +37,8 @@ export const useMessageStore = defineStore('message', () => {
     }, 0)
   })
   let socket: Socket<ServerToClientEvents, ClientToServerEvents> | undefined = undefined
+  const matchSession = ref<Session>()
+  const isMatching = ref(false)
 
   // 连接私信服务器
   function connectChatServer(token: string) {
@@ -111,6 +115,40 @@ export const useMessageStore = defineStore('message', () => {
       const session = fetchSession(sessionId)
       if (session) deleteMessage(session, messageId)
     })
+
+    socket?.on('matchSuccess', (sessionId, peerId) => {
+      matchSession.value = {
+        id: sessionId,
+        peer: {
+          id: peerId,
+          username: 'Anonymous',
+          email: 'Anonymous',
+          avatar: 'https://gker-love.oss-cn-beijing.aliyuncs.com/Anonymous.png'
+        },
+        anonymous: true,
+        messages: []
+      }
+      isMatching.value = false
+      router.push({
+        name: 'chatWindow',
+        params: {
+          id: 'Anonymous'
+        }
+      })
+    })
+
+    socket?.on('matchLeave', () => {
+      matchSession.value = undefined
+      showDialog({
+        message: '对方已离开',
+        confirmButtonText: '确定',
+        showCancelButton: false,
+        beforeClose: () => {
+          router.push({ name: 'meet' })
+          return true
+        }
+      })
+    })
   }
 
   // 获取聊天会话列表
@@ -168,12 +206,15 @@ export const useMessageStore = defineStore('message', () => {
   }
 
   function fetchSession(sessionId: string) {
+    if (sessionId === matchSession.value?.id) {
+      return matchSession.value
+    }
     return sessions.value.find((session) => session.id === sessionId)
   }
 
   function sendMessage(session: Session, message: IClientToServerMessage) {
     return new Promise((resolve, reject) => {
-      socket?.timeout(5000).emit('privateMessage', message, (err, res) => {
+      socket?.timeout(5000).emit('privateMessage', session.id, message, (err, res) => {
         if (err) reject(err)
         if (res.type === 'ERROR') {
           reject(res.message)
@@ -249,10 +290,57 @@ export const useMessageStore = defineStore('message', () => {
     return unreadMessages.length
   }
 
+  function matchRequest() {
+    return new Promise((resolve, reject) => {
+      socket?.timeout(5000).emit('matchRequest', (err, res) => {
+        if (err) {
+          reject(err)
+        }
+        if (res.type === 'ERROR') {
+          reject(res.message)
+        }
+        isMatching.value = true
+        resolve(res)
+      })
+    })
+  }
+
+  function matchCancel() {
+    return new Promise((resolve, reject) => {
+      socket?.timeout(5000).emit('matchCancel', (err, res) => {
+        if (err) {
+          reject(err)
+        }
+        if (res.type === 'ERROR') {
+          reject(res.message)
+        }
+        isMatching.value = false
+        resolve(res)
+      })
+    })
+  }
+
+  function matchLeave() {
+    return new Promise((resolve, reject) => {
+      socket?.timeout(5000).emit('matchLeave', (err, res) => {
+        if (err) {
+          reject(err)
+        }
+        if (res.type === 'ERROR') {
+          reject(res.message)
+        }
+        isMatching.value = false
+        resolve(res)
+      })
+    })
+  }
+
   return {
     sessions,
     sortedSessions,
     totalUnread,
+    matchSession,
+    isMatching,
     initSessions,
     fetchSession,
     createSession,
@@ -264,6 +352,9 @@ export const useMessageStore = defineStore('message', () => {
     stopTyping,
     viewDisappearingImage,
     readMessages,
-    countUnreadMessages
+    countUnreadMessages,
+    matchRequest,
+    matchCancel,
+    matchLeave
   }
 })
