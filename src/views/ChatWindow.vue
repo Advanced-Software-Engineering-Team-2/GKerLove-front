@@ -101,7 +101,7 @@ import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router'
 import { User } from '@/types/User'
 import { onBeforeRouteLeave } from 'vue-router'
-import { UploaderFileListItem } from 'vant'
+import { UploaderFileListItem, showConfirmDialog } from 'vant'
 import { v4 as uuidv4 } from 'uuid'
 import type { IClientToServerMessage } from '@/types/socket.io.ts'
 
@@ -285,20 +285,29 @@ watch(
 )
 
 onBeforeRouteLeave(async (_to, _from, next) => {
-  if (session.value) {
-    messageStore.readMessages(session.value)
-    if (session.value.anonymous) {
-      try {
-        await messageStore.matchLeave()
-      } catch (err) {
-        if (typeof err === 'string') showError(err)
-        else showError('离开出错')
-        next(false)
-        return
-      }
-    }
+  if (!session.value) {
+    return next()
   }
-  next()
+
+  messageStore.readMessages(session.value)
+
+  if (!session.value.anonymous || !messageStore.matchSession) {
+    return next()
+  }
+
+  try {
+    await showConfirmDialog({
+      title: '确认离开',
+      message: '聊天记录将会被清空，对方的聊天窗口也会关闭，是否确认离开？'
+    })
+    messageStore.matchLeave()
+    return next()
+  } catch (err) {
+    const errorMessage =
+      typeof err === 'string' ? err : err instanceof Error ? err.message : '离开出错'
+    showError(errorMessage)
+    return next(false)
+  }
 })
 </script>
 

@@ -13,7 +13,7 @@
     </van-swipe>
     <div class="footer">
       <van-button type="success" @click="getUsers()"> 换一批 </van-button>
-      <van-button type="primary" @click="handleMatchClicked"> 匹配 </van-button>
+      <van-button type="primary" @click="handleMatchClicked"> 匿名匹配 </van-button>
     </div>
     <van-dialog
       v-model:show="messageStore.isMatching"
