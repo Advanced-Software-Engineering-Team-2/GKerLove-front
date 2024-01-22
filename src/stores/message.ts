@@ -1,6 +1,6 @@
 import { Session } from '@/types/Session'
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { Ref, computed, ref } from 'vue'
 import messageApi from '@/api/message'
 import meetApi from '@/api/meet'
 import { Message } from '@/types/Message'
@@ -12,7 +12,8 @@ import {
 } from '@/types/socket.io'
 import { Socket, io } from 'socket.io-client'
 import router from '@/router'
-import { showDialog } from 'vant'
+import { showConfirmDialog, showDialog } from 'vant'
+import { showError, showSuccess } from '@/utils/show'
 
 export const useMessageStore = defineStore('message', () => {
   const sessions = ref<Session[]>([])
@@ -24,8 +25,22 @@ export const useMessageStore = defineStore('message', () => {
       )
     })
   })
+
+  let socket: Socket<ServerToClientEvents, ClientToServerEvents> | undefined = undefined
+  const matchSession = ref<Session>()
+  const isMatching = ref(false)
+  const viewProfileStatus: Ref<'NOT_REQUESTED' | 'REQUESTED' | 'ACCEPTED' | 'REJECTED'> =
+    ref('NOT_REQUESTED')
+
+  const totalSessions = computed(() => {
+    const s = [...sessions.value]
+    if (matchSession.value) {
+      s.push(matchSession.value)
+    }
+    return s
+  })
   const totalUnread = computed(() => {
-    return sessions.value.reduce((count, session) => {
+    return totalSessions.value.reduce((count, session) => {
       if (!session.lastRead) {
         return count + session.messages.length
       } else {
@@ -36,9 +51,6 @@ export const useMessageStore = defineStore('message', () => {
       }
     }, 0)
   })
-  let socket: Socket<ServerToClientEvents, ClientToServerEvents> | undefined = undefined
-  const matchSession = ref<Session>()
-  const isMatching = ref(false)
 
   // 连接私信服务器
   function connectChatServer(token: string) {
@@ -140,7 +152,7 @@ export const useMessageStore = defineStore('message', () => {
     socket?.on('matchLeave', () => {
       matchSession.value = undefined
       showDialog({
-        message: '对方已离开',
+        message: '匿名聊天对方已离开匿名聊天会话',
         confirmButtonText: '确定',
         showCancelButton: false,
         beforeClose: () => {
@@ -148,6 +160,34 @@ export const useMessageStore = defineStore('message', () => {
           return true
         }
       })
+    })
+
+    socket?.on('viewProfileRequest', (sessionId) => {
+      if (matchSession.value && matchSession.value.id === sessionId) {
+        showConfirmDialog({
+          message: '匿名聊天对方请求查看你的资料',
+          confirmButtonText: '同意',
+          cancelButtonText: '拒绝'
+        })
+          .then(() => {
+            responseViewProfile(true)
+          })
+          .catch(() => {
+            responseViewProfile(false)
+          })
+      }
+    })
+
+    socket?.on('viewProfileResponse', (sessionId, accept) => {
+      if (matchSession.value && matchSession.value.id === sessionId) {
+        if (accept) {
+          showSuccess('匿名聊天对方同意了你的查看资料请求')
+          viewProfileStatus.value = 'ACCEPTED'
+        } else {
+          showError('匿名聊天对方拒绝了你的查看资料请求')
+          viewProfileStatus.value = 'REJECTED'
+        }
+      }
     })
   }
 
@@ -297,6 +337,12 @@ export const useMessageStore = defineStore('message', () => {
   }
 
   function matchRequest() {
+    if (isMatching.value) {
+      return Promise.reject('正在匹配中')
+    }
+    if (matchSession.value) {
+      return Promise.reject('已有匹配，请先删除匹配')
+    }
     return new Promise((resolve, reject) => {
       socket?.timeout(5000).emit('matchRequest', (err, res) => {
         if (err) {
@@ -344,7 +390,51 @@ export const useMessageStore = defineStore('message', () => {
           return
         }
         resolve(res)
+        matchSession.value = undefined
       })
+    })
+  }
+
+  function requestViewProfile() {
+    return new Promise((resolve, reject) => {
+      if (matchSession.value) {
+        socket?.timeout(5000).emit('viewProfileRequest', matchSession.value.id, (err, res) => {
+          if (err) {
+            reject(err)
+            return
+          }
+          if (res.type === 'ERROR') {
+            reject(res.message)
+            return
+          }
+          viewProfileStatus.value = 'REQUESTED'
+          resolve(res)
+        })
+      } else {
+        reject('没有匹配的会话')
+      }
+    })
+  }
+
+  function responseViewProfile(accept: boolean) {
+    return new Promise((resolve, reject) => {
+      if (matchSession.value) {
+        socket
+          ?.timeout(5000)
+          .emit('viewProfileResponse', matchSession.value.id, accept, (err, res) => {
+            if (err) {
+              reject(err)
+              return
+            }
+            if (res.type === 'ERROR') {
+              reject(res.message)
+              return
+            }
+            resolve(res)
+          })
+      } else {
+        reject('没有匹配的会话')
+      }
     })
   }
 
@@ -354,6 +444,7 @@ export const useMessageStore = defineStore('message', () => {
     totalUnread,
     matchSession,
     isMatching,
+    viewProfileStatus,
     initSessions,
     fetchSession,
     createSession,
@@ -368,6 +459,8 @@ export const useMessageStore = defineStore('message', () => {
     countUnreadMessages,
     matchRequest,
     matchCancel,
-    matchLeave
+    matchLeave,
+    requestViewProfile,
+    responseViewProfile
   }
 })

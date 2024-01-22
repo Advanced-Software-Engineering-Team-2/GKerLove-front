@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     BackNavBar: typeof import('./src/components/BackNavBar.vue')['default']
     ChatIcon: typeof import('./src/components/icons/ChatIcon.vue')['default']
+    ChatItem: typeof import('./src/components/ChatItem.vue')['default']
     DisappearingImageMessage: typeof import('./src/components/messages/DisappearingImageMessage.vue')['default']
     DislikeIcon: typeof import('./src/components/icons/DislikeIcon.vue')['default']
     FemaleIcon: typeof import('./src/components/icons/FemaleIcon.vue')['default']
@@ -34,6 +35,7 @@ declare module 'vue' {
     VanEmpty: typeof import('vant/es')['Empty']
     VanField: typeof import('vant/es')['Field']
     VanForm: typeof import('vant/es')['Form']
+    VanIcon: typeof import('vant/es')['Icon']
     VanImage: typeof import('vant/es')['Image']
     VanImagePreview: typeof import('vant/es')['ImagePreview']
     VanList: typeof import('vant/es')['List']

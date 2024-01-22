@@ -100,11 +100,12 @@ const handleLogoutButtonClicked = async () => {
   try {
     messageStore.disconnectChatServer()
     user.$reset()
-    showSuccess('退出登录成功')
-    router.push({
-      name: 'login'
-    })
-    user.$reset()
+    // showSuccess('退出登录成功')
+    // router.push({
+    //   name: 'login'
+    // })
+    // user.$reset()
+    window.location.href = '/'
   } catch (err) {
     console.log(err)
   }

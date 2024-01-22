@@ -1,8 +1,23 @@
 <template>
   <van-sticky>
-    <back-nav-bar
+    <van-nav-bar
+      left-arrow
       :title="session?.isPeerTyping ? '对方正在输入...' : session?.peer.username || '聊天'"
-    />
+      @click-left="router.back()"
+      :border="false"
+      safe-area-inset-top
+    >
+      <template #right>
+        <van-button
+          v-if="session?.anonymous"
+          type="danger"
+          size="small"
+          @click="handleDestroyButtonClicked"
+        >
+          删除
+        </van-button>
+      </template>
+    </van-nav-bar>
   </van-sticky>
 
   <div class="chat-window" v-if="session">
@@ -13,14 +28,7 @@
         :message="message"
         :author="message.senderId === session.peer.id ? session.peer : me"
         :show-time="shouldShowTime(index)"
-        @avatar-clicked="
-          router.push({
-            name: 'userDetail',
-            params: {
-              id: message.senderId
-            }
-          })
-        "
+        @avatar-clicked="handleAvatarClicked(message)"
         @image-clicked="showImage"
         @image-loaded="handleImageLoaded"
         @disappearing-image-clicked="showDisappearingImage"
@@ -94,7 +102,7 @@ import moment from 'moment'
 import { useMessageStore } from '@/stores/message'
 import { useUserStore } from '@/stores/user'
 import { Session } from '@/types/Session'
-import { showError } from '@/utils/show'
+import { showError, showWarning } from '@/utils/show'
 import type { Message, messageType } from '@/types/Message'
 import { nextTick, onActivated, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -238,6 +246,21 @@ const handleSendButtonClicked = async () => {
   if (res) content.value = ''
 }
 
+const handleDestroyButtonClicked = async () => {
+  try {
+    await showConfirmDialog({
+      title: '确认删除',
+      message: '聊天记录将被清空，对方的聊天窗口也会删除，是否确认删除？'
+    })
+    messageStore.matchLeave()
+    router.push({ name: 'meet' })
+  } catch (err) {
+    const errorMessage =
+      typeof err === 'string' ? err : err instanceof Error ? err.message : '离开出错'
+    showError(errorMessage)
+  }
+}
+
 onActivated(async () => {
   const recipientId = route.params.id
   if (!recipientId || Array.isArray(recipientId)) {
@@ -288,27 +311,55 @@ onBeforeRouteLeave(async (_to, _from, next) => {
   if (!session.value) {
     return next()
   }
-
   messageStore.readMessages(session.value)
-
-  if (!session.value.anonymous || !messageStore.matchSession) {
-    return next()
-  }
-
-  try {
-    await showConfirmDialog({
-      title: '确认离开',
-      message: '聊天记录将会被清空，对方的聊天窗口也会关闭，是否确认离开？'
-    })
-    messageStore.matchLeave()
-    return next()
-  } catch (err) {
-    const errorMessage =
-      typeof err === 'string' ? err : err instanceof Error ? err.message : '离开出错'
-    showError(errorMessage)
-    return next(false)
-  }
+  return next()
 })
+
+const handleAvatarClicked = (message: Message) => {
+  console.log(message)
+  console.log(session.value)
+  console.log(messageStore.viewProfileStatus)
+
+  if (message.senderId === me.id) {
+    router.push({
+      name: 'userDetail',
+      params: {
+        id: me.id
+      }
+    })
+  } else {
+    if (!session.value?.anonymous) {
+      router.push({
+        name: 'userDetail',
+        params: {
+          id: session.value?.peer.id
+        }
+      })
+    } else {
+      if (messageStore.viewProfileStatus === 'ACCEPTED') {
+        router.push({
+          name: 'userDetail',
+          params: {
+            id: session.value?.peer.id
+          }
+        })
+      } else if (messageStore.viewProfileStatus === 'REQUESTED') {
+        showWarning('正在等待对方确认')
+      } else if (messageStore.viewProfileStatus === 'REJECTED') {
+        showError('匿名聊天对方拒绝了你的查看资料请求')
+      } else if (messageStore.viewProfileStatus === 'NOT_REQUESTED') {
+        showConfirmDialog({
+          title: '查看资料',
+          message: '对方是匿名用户，查看资料需要对方同意，是否发送查看请求？'
+        })
+          .then(() => {
+            messageStore.requestViewProfile()
+          })
+          .catch(() => {})
+      }
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">
