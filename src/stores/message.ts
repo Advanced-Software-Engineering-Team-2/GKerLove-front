@@ -153,12 +153,15 @@ export const useMessageStore = defineStore('message', () => {
     socket?.on('matchLeave', () => {
       matchSession.value = undefined
       viewProfileStatus.value = 'NOT_REQUESTED'
+      const route = router.currentRoute.value
       showDialog({
         message: '匿名聊天对方已离开匿名聊天会话',
         confirmButtonText: '确定',
         showCancelButton: false,
         beforeClose: () => {
-          router.push({ name: 'meet' })
+          if (route.name === 'chatWindow' && route.params.id === 'Anonymous') {
+            router.push({ name: 'meet' })
+          }
           return true
         }
       })
@@ -393,7 +396,7 @@ export const useMessageStore = defineStore('message', () => {
         }
         resolve(res)
         matchSession.value = undefined
-        viewProfileStatue.value = 'NOT_REQUESTED'
+        viewProfileStatus.value = 'NOT_REQUESTED'
       })
     })
   }
