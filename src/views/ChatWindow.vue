@@ -316,10 +316,6 @@ onBeforeRouteLeave(async (_to, _from, next) => {
 })
 
 const handleAvatarClicked = (message: Message) => {
-  console.log(message)
-  console.log(session.value)
-  console.log(messageStore.viewProfileStatus)
-
   if (message.senderId === me.id) {
     router.push({
       name: 'userDetail',

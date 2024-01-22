@@ -81,7 +81,6 @@
 import router from '@/router'
 import { useUserStore } from '@/stores/user'
 import { useMessageStore } from '@/stores/message'
-import { showSuccess } from '@/utils/show'
 import { ref } from 'vue'
 import { usePreserveScroll } from '@/hooks/usePreserveScroll'
 import { usePostStore } from '@/stores/post'
