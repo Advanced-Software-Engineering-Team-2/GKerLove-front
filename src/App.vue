@@ -10,7 +10,7 @@
             :is="Component"
             :key="
               route.name === 'meet' ||
-              route.name === 'chat' ||
+              route.name === 'message' ||
               route.name === 'post' ||
               route.name === 'home'
                 ? 'MainLayout'

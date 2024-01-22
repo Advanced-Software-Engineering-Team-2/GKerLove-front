@@ -128,6 +128,7 @@ export const useMessageStore = defineStore('message', () => {
       if (session) deleteMessage(session, messageId)
     })
 
+    // 匹配成功
     socket?.on('matchSuccess', (sessionId, peerId) => {
       matchSession.value = {
         id: sessionId,
@@ -150,6 +151,7 @@ export const useMessageStore = defineStore('message', () => {
       })
     })
 
+    // 对方离开
     socket?.on('matchLeave', () => {
       matchSession.value = undefined
       viewProfileStatus.value = 'NOT_REQUESTED'
@@ -167,6 +169,7 @@ export const useMessageStore = defineStore('message', () => {
       })
     })
 
+    // 对方请求查看资料
     socket?.on('viewProfileRequest', (sessionId) => {
       if (matchSession.value && matchSession.value.id === sessionId) {
         showConfirmDialog({
@@ -183,6 +186,7 @@ export const useMessageStore = defineStore('message', () => {
       }
     })
 
+    // 对方同意/拒绝查看资料
     socket?.on('viewProfileResponse', (sessionId, accept) => {
       if (matchSession.value && matchSession.value.id === sessionId) {
         if (accept) {
