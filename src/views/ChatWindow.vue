@@ -112,9 +112,11 @@ import { onBeforeRouteLeave } from 'vue-router'
 import { UploaderFileListItem, showConfirmDialog } from 'vant'
 import { v4 as uuidv4 } from 'uuid'
 import type { IClientToServerMessage } from '@/types/socket.io.ts'
+import { useMatchStore } from '@/stores/match'
 
 const userStore = useUserStore()
 const messageStore = useMessageStore()
+const matchStore = useMatchStore()
 const route = useRoute()
 const router = useRouter()
 
@@ -252,7 +254,7 @@ const handleDestroyButtonClicked = async () => {
       title: '确认删除',
       message: '聊天记录将被清空，对方的聊天窗口也会删除，是否确认删除？'
     })
-    messageStore.matchLeave()
+    matchStore.matchLeave()
     router.push({ name: 'meet' })
   } catch (err) {
     const errorMessage =
@@ -268,7 +270,7 @@ onActivated(async () => {
       name: '404'
     })
   } else if (recipientId === 'Anonymous') {
-    session.value = messageStore.matchSession
+    session.value = matchStore.matchSession
     if (!session.value) {
       router.push({
         name: '404'
@@ -332,24 +334,24 @@ const handleAvatarClicked = (message: Message) => {
         }
       })
     } else {
-      if (messageStore.viewProfileStatus === 'ACCEPTED') {
+      if (matchStore.viewProfileStatus === 'ACCEPTED') {
         router.push({
           name: 'userDetail',
           params: {
             id: session.value?.peer.id
           }
         })
-      } else if (messageStore.viewProfileStatus === 'REQUESTED') {
+      } else if (matchStore.viewProfileStatus === 'REQUESTED') {
         showWarning('正在等待对方确认')
-      } else if (messageStore.viewProfileStatus === 'REJECTED') {
+      } else if (matchStore.viewProfileStatus === 'REJECTED') {
         showError('匿名聊天对方拒绝了你的查看资料请求')
-      } else if (messageStore.viewProfileStatus === 'NOT_REQUESTED') {
+      } else if (matchStore.viewProfileStatus === 'NOT_REQUESTED') {
         showConfirmDialog({
           title: '查看资料',
           message: '对方是匿名用户，查看资料需要对方同意，是否发送查看请求？'
         })
           .then(() => {
-            messageStore.requestViewProfile()
+            matchStore.requestViewProfile()
           })
           .catch(() => {})
       }

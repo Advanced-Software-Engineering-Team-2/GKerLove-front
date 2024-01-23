@@ -39,7 +39,13 @@ interface ClientToServerEvents {
   startTyping: (sessionId: string, callback: (res: R) => void) => void
   stopTyping: (sessionId: string, callback: (res: R) => void) => void
   readMessages: (sessionId: string, callback: (res: R) => void) => void
-  matchRequest: (callback: (res: R) => void) => void
+  matchRequest: (
+    condition: {
+      diffGender: boolean
+      noPreviousMatch: boolean
+    },
+    callback: (res: R) => void
+  ) => void
   matchCancel: (callback: (res: R) => void) => void
   matchLeave: (callback: (res: R) => void) => void
   viewProfileRequest: (sessionId: string, callback: (res: R) => void) => void
