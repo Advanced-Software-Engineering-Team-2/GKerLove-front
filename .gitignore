@@ -30,3 +30,6 @@ coverage
 # For test
 test.vue
 testComponent.vue
+
+# For deploy
+deploy.mjs
