@@ -80,7 +80,7 @@
 <script setup lang="ts">
 import router from '@/router'
 import { useUserStore } from '@/stores/user'
-import { useMessageStore } from '@/stores/message'
+import { disconnectChatServer } from '@/socket'
 import { ref } from 'vue'
 import { usePreserveScroll } from '@/hooks/usePreserveScroll'
 import { usePostStore } from '@/stores/post'
@@ -89,7 +89,6 @@ import { useMeetStore } from '@/stores/meet'
 const user = useUserStore()
 const postStore = usePostStore()
 const meetStore = useMeetStore()
-const messageStore = useMessageStore()
 const root = ref<HTMLElement | undefined>()
 const loading = ref(true)
 
@@ -97,7 +96,7 @@ usePreserveScroll(root, 'home')
 
 const handleLogoutButtonClicked = async () => {
   try {
-    messageStore.disconnectChatServer()
+    disconnectChatServer()
     user.$reset()
     // showSuccess('退出登录成功')
     // router.push({
