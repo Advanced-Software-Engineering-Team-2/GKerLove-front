@@ -42,7 +42,7 @@ export const useMatchStore = defineStore('match', () => {
       viewProfileStatus.value = 'NOT_REQUESTED'
       const route = router.currentRoute.value
       showDialog({
-        message: '匿名聊天对方已离开匿名聊天会话',
+        message: '匿名聊天对方已删除匿名聊天会话',
         confirmButtonText: '确定',
         showCancelButton: false,
         beforeClose: () => {
