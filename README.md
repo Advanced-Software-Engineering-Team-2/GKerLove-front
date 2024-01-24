@@ -1,46 +1,33 @@
-# soul
+# GKerLove-front
 
-This template should help get you started developing with Vue 3 in Vite.
+果壳之恋前端项目
 
-## Recommended IDE Setup
+## 运行
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+安装依赖：
 
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
+```shell
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+开发环境：
 
-```sh
+```shell
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+打包构建：
 
-```sh
+```shell
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+## 配置后端服务器地址和聊天服务器地址
 
-```sh
-npm run lint
-```
+修改 *.env.development*中的*VITE_API_URL*为后端服务器地址，*VITE_CHAT_SERVER_URL*为聊天服务器地址。
+
+## 项目结构
+
+在*components*中编写组件，在*views*编写视图，在*stores*中编写业务逻辑，在*api*中编写与后端服务器交互的接口。
+
+整个数据流：后端 <=> api <=> stores <=> views <=> components。
