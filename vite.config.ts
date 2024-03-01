@@ -9,7 +9,7 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: 'https://love.gkers.cqupt-gyr.xyz',
+  base: 'https://love.gkers.top',
   plugins: [
     vue(),
     Components({
@@ -24,16 +24,18 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  server: {
+    port: 15189,
+    strictPort: false
+    //   cors: true,
+    //   proxy: {
+    //     '/api': {
+    //       target: 'https://back.love.gkers.cqupt-gyr.xyz:1111',
+    //       changeOrigin: true,
+    //       ws: true,
+    //       rewrite: (path) => path.replace(/^\/api/, '')
+    //     }
+    //   }
   }
-  // server: {
-  //   cors: true,
-  //   proxy: {
-  //     '/api': {
-  //       target: 'https://back.love.gkers.cqupt-gyr.xyz:1111',
-  //       changeOrigin: true,
-  //       ws: true,
-  //       rewrite: (path) => path.replace(/^\/api/, '')
-  //     }
-  //   }
-  // }
 })
